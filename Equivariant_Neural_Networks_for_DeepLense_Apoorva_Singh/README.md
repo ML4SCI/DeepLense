@@ -1,0 +1,1 @@
+Apoorva Vikram Singh - Equivariant Neural Networks for Dark Matter Morphology with Strong Gravitational Lensing
