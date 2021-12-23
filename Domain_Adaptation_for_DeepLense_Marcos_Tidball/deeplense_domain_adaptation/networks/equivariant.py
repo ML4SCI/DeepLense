@@ -3,7 +3,7 @@ from e2cnn import gspaces
 import e2cnn.nn as e2nn
 
 class Encoder(nn.Module):
-    def __init__(self, features_size=256, sym_group='Dihyderal', N=2):
+    def __init__(self, features_size=256, sym_group='Dihedral', N=2):
         """
         Equivariant neural network receives that images and encodes them into an array of size `features_size`.
         NEED TO DOWNGRADE VERSIONS: !pip install torch==1.4 torchvision==0.5
@@ -13,7 +13,7 @@ class Encoder(nn.Module):
         features_size: int
             Size of encoded features array.
 
-        sym_group: str ['Dihyderal', 'Circular']
+        sym_group: str ['Dihedral', 'Circular']
             Kind of symmetry group to consider.
 
         N: int
@@ -22,7 +22,7 @@ class Encoder(nn.Module):
 
         super(Encoder, self).__init__()
 
-        if sym_group == 'Dihyderal':
+        if sym_group == 'Dihedral':
             self.r2_act = gspaces.FlipRot2dOnR2(N=N)
 
         elif sym_group == 'Circular':

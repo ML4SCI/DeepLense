@@ -1,5 +1,5 @@
 from torch import nn
-from torchvision.models import resnet18, resnet50#, wide_resnet50_2
+from torchvision.models import resnet18, resnet50
 
 class Encoder(nn.Module):
     def __init__(self, resnet, three_channels=False, pretrained=False, features_size=256):
@@ -27,8 +27,6 @@ class Encoder(nn.Module):
             self.resnet = resnet18(pretrained=pretrained)
         elif resnet == '50':
             self.resnet = resnet50(pretrained=pretrained)
-        #elif resnet == 'wide':
-        #    self.resnet = wide_resnet50_2(pretrained=pretrained)
 
         if three_channels:
             self.resnet.conv1 = nn.Conv2d(3, 64, kernel_size=(7, 7), stride=(2, 2), padding=(3, 3), bias=False)

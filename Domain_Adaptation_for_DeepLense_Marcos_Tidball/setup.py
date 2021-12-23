@@ -5,7 +5,7 @@ with open("README.md", "r", encoding="utf-8") as f:
 
 setup(
     name = 'deeplense_domain_adaptation',
-    version = '0.1.0',
+    version = '0.2.0',
     license='MIT',
     description = 'A PyTorch-based collection of Unsupervised Domain Adaptation methods applied to strong gravitational lenses',
     long_description=long_description,
@@ -22,9 +22,10 @@ setup(
     keywords = ['Gravitational Lensing', 'Unsupervised Domain Adaptation', 'Deep Learning', 'Dark Matter'],
     install_requires=[
         'numpy==1.21.2',
-        'torch==1.9.0',
-        'e2cnn==0.1.9',
-        'torchvision==0.10.0',
+        'torch==1.9.1',
+        'torchvision==0.10.1',
+        'e2cnn==0.1.7',
+        'geffnet==1.0.2',
         'matplotlib==3.4.3',
         'scikit-learn==0.24.2',
         'scipy==1.7.1',
