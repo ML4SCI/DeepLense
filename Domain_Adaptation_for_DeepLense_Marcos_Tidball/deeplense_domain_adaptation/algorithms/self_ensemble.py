@@ -98,7 +98,7 @@ class SelfEnsemble(Supervised):
 
         # configure optimizers and schedulers
         student_optimizer = optim.Adam(list(self.student_encoder.parameters()) + list(self.student_classifier.parameters()), lr=lr_student, weight_decay=wd)
-        teacher_optimizer = self._EMA(self.student_encoder, self.student_classifier, self.encoder, self.classifier)
+        teacher_optimizer = self._EMA(list(self.student_encoder.parameters()) + list(self.student_classifier.parameters()), list(self.encoder.parameters()) + list(self.classifier.parameters()))
         if cyclic_scheduler:
             scheduler = optim.lr_scheduler.OneCycleLR(student_optimizer, lr_student, epochs=epochs, steps_per_epoch=iters)
 
@@ -125,7 +125,7 @@ class SelfEnsemble(Supervised):
 
             running_supervised_loss = 0.0
             running_unsupervised_loss = 0.0
-            running_unsupervised_mask_count = 0.0 # best teacher_net is the one with largest unsupervised_mask_count
+            running_unsupervised_mask_count = 0.0
 
             for (data_source, labels_source), (data_target_student, _), (data_target_teacher, _) in zip(source_dataloader, target_dataloader_student, target_dataloader_teacher):
                 data_source = data_source.to(self.device)
@@ -256,32 +256,21 @@ class SelfEnsemble(Supervised):
         Exponential moving average weight optimizer for mean teacher model.
         The student network is trained with gradient descent while the weigts of the teacher network are an exponential moving average of the student's.
         """
-        def __init__(self, source_encoder, source_classifier, target_encoder, target_classifier, alpha=0.99):        
+        def __init__(self, student_parameters, teacher_parameters, alpha=0.999):        
             # get network parameters (weights)
-            source_encoder_params = list(source_encoder.state_dict().values())
-            source_classifier_params = list(source_classifier.state_dict().values())
-            target_encoder_params = list(target_encoder.state_dict().values())
-            target_classifier_params = list(target_classifier.state_dict().values())
+            self.student_parameters = student_parameters
+            self.teacher_parameters = teacher_parameters
             self.alpha = alpha
-
-            self.source_params = source_encoder_params + source_classifier_params
-            self.target_params = target_encoder_params + target_classifier_params
-
-            for tgt_p, src_p in zip(self.target_params, self.source_params):
-                try:
-                    tgt_p[:] = src_p[:] 
-                except IndexError as e:
-                    tgt_p = src_p 
 
         def step(self):
             one_minus_alpha = 1.0 - self.alpha
-            for tgt_p, src_p in zip(self.target_params, self.source_params):
-                try:
-                    tgt_p.mul_(self.alpha)
-                    tgt_p.add_(src_p * one_minus_alpha)
-                except RuntimeError as e:
-                    tgt_p.mul_(int(self.alpha))
-                    tgt_p.add_((src_p * one_minus_alpha).long())
+            
+            for student_p, teacher_p in zip(self.student_parameters, self.teacher_parameters):
+                tmp = student_p.clone().detach()
+                tmp.mul_(one_minus_alpha)
+                
+                teacher_p.mul_(self.alpha)
+                teacher_p.add_(tmp)
 
     @staticmethod
     def _augmentation_loss(student_output, teacher_output, confidence_thresh=0.96837722, class_balance=0.005, n_classes=3):
