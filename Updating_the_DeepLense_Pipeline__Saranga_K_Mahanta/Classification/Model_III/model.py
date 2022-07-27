@@ -7,7 +7,7 @@ class EffNetB1_backbone_model(nn.Module):
     def __init__(self, pretrained = True):
         super().__init__()
         self.model = timm.create_model('efficientnet_b1', pretrained = pretrained, in_chans = 1)
-        
+
         self.fc = nn.Sequential(
                                 nn.Linear(1280 * 2 * 2, 1024),
                                 nn.PReLU(),
