@@ -17,7 +17,7 @@ MAE on test set. Some result will be posted soon, I'm sorting them out.
 | :-----------------------------------: | :------------: | :---------: | :----------: | ----- |
 |   ResNet34 (pretrained on ImageNet)   |     0.2849     |   0.2162    |    0.1332    | 300   |
 |               Pure VIT                | 0.4420 (15*15) | 0.2437(8*8) | 0.2175 (8*8) | 300   |
-|                 CNN-T                 |                |             |    0.1459    | 300   |
+|                 CNN-T                 |     0.2883     |   0.2431    |    0.1459    | 300   |
 | MobileNet V2 (pretrained on ImageNet) |                |             |    0.1568    | 300   |
 |                CvT-13                 |     0.2779     |   0.2548    |    0.1403    | 300   |
 
@@ -27,7 +27,7 @@ MAE on test set. Some result will be posted soon, I'm sorting them out.
 | ------------ | :------------------------------------------: | :-------------------------------------------: | :-----------------------------------------------: |
 | ResNet       | <img src="./imgs/model-I-resnet34-300.png"/> | <img src="./imgs/model-II-resnet34-300.png"/> |  <img src="./imgs/model-III-resnet34-300.png"/>   |
 | Pure VIT     | <img src="./imgs/model-I-purevit-300.png"/>  | <img src="./imgs/model-II-purevit-300.png"/>  |   <img src="./imgs/model-III-purevit-300.png"/>   |
-| CNN-T        |                                              |                                               |    <img src="./imgs/model-III-cnnt-300.png"/>     |
+| CNN-T        |   <img src="./imgs/model-I-cnnt-300.png"/>   |   <img src="./imgs/model-II-cnnt-300.png"/>   |    <img src="./imgs/model-III-cnnt-300.png"/>     |
 | MobileNet V2 |                                              |                                               | <img src="./imgs/model-III-mobilenetv2-300.png"/> |
 | CvT-13       |   <img src="./imgs/model-I-cvt-300.png"/>    |   <img src="./imgs/model-II-cvt-300.png"/>    |     <img src="./imgs/model-III-cvt-300.png"/>     |
 
