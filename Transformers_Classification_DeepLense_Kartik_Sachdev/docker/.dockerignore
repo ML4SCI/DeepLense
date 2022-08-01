@@ -1,0 +1,12 @@
+# folders to ignore
+**/data/*
+**/checkpoints/*
+*/.ipynb_checkpoints
+*/__pycache__
+
+# files to ignore
+*.tgz
+*.tar
+*.zip
+
+

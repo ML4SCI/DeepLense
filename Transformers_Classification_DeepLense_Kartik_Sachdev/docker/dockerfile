@@ -1,0 +1,17 @@
+FROM pytorch/pytorch:1.11.0-cuda11.3-cudnn8-devel
+
+ENV DEBIAN_FRONTEND=noninteractive
+
+RUN rm /etc/apt/sources.list.d/cuda.list
+RUN rm /etc/apt/sources.list.d/nvidia-ml.list
+
+RUN apt-get update && apt-get install -y \
+    git \
+    vim
+
+RUN mkdir -p GSoC-2022 
+COPY . GSoC-2022/
+WORKDIR GSoC-2022
+
+RUN pip install --upgrade -r requirements.txt
+
