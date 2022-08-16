@@ -4,8 +4,8 @@ import numpy as np
 import matplotlib.pyplot as plt
 
 import torch
-from torch.utils.data import DataLoader, Dataset, random_split
 from torchvision import utils
+from torch.utils.data import DataLoader, Dataset, random_split
 
 import albumentations as A
 from albumentations.pytorch import ToTensorV2
