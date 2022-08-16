@@ -1,16 +1,13 @@
-
 import torch
 import torch.nn as nn
 import torch.optim as optim
 from torch.optim.lr_scheduler import CosineAnnealingWarmRestarts
-import albumentations as A
-from albumentations.pytorch import ToTensorV2
 import numpy as np
 from tqdm import tqdm
 import matplotlib.pyplot as plt
 
 
-from utils import device, calculate_accuracy
+from utils import device, calculate_accuracy, transforms
 from config import EPOCHS, LEARNING_RATE, BATCH_SIZE, MODEL_PATH, TRAIN_DATA_PATH, TEST_DATA_PATH, SAVE_MODEL
 from dataloader import create_data_loaders
 from model import EffNetB1_backbone_model
@@ -100,14 +97,6 @@ def fit_model(model, criterion, optimizer):
     return model, loss_dict, acc_dict
 
 if __name__ == '__main__':
-
-    #pre-processing transformation
-    transforms = A.Compose(
-            [
-                A.CenterCrop(height = 50, width = 50, p=1.0),
-                ToTensorV2()
-            ]
-        )
 
     train_loader, val_loader, _ = create_data_loaders(TRAIN_DATA_PATH, TEST_DATA_PATH, 
                                                                 val_split = 0.2, batch_size = BATCH_SIZE,
