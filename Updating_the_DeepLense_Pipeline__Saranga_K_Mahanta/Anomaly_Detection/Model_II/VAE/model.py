@@ -1,10 +1,17 @@
+import sys
+import torch
 import torch.nn as nn
 
-class Encoder(nn.Module):
+sys.path.append('../')
+from utils import device
+from config import MODEL_PATH
 
-    def __init__(self, in_channels=1, latent_dim = 2048):
+class Encoder(nn.Module):
+    
+    def __init__(self, in_channels = 1, latent_dim = 2048):
         super().__init__()
         
+        ### Convolutional section
         self.encoder_cnn = nn.Sequential(
             nn.Conv2d(in_channels = in_channels, out_channels = 16, kernel_size = 7, stride = 2, padding = 1),
             nn.BatchNorm2d(16),
@@ -16,21 +23,26 @@ class Encoder(nn.Module):
             
             nn.Conv2d(32, 64, 7),
             nn.BatchNorm2d(64),
-            nn.PReLU())
-
-        self.flat = nn.Flatten()
-        self.enc_lin = nn.Linear(3136, latent_dim)
+            nn.PReLU(),           
+        )
+       
+        self.mu = nn.Linear(3136, latent_dim)
+        self.var = nn.Linear(3136, latent_dim)
+         
 
     def forward(self, x):
-        
         x = self.encoder_cnn(x)
-        x = self.flat(x)
-        x = self.enc_lin(x)
+        x = x.view(x.shape[0],-1)
 
-        return x
+        z_mu = self.mu(x)
+        z_var = self.var(x)
+
+        return z_mu, z_var
+
+
 
 class Decoder(nn.Module):
-
+    
     def __init__(self, out_channels = 1, latent_dim = 2048):
         super().__init__()
         self.decoder_lin = nn.Sequential(
@@ -57,23 +69,32 @@ class Decoder(nn.Module):
 #         x = torch.tanh(x)
         return x
 
-class Discriminator(nn.Module):
 
-    def __init__(self, dim_z = 2048 , dim_h = 256):
-        super(Discriminator,self).__init__()
-        self.dim_z = dim_z
-        self.dim_h = dim_h
-        self.network = []
-        self.network.extend([
-            nn.Linear(self.dim_z, self.dim_h),
-            nn.PReLU(),
-            nn.Linear(self.dim_h, self.dim_h),
-            nn.PReLU(),
-            nn.Linear(self.dim_h,1),
-            nn.Sigmoid(),
-        ])
-        self.network = nn.Sequential(*self.network)
+class VAE(nn.Module):
 
-    def forward(self, z):
-        disc = self.network(z)
-        return disc
+    def __init__(self, enc, dec):
+        super().__init__()
+
+        self.enc = enc
+        self.dec = dec
+
+    def forward(self, x):
+        
+        z_mu, z_var = self.enc(x)
+        std = torch.exp(z_var / 2)
+        eps = torch.randn_like(std)
+        x_sample = eps.mul(std).add_(z_mu)
+        predicted = self.dec(x_sample)
+        
+        return predicted, z_mu, z_var
+
+
+if __name__ == '__main__':
+    encoder = Encoder()
+    decoder = Decoder()
+    model = VAE(encoder, decoder)
+    if device != 'cpu':
+        model.load_state_dict(torch.load(MODEL_PATH))
+    else:
+        model.load_state_dict(torch.load(MODEL_PATH, map_location = torch.device('cpu')))
+    print(model)

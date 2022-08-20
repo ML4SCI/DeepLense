@@ -75,8 +75,8 @@ def test_epoch(model, dataloader,criterion):
     return y_pred_list, y_truth_list, np.mean(losses)
 
 
-def plot_results(model, dataloader, criterion, epoch):
-    y_pred_list, y_truth_list, test_loss = test_epoch(model, test_loader, criterion)
+def plot_results(model, dataloader, criterion):
+    y_pred_list, y_truth_list, _ = test_epoch(model, dataloader, criterion)
     
     def flatten_list(x):
         flattened_list = []
