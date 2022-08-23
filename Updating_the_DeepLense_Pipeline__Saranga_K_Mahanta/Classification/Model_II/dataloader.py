@@ -4,11 +4,11 @@ import numpy as np
 import matplotlib.pyplot as plt
 
 import torch
-from torch.utils.data import DataLoader, Dataset, random_split
 from torchvision import utils
+from torch.utils.data import DataLoader, Dataset, random_split
 
-import albumentations as A
-from albumentations.pytorch import ToTensorV2
+from config import BATCH_SIZE, TRAIN_DATA_PATH, TEST_DATA_PATH
+from utils import transforms
 
 
 class CustomDataset(Dataset):
@@ -88,19 +88,8 @@ def create_data_loaders(train_data_path, test_data_path, val_split = 0.1, batch_
 
 if __name__ == "__main__":
 
-    batch_size = 128
-    transforms = A.Compose(
-            [
-                A.CenterCrop(height = 50, width = 50, p=1.0),
-                ToTensorV2()
-            ]
-        )
-
-    train_data_path = r'C:\Users\Saranga\Desktop\ML4SCI\Work\Model_I_subset\*\*'
-    test_data_path = r'C:\Users\Saranga\Desktop\ML4SCI\Work\Model_I_test_subset\*\*'
-
-    train_loader, val_loader, test_loader = create_data_loaders(train_data_path, test_data_path, 
-                                                                val_split = 0.2, batch_size = batch_size,
+    train_loader, val_loader, test_loader = create_data_loaders(TRAIN_DATA_PATH, TEST_DATA_PATH, 
+                                                                val_split = 0.2, batch_size = BATCH_SIZE,
                                                                 transforms = transforms)
 
     single_batch = next(iter(train_loader))
