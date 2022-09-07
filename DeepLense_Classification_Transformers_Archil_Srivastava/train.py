@@ -97,8 +97,8 @@ if __name__ == '__main__':
     parser.add_argument('--device', choices=['cpu', 'mps', 'cuda', 'tpu', 'best'], default='best')
 
     # Augmentations
-    parser.add_argument('--random_zoom', type=float, default=0.8)
-    parser.add_argument('--random_rotation', type=float, default=180)
+    parser.add_argument('--random_zoom', type=float, default=0.9)
+    parser.add_argument('--random_rotation', type=float, default=90)
 
     # Common hyperparameters
     parser.add_argument('--batchsize', type=int, default=128)
@@ -107,21 +107,20 @@ if __name__ == '__main__':
     parser.add_argument('--optimizer', choices=['sgd', 'adam'], default='adam')
     parser.add_argument('--decay_lr', type=int, default=0)
 
-    # ViT hyperparameters
-    parser.add_argument('--patch_size', type=int, default=30)
-    parser.add_argument('--projection_dim', type=int, default=1024)
-    parser.add_argument('--num_transformer_layers', type=int, default=8)
-    parser.add_argument('--num_heads', type=int, default=16)
-    parser.add_argument('--mlp_dim', type=int, default=2048)
-    parser.add_argument('--transformer_dropout', type=float, default=0.1)
-
     run_config = parser.parse_args()
 
-    tune = bool(run_config.tune)
     pretrained = bool(run_config.pretrained)
+    tune = bool(run_config.tune) or not pretrained
     complex = bool(run_config.complex)
 
-    with wandb.init(entity='_archil', config=run_config, group=f'{run_config.dataset}', job_type='train'):
+    # Group for wandb
+    group = 'baseline'
+    if run_config.model_source == 'timm':
+        group = f'timm-{run_config.model_name}'
+        if complex:
+            group = f'{group}-complex'
+
+    with wandb.init(entity='_archil', config=run_config, group=group, job_type=f'{run_config.dataset}'):
         if run_config.seed:
             set_seed(run_config.seed)
         
@@ -145,9 +144,7 @@ if __name__ == '__main__':
             model = None
         
         if device == 'cuda' and torch.cuda.device_count() > 1:
-            device = 'cuda:0'
-            model = torch.nn.DataParallel(model)
-            model = model.to(device)
+            model = torch.nn.DataParallel(model, device_ids=list(range(torch.cuda.device_count())))
         
         datapath = os.path.join('./data', f'{run_config.dataset}', 'memmap', 'train')
         train_dataset = LensDataset(image_size=IMAGE_SIZE, memmap_path=datapath)

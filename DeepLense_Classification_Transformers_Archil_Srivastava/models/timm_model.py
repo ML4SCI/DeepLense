@@ -16,10 +16,6 @@ class TimmModelSimple(torch.nn.Module):
     def get_representation_features(self):
         return self.backbone.get_classifier().in_features
     
-    def set_classifier(self, classifier):
-        self.backbone.reset_classifier(0)
-        self.classifier = classifier
-    
     def forward(self, img):
         return self.backbone(img)
 
@@ -33,12 +29,10 @@ class TimmModelComplex(TimmModelSimple):
                             Linear(in_features, 1024),
                             PReLU(),
                             BatchNorm1d(1024),
-                            Dropout(p=dropout_rate),
                             
                             Linear(1024, 512),
                             BatchNorm1d(512),
                             PReLU(),
-                            Dropout(p=dropout_rate),
     
                             Linear(512, 128),
                             PReLU(),
