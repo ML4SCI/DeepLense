@@ -5,6 +5,7 @@
 /data/*
 *.ipynb_checkpoints/*
 wandb/*
+/logger/*
 
 # Files to ignore
 *.zip
