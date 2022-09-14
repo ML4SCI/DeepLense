@@ -66,7 +66,8 @@ import json
 import wandb
 
 from ray import tune
-from ray.tune.integration.wandb import WandbLogger
+
+# from ray.tune.integration.wandb import WandbLogger
 from ray.tune.schedulers import ASHAScheduler
 
 parser = ArgumentParser()
@@ -238,7 +239,7 @@ def main():
         # progress_reporter=reporter,
         checkpoint_score_attr="mean_accuracy",
         # local_dir='Tune-Best-Test',
-        loggers=[WandbLogger],
+        # loggers=[WandbLogger],
     )
 
     # train(

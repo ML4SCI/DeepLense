@@ -15,6 +15,7 @@ from transformers import get_cosine_schedule_with_warmup
 import math
 from torch.utils.data import DataLoader
 import os
+from ray import tune
 
 
 @wandb_mixin
@@ -206,4 +207,6 @@ def train(
             wandb.save(path)
             torch.save(best_model.state_dict(), path)
 
+        tune.report(best_accuracy = best_accuracy)
+    
     return best_accuracy
