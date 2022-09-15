@@ -16,6 +16,7 @@ import math
 from torch.utils.data import DataLoader
 import os
 from ray import tune
+from ray.air import session
 
 
 @wandb_mixin
@@ -209,6 +210,7 @@ def train(
             wandb.save(path)
             torch.save(best_model.state_dict(), path)
 
-        tune.report(best_accuracy=best_accuracy)
+        session.report({"best_accuracy": best_accuracy})
+        # tune.report(best_accuracy=best_accuracy)
     return best_accuracy
 
