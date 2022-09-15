@@ -210,4 +210,5 @@ def train(
             torch.save(best_model.state_dict(), path)
 
         tune.report(best_accuracy=best_accuracy)
+    return best_accuracy
 

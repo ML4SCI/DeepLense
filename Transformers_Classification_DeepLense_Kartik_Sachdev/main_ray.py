@@ -247,7 +247,7 @@ def main():
         # fail_fast=True,  # fail on first error
         # keep_checkpoints_num=2,
         progress_reporter=reporter,
-        checkpoint_score_attr="best_accuracy",
+        # checkpoint_score_attr="best_accuracy",
         # local_dir="Tune-Best-Test",
         # loggers=[WandbLogger],
     )
