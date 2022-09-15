@@ -213,7 +213,7 @@ def main():
 
     reporter = CLIReporter(
         # parameter_columns=["l1", "l2", "lr", "batch_size"],
-        metric_columns=["mean_accuracy"]
+        metric_columns=["best_accuracy"]
     )
 
     num_samples = 10
@@ -247,16 +247,16 @@ def main():
         # fail_fast=True,  # fail on first error
         # keep_checkpoints_num=2,
         progress_reporter=reporter,
-        checkpoint_score_attr="mean_accuracy",
+        checkpoint_score_attr="best_accuracy",
         # local_dir="Tune-Best-Test",
         # loggers=[WandbLogger],
     )
 
-    best_trial = result.get_best_trial("mean_accuracy", "max", "last")
+    best_trial = result.get_best_trial("best_accuracy", "max", "last")
     print("Best trial config: {}".format(best_trial.config))
     print(
         "Best trial final validation accuracy: {}".format(
-            best_trial.last_result["mean_accuracy"]
+            best_trial.last_result["best_accuracy"]
         )
     )
 
