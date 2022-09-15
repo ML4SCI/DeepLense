@@ -213,7 +213,7 @@ def main():
 
     reporter = CLIReporter(
         # parameter_columns=["l1", "l2", "lr", "batch_size"],
-        metric_columns=["loss", "accuracy", "training_iteration"]
+        metric_columns=["mean_accuracy"]
     )
 
     num_samples = 10
@@ -245,7 +245,7 @@ def main():
         num_samples=num_samples,
         # reuse_actors=True,  # keep to true to check how training progresses
         # fail_fast=True,  # fail on first error
-        keep_checkpoints_num=2,
+        # keep_checkpoints_num=2,
         progress_reporter=reporter,
         checkpoint_score_attr="mean_accuracy",
         # local_dir="Tune-Best-Test",
