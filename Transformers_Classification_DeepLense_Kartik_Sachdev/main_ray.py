@@ -216,6 +216,8 @@ def main():
         metric_columns=["loss", "accuracy", "training_iteration"]
     )
 
+    num_samples = 10
+
     trainable = tune.with_parameters(
         train,
         # epochs=epochs,
@@ -240,13 +242,14 @@ def main():
         resources_per_trial={"cpu": num_workers, "gpu": 1},
         stop={"training_iteration": epochs,},
         verbose=1,
-        reuse_actors=True,  # keep to true to check how training progresses
-        fail_fast=True,  # fail on first error
+        num_samples=num_samples,
+        # reuse_actors=True,  # keep to true to check how training progresses
+        # fail_fast=True,  # fail on first error
         keep_checkpoints_num=2,
-        # progress_reporter=reporter,
+        progress_reporter=reporter,
         checkpoint_score_attr="mean_accuracy",
         progress_reporter=reporter,
-        # local_dir='Tune-Best-Test',
+        local_dir='Tune-Best-Test',
         # loggers=[WandbLogger],
     )
 
