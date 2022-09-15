@@ -248,7 +248,7 @@ def main():
         keep_checkpoints_num=2,
         progress_reporter=reporter,
         checkpoint_score_attr="mean_accuracy",
-        local_dir="Tune-Best-Test",
+        # local_dir="Tune-Best-Test",
         # loggers=[WandbLogger],
     )
 
