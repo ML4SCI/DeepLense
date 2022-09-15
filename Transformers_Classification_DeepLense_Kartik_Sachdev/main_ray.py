@@ -66,6 +66,7 @@ import json
 import wandb
 
 from ray import tune
+from ray.tune import CLIReporter
 
 # from ray.tune.integration.wandb import WandbLogger
 from ray.tune.schedulers import ASHAScheduler
@@ -201,12 +202,18 @@ def main():
         "project": "HPO-trial-1",
         "api_key": "0eab39620668aed6d80d5cc8e58407d2509af0eb",  # os.environ["WANDB_KEY"]
     }
+
     scheduler = ASHAScheduler(
         metric="best_accuracy",
         max_t=epochs,
-        grace_period=4,
-        reduction_factor=4,
+        grace_period=1,
+        reduction_factor=2,
         mode="max",
+    )
+
+    reporter = CLIReporter(
+        # parameter_columns=["l1", "l2", "lr", "batch_size"],
+        metric_columns=["loss", "accuracy", "training_iteration"]
     )
 
     trainable = tune.with_parameters(
@@ -232,14 +239,23 @@ def main():
         # search_alg=algo,
         resources_per_trial={"cpu": num_workers, "gpu": 1},
         stop={"training_iteration": epochs,},
-        verbose=0,
+        verbose=1,
         reuse_actors=True,  # keep to true to check how training progresses
         fail_fast=True,  # fail on first error
         keep_checkpoints_num=2,
         # progress_reporter=reporter,
         checkpoint_score_attr="mean_accuracy",
+        progress_reporter=reporter,
         # local_dir='Tune-Best-Test',
         # loggers=[WandbLogger],
+    )
+
+    best_trial = result.get_best_trial("mean_accuracy", "max", "last")
+    print("Best trial config: {}".format(best_trial.config))
+    print(
+        "Best trial final validation accuracy: {}".format(
+            best_trial.last_result["mean_accuracy"]
+        )
     )
 
     # train(

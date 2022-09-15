@@ -120,7 +120,9 @@ def train(
         num_training_steps
     )
 
-    with open(f"{os.path.dirname(os.path.abspath(__file__))}/../{log_dir}/config.json", "w") as fp:
+    with open(
+        f"{os.path.dirname(os.path.abspath(__file__))}/../{log_dir}/config.json", "w"
+    ) as fp:
         json.dump(config, fp)
 
     path = f"{os.path.dirname(os.path.abspath(__file__))}/../{path}"
@@ -207,6 +209,5 @@ def train(
             wandb.save(path)
             torch.save(best_model.state_dict(), path)
 
-        tune.report(best_accuracy = best_accuracy)
-    
-    return best_accuracy
+        tune.report(best_accuracy=best_accuracy)
+
