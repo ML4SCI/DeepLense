@@ -118,7 +118,7 @@ def plot_ae_outputs(model, dataloader, n = 10):
     plt.draw()  
 
 
-def fit_model(model,checkpoint_path):
+def fit_model(model, checkpoint_path):
     
 
         optimizer = optim.Adam(model.parameters(), lr = LEARNING_RATE)
