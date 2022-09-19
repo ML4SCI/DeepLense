@@ -200,7 +200,7 @@ def main():
     )
     train_config["optimizer_config"]["momentum"] = tune.uniform(0.7, 0.99)
     train_config["wandb"] = {
-        "project": "HPO-trial-1",
+        "project": f"{network_type}_{dataset_name}_hpo",
         "api_key": "0eab39620668aed6d80d5cc8e58407d2509af0eb",  # os.environ["WANDB_KEY"]
     }
 
