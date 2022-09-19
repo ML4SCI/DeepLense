@@ -76,8 +76,6 @@ def train(
    >>>     config=train_config,
    >>>     dataset_name=dataset_name)
     """
-    wandb.init(config=config, group=dataset_name, job_type="train")  # ,mode="disabled"
-    wandb.watch(model, criterion, log="all", log_freq=log_freq)
 
     # Transformer model
     model = TransformerModels(
@@ -94,6 +92,9 @@ def train(
         return sum(p.numel() for p in model.parameters() if p.requires_grad)
 
     print("Parameter count:", count_parameters(model))
+
+    wandb.init(config=config, group=dataset_name, job_type="train")  # ,mode="disabled"
+    wandb.watch(model, criterion, log="all", log_freq=log_freq)
 
     optimizer_config = config["optimizer_config"]
     lr_schedule_config = config["lr_schedule_config"]
