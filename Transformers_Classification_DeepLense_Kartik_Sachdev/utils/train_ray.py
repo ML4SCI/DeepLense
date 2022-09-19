@@ -17,6 +17,12 @@ from torch.utils.data import DataLoader
 import os
 from ray import tune
 from ray.air import session
+import time
+
+RUN = 1
+BEST_ACC_OVERALL = 0
+BEST_CONFIG = None
+BEST_CHECKPOINT = None
 
 
 @wandb_mixin
@@ -74,6 +80,11 @@ def train(
     optimizer_config = config["optimizer_config"]
     lr_schedule_config = config["lr_schedule_config"]
 
+    global RUN
+    global BEST_ACC_OVERALL
+    global BEST_CONFIG
+    global BEST_CHECKPOINT
+
     # optimizer
     optimizer = optim.AdamW(
         model.parameters(),
@@ -120,13 +131,30 @@ def train(
     config["lr_schedule_config"]["cosine_scheduler"]["num_training_steps"] = int(
         num_training_steps
     )
+    network_type = config["network_type"]
+
+    os.makedirs(
+        f"{os.path.dirname(os.path.abspath(__file__))}/../{log_dir}/run_{RUN}",
+        exist_ok=True,
+    )
+    os.makedirs(
+        f"{os.path.dirname(os.path.abspath(__file__))}/../{log_dir}/run_{RUN}/checkpoint",
+        exist_ok=True,
+    )
 
     with open(
-        f"{os.path.dirname(os.path.abspath(__file__))}/../{log_dir}/config.json", "w"
+        f"{os.path.dirname(os.path.abspath(__file__))}/../{log_dir}/run_{RUN}/config.json",
+        "w",
     ) as fp:
         json.dump(config, fp)
 
-    path = f"{os.path.dirname(os.path.abspath(__file__))}/../{path}"
+    current_time = time.strftime("%Y-%m-%d-%H-%M-%S", time.localtime())
+    path = os.path.join(
+        f"{os.path.dirname(os.path.abspath(__file__))}/../{log_dir}/run_{RUN}/checkpoint",
+        f"{network_type}_{dataset_name}_{current_time}.pt",
+    )
+    # path = f"{os.path.dirname(os.path.abspath(__file__))}/../{path}"
+
     steps = 0
     all_train_loss = []
     all_val_loss = []
@@ -135,7 +163,7 @@ def train(
     all_test_accuracy = []
     all_epoch_loss = []
 
-    best_accuracy = 0
+    best_accuracy = 0.0
     model.to(device)
 
     for epoch in range(epochs):
@@ -202,15 +230,42 @@ def train(
         wandb.log(log_dict, step=steps)
 
         if epoch_val_accuracy > best_accuracy:
-            best_accuracy = epoch_val_accuracy
+            best_accuracy = epoch_val_accuracy.cpu().detach().numpy()
             best_model = copy.deepcopy(model)
-            wandb.run.summary["best_accuracy"] = epoch_val_accuracy
+            wandb.run.summary["best_accuracy"] = best_accuracy
             wandb.run.summary["best_epoch"] = epoch
             wandb.run.summary["best_step"] = steps
             wandb.save(path)
             torch.save(best_model.state_dict(), path)
 
-        session.report({"best_accuracy": best_accuracy})
-        # tune.report(best_accuracy=best_accuracy)
-    return best_accuracy
+        # session.report({"best_accuracy": best_accuracy})
+        tune.report(best_accuracy=best_accuracy)
+
+    if best_accuracy > BEST_ACC_OVERALL:
+        BEST_ACC_OVERALL = best_accuracy
+        BEST_CONFIG = config
+        BEST_CONFIG["best_accuracy"] = BEST_ACC_OVERALL
+        BEST_CHECKPOINT = best_model
+
+        # change folder name : run_best/---
+        os.makedirs(
+            f"{os.path.dirname(os.path.abspath(__file__))}/../{log_dir}/run_best",
+            exist_ok=True,
+        )
+
+        best_path = os.path.join(
+            f"{os.path.dirname(os.path.abspath(__file__))}/../{log_dir}/run_best",
+            f"{network_type}_{dataset_name}_{current_time}.pt",
+        )
+
+        torch.save(BEST_CHECKPOINT.state_dict(), best_path)
+
+        with open(
+            f"{os.path.dirname(os.path.abspath(__file__))}/../{log_dir}/run_best/best_config.json",
+            "w",
+        ) as fp:
+            json.dump(BEST_CONFIG, fp)
+
+    RUN += 1
+    return {"best_accuracy": best_accuracy}
 

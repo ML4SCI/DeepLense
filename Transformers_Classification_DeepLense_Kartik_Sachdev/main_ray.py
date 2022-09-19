@@ -67,6 +67,7 @@ import wandb
 
 from ray import tune
 from ray.tune import CLIReporter
+import ray
 
 # from ray.tune.integration.wandb import WandbLogger
 from ray.tune.schedulers import ASHAScheduler
@@ -162,7 +163,7 @@ def main():
     current_time = time.strftime("%Y-%m-%d-%H-%M-%S", time.localtime())
     log_dir_base = "logger"
     log_dir = f"{log_dir_base}/{current_time}"
-    init_logging_handler(log_dir_base, current_time)
+    init_logging_handler(log_dir_base, current_time, use_ray=True)
 
     PATH = os.path.join(
         f"{log_dir}/checkpoint", f"{network_type}_{dataset_name}_{current_time}.pt"
@@ -233,46 +234,34 @@ def main():
         num_workers=num_workers,
     )
 
+    ray.init()
     result = tune.run(
         trainable,
         name=f"{train_config_name}_{current_time}",
         config=train_config,
         scheduler=scheduler,
         # search_alg=algo,
-        resources_per_trial={"cpu": num_workers, "gpu": 1},
+        resources_per_trial={"cpu": 10, "gpu": 1},  # num_workers
         stop={"training_iteration": epochs,},
         verbose=1,
         num_samples=num_samples,
         # reuse_actors=True,  # keep to true to check how training progresses
         # fail_fast=True,  # fail on first error
-        # keep_checkpoints_num=2,
-        # progress_reporter=reporter,
-        # checkpoint_score_attr="best_accuracy",
-        # local_dir="Tune-Best-Test",
+        keep_checkpoints_num=2,
+        progress_reporter=reporter,
+        checkpoint_score_attr="best_accuracy",
+        local_dir="Tune-Best-Test",
         # loggers=[WandbLogger],
     )
 
-    best_trial = result.get_best_trial("best_accuracy", "max", "last")
-    print("Best trial config: {}".format(best_trial.config))
-    print(
-        "Best trial final validation accuracy: {}".format(
-            best_trial.last_result["best_accuracy"]
-        )
-    )
-
-    # train(
-    #     epochs=train_config["num_epochs"],
-    #     model=model,
-    #     device=device,
-    #     train_loader=train_loader,
-    #     valid_loader=test_loader,  # change to val-loader
-    #     criterion=criterion,
-    #     path=PATH,
-    #     log_dir=log_dir,
-    #     log_freq=20,
-    #     config=train_config,
-    #     dataset_name=dataset_name,
+    # best_trial = result.get_best_trial("best_accuracy", "max", "last")
+    # print("Best trial config: {}".format(best_trial))
+    # print(
+    #     "Best trial final validation accuracy: {}".format(
+    #         best_trial.last_result["best_accuracy"]
+    #     )
     # )
+    ray.shutdown()
 
     # infer_obj = Inference(
     #     model,
