@@ -55,7 +55,7 @@ from models.transformer_zoo import (
 )
 
 from config.cct_config import CCT_CONFIG
-from config.twinssvt_config import TWINSSVT_CONFIG
+from config.twinssvt_config import TWINSSVT_CONFIG, TWINSSVT_RAY_CONFIG
 from config.levit_config import LEVIT_CONFIG
 from config.cait_config import CAIT_CONFIG
 from config.crossvit_config import CROSSVIT_CONFIG
@@ -90,6 +90,14 @@ parser.add_argument(
 )
 
 parser.add_argument(
+    "--num_samples",
+    metavar="10",
+    type=int,
+    default=10,
+    help="number of combinations for tuning",
+)
+
+parser.add_argument(
     "--train_config",
     type=str,
     default="CCT",
@@ -118,7 +126,7 @@ def main():
     if train_config_name == "CCT":
         train_config = CCT_CONFIG
     elif train_config_name == "TwinsSVT":
-        train_config = TWINSSVT_CONFIG
+        train_config = TWINSSVT_RAY_CONFIG
     elif train_config_name == "LeViT":
         train_config = LEVIT_CONFIG
     elif train_config_name == "CaiT":
@@ -176,29 +184,25 @@ def main():
     print(f"Val Data: {len(testset)}")
 
     # Transformer model
-    model = TransformerModels(
-        transformer_type=train_config["network_type"],
-        num_channels=train_config["channels"],
-        num_classes=num_classes,
-        img_size=image_size,
-        **train_config["network_config"],
-    )
+    # model = TransformerModels(
+    #     transformer_type=train_config["network_type"],
+    #     num_channels=train_config["channels"],
+    #     num_classes=num_classes,
+    #     img_size=image_size,
+    #     **train_config["network_config"],
+    # )
 
-    summary(model, input_size=(train_config["batch_size"], 1, image_size, image_size))
+    # summary(model, input_size=(train_config["batch_size"], 1, image_size, image_size))
 
-    def count_parameters(model):
-        return sum(p.numel() for p in model.parameters() if p.requires_grad)
+    # def count_parameters(model):
+    #     return sum(p.numel() for p in model.parameters() if p.requires_grad)
 
-    print("Parameter count:", count_parameters(model))
+    # print("Parameter count:", count_parameters(model))
 
     # loss function
     criterion = nn.CrossEntropyLoss()
     epochs = train_config["num_epochs"]
 
-    train_config["optimizer_config"]["lr"] = tune.sample_from(
-        lambda spec: 10 ** (-10 * np.random.rand())
-    )
-    train_config["optimizer_config"]["momentum"] = tune.uniform(0.7, 0.99)
     train_config["wandb"] = {
         "project": f"{network_type}_{dataset_name}_hpo",
         "api_key": "0eab39620668aed6d80d5cc8e58407d2509af0eb",  # os.environ["WANDB_KEY"]
@@ -217,12 +221,10 @@ def main():
         metric_columns=["best_accuracy"]
     )
 
-    num_samples = 10
+    num_samples = args.num_workers
 
     trainable = tune.with_parameters(
         train,
-        # epochs=epochs,
-        model=model,
         device=device,
         trainset=trainset,
         testset=testset,
@@ -232,6 +234,8 @@ def main():
         log_freq=20,
         dataset_name=dataset_name,
         num_workers=num_workers,
+        num_classes=num_classes,
+        image_size=image_size,
     )
 
     ray.init()
@@ -241,7 +245,7 @@ def main():
         config=train_config,
         scheduler=scheduler,
         # search_alg=algo,
-        resources_per_trial={"cpu": 10, "gpu": 1},  # num_workers
+        resources_per_trial={"cpu": num_workers, "gpu": 1},  # num_workers
         stop={"training_iteration": epochs,},
         verbose=1,
         num_samples=num_samples,

@@ -18,6 +18,8 @@ import os
 from ray import tune
 from ray.air import session
 import time
+from torchinfo import summary
+from models.transformer_zoo import TransformerModels
 
 RUN = 1
 BEST_ACC_OVERALL = 0
@@ -28,8 +30,6 @@ BEST_CHECKPOINT = None
 @wandb_mixin
 def train(
     config: dict,
-    # epochs: int,
-    model: nn.Module,
     device: Union[int, str],
     trainset: Any,
     testset: Any,
@@ -38,6 +38,8 @@ def train(
     log_dir: str,
     dataset_name: str,
     num_workers: int,
+    num_classes: int,
+    image_size: int,
     log_freq=100,
     checkpoint_dir=None,
 ):
@@ -76,6 +78,22 @@ def train(
     """
     wandb.init(config=config, group=dataset_name, job_type="train")  # ,mode="disabled"
     wandb.watch(model, criterion, log="all", log_freq=log_freq)
+
+    # Transformer model
+    model = TransformerModels(
+        transformer_type=config["network_type"],
+        num_channels=config["channels"],
+        num_classes=num_classes,
+        img_size=image_size,
+        **config["network_config"],
+    )
+
+    summary(model, input_size=(config["batch_size"], 1, image_size, image_size))
+
+    def count_parameters(model):
+        return sum(p.numel() for p in model.parameters() if p.requires_grad)
+
+    print("Parameter count:", count_parameters(model))
 
     optimizer_config = config["optimizer_config"]
     lr_schedule_config = config["lr_schedule_config"]
@@ -220,6 +238,10 @@ def train(
         )
 
         # logging frequency = each epoch
+        loss = loss.cpu().detach().numpy()
+        epoch_val_loss = epoch_val_loss.cpu().detach().numpy()
+        epoch_val_accuracy = epoch_val_accuracy.cpu().detach().numpy()
+
         log_dict = {
             "epoch": epoch,
             "steps": steps,
@@ -230,7 +252,7 @@ def train(
         wandb.log(log_dict, step=steps)
 
         if epoch_val_accuracy > best_accuracy:
-            best_accuracy = epoch_val_accuracy.cpu().detach().numpy()
+            best_accuracy = epoch_val_accuracy
             best_model = copy.deepcopy(model)
             wandb.run.summary["best_accuracy"] = best_accuracy
             wandb.run.summary["best_epoch"] = epoch
