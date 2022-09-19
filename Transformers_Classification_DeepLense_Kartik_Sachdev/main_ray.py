@@ -178,7 +178,7 @@ def main():
     )
 
     num_classes = len(classes)  # number of classes to be classified
-    # image size (129x129)
+
     print(num_classes)
     print(f"Train Data: {len(trainset)}")
     print(f"Val Data: {len(testset)}")
@@ -192,6 +192,7 @@ def main():
         "api_key": "0eab39620668aed6d80d5cc8e58407d2509af0eb",  # os.environ["WANDB_KEY"]
     }
 
+    train_config["classes"] = classes
     scheduler = ASHAScheduler(
         metric="best_accuracy",
         max_t=epochs,
@@ -220,7 +221,6 @@ def main():
         num_workers=num_workers,
         num_classes=num_classes,
         image_size=image_size,
-        classes=classes,
     )
 
     ray.init()

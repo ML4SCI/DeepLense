@@ -23,7 +23,7 @@ from models.transformer_zoo import TransformerModels
 from utils.inference import Inference
 
 
-RUN = 1
+RUN = 0
 BEST_ACC_OVERALL = 0
 BEST_CONFIG = None
 BEST_CHECKPOINT = None
@@ -42,7 +42,6 @@ def train(
     num_workers: int,
     num_classes: int,
     image_size: int,
-    classes,
     log_freq=100,
     checkpoint_dir=None,
 ):
@@ -107,6 +106,8 @@ def train(
     global BEST_CONFIG
     global BEST_CHECKPOINT
 
+    RUN += 1
+
     # optimizer
     optimizer = optim.AdamW(
         model.parameters(),
@@ -168,6 +169,20 @@ def train(
         f"{log_run_dir}/checkpoint", f"{network_type}_{dataset_name}_{current_time}.pt",
     )
     # path = f"{os.path.dirname(os.path.abspath(__file__))}/../{path}"
+
+    infer_obj = Inference(
+        model,
+        valid_loader,
+        device,
+        num_classes,
+        testset,
+        dataset_name,
+        labels_map=config["classes"],
+        image_size=image_size,
+        channels=config["channels"],
+        destination_dir="data",
+        log_dir=log_run_dir,
+    )
 
     steps = 0
     all_train_loss = []
@@ -256,6 +271,9 @@ def train(
             wandb.save(path)
             torch.save(best_model.state_dict(), path)
 
+            infer_obj.infer_plot_roc()
+            infer_obj.generate_plot_confusion_matrix()
+
         # session.report({"best_accuracy": best_accuracy})
         tune.report(best_accuracy=best_accuracy)
 
@@ -275,24 +293,6 @@ def train(
 
         with open(f"{log_dir}/run_best/best_config.json", "w",) as fp:
             json.dump(BEST_CONFIG, fp)
-
-    RUN += 1
-
-    infer_obj = Inference(
-        model,
-        valid_loader,
-        device,
-        num_classes,
-        testset,
-        dataset_name,
-        labels_map=classes,
-        image_size=image_size,
-        channels=config["channels"],
-        destination_dir="data",
-        log_dir=log_run_dir,
-    )
-    infer_obj.infer_plot_roc()
-    infer_obj.generate_plot_confusion_matrix()
 
     return {"best_accuracy": best_accuracy}
 
