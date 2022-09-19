@@ -4,6 +4,7 @@ from .levit import LeViT
 from .pit import PiT
 from .cait import CaiT
 from .cross_vit import CrossViT
+from .swin import SwinTransformer
 from vit_pytorch.cct import CCT
 from vit_pytorch.t2t import T2TViT
 from typing import Any
@@ -227,9 +228,18 @@ def TransformerModels(
     CaiT: https://arxiv.org/pdf/2103.17239.pdf \n
     CrossViT: https://arxiv.org/pdf/2103.14899.pdf \n
     PiT: https://arxiv.org/pdf/2103.16302.pdf \n
+    Swin: \n
     """
 
-    assert transformer_type in ["CCT", "TwinsSVT", "LeViT", "CaiT", "CrossViT", "PiT"]
+    assert transformer_type in [
+        "CCT",
+        "TwinsSVT",
+        "LeViT",
+        "CaiT",
+        "CrossViT",
+        "PiT",
+        "Swin",
+    ]
 
     if transformer_type == "CCT":
         model = CCT(
@@ -342,6 +352,19 @@ def TransformerModels(
             mlp_dim=kwargs["mlp_dim"],
             dropout=kwargs["dropout"],
             emb_dropout=kwargs["emb_dropout"],
+        )
+
+    elif transformer_type == "Swin":
+        model = SwinTransformer(
+            img_size=img_size,
+            num_classes=num_classes,
+            patch_size=kwargs["patch_size"],
+            window_size=kwargs["window_size"],
+            embed_dim=kwargs["embed_dim"],
+            in_chans=kwargs["in_chans"],
+            drop_path_rate=kwargs["drop_path_rate"],
+            depths=kwargs["depths"],
+            num_heads=kwargs["num_heads"],
         )
 
     return model
