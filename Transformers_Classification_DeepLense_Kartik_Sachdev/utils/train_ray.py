@@ -20,6 +20,8 @@ from ray.air import session
 import time
 from torchinfo import summary
 from models.transformer_zoo import TransformerModels
+from utils.inference import Inference
+
 
 RUN = 1
 BEST_ACC_OVERALL = 0
@@ -40,6 +42,7 @@ def train(
     num_workers: int,
     num_classes: int,
     image_size: int,
+    classes,
     log_freq=100,
     checkpoint_dir=None,
 ):
@@ -152,25 +155,17 @@ def train(
     )
     network_type = config["network_type"]
 
-    os.makedirs(
-        f"{os.path.dirname(os.path.abspath(__file__))}/../{log_dir}/run_{RUN}",
-        exist_ok=True,
-    )
-    os.makedirs(
-        f"{os.path.dirname(os.path.abspath(__file__))}/../{log_dir}/run_{RUN}/checkpoint",
-        exist_ok=True,
-    )
+    log_dir = f"{os.path.dirname(os.path.abspath(__file__))}/../{log_dir}"
+    log_run_dir = f"{log_dir}/run_{RUN}"
+    os.makedirs(f"{log_run_dir}", exist_ok=True)
+    os.makedirs(f"{log_run_dir}/checkpoint", exist_ok=True)
 
-    with open(
-        f"{os.path.dirname(os.path.abspath(__file__))}/../{log_dir}/run_{RUN}/config.json",
-        "w",
-    ) as fp:
+    with open(f"{log_run_dir}/config.json", "w",) as fp:
         json.dump(config, fp)
 
     current_time = time.strftime("%Y-%m-%d-%H-%M-%S", time.localtime())
     path = os.path.join(
-        f"{os.path.dirname(os.path.abspath(__file__))}/../{log_dir}/run_{RUN}/checkpoint",
-        f"{network_type}_{dataset_name}_{current_time}.pt",
+        f"{log_run_dir}/checkpoint", f"{network_type}_{dataset_name}_{current_time}.pt",
     )
     # path = f"{os.path.dirname(os.path.abspath(__file__))}/../{path}"
 
@@ -270,25 +265,34 @@ def train(
         BEST_CONFIG["best_accuracy"] = BEST_ACC_OVERALL
         BEST_CHECKPOINT = best_model
 
-        # change folder name : run_best/---
-        os.makedirs(
-            f"{os.path.dirname(os.path.abspath(__file__))}/../{log_dir}/run_best",
-            exist_ok=True,
-        )
+        os.makedirs(f"{log_dir}/run_best", exist_ok=True)
 
         best_path = os.path.join(
-            f"{os.path.dirname(os.path.abspath(__file__))}/../{log_dir}/run_best",
-            f"{network_type}_{dataset_name}_{current_time}.pt",
+            f"{log_dir}/run_best", f"{network_type}_{dataset_name}_{current_time}.pt"
         )
 
         torch.save(BEST_CHECKPOINT.state_dict(), best_path)
 
-        with open(
-            f"{os.path.dirname(os.path.abspath(__file__))}/../{log_dir}/run_best/best_config.json",
-            "w",
-        ) as fp:
+        with open(f"{log_dir}/run_best/best_config.json", "w",) as fp:
             json.dump(BEST_CONFIG, fp)
 
     RUN += 1
+
+    infer_obj = Inference(
+        model,
+        valid_loader,
+        device,
+        num_classes,
+        testset,
+        dataset_name,
+        labels_map=classes,
+        image_size=image_size,
+        channels=config["channels"],
+        destination_dir="data",
+        log_dir=log_run_dir,
+    )
+    infer_obj.infer_plot_roc()
+    infer_obj.generate_plot_confusion_matrix()
+
     return {"best_accuracy": best_accuracy}
 

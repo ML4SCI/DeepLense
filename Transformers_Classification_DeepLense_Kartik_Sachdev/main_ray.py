@@ -183,22 +183,6 @@ def main():
     print(f"Train Data: {len(trainset)}")
     print(f"Val Data: {len(testset)}")
 
-    # Transformer model
-    # model = TransformerModels(
-    #     transformer_type=train_config["network_type"],
-    #     num_channels=train_config["channels"],
-    #     num_classes=num_classes,
-    #     img_size=image_size,
-    #     **train_config["network_config"],
-    # )
-
-    # summary(model, input_size=(train_config["batch_size"], 1, image_size, image_size))
-
-    # def count_parameters(model):
-    #     return sum(p.numel() for p in model.parameters() if p.requires_grad)
-
-    # print("Parameter count:", count_parameters(model))
-
     # loss function
     criterion = nn.CrossEntropyLoss()
     epochs = train_config["num_epochs"]
@@ -236,6 +220,7 @@ def main():
         num_workers=num_workers,
         num_classes=num_classes,
         image_size=image_size,
+        classes=classes,
     )
 
     ray.init()
@@ -258,30 +243,7 @@ def main():
         # loggers=[WandbLogger],
     )
 
-    # best_trial = result.get_best_trial("best_accuracy", "max", "last")
-    # print("Best trial config: {}".format(best_trial))
-    # print(
-    #     "Best trial final validation accuracy: {}".format(
-    #         best_trial.last_result["best_accuracy"]
-    #     )
-    # )
     ray.shutdown()
-
-    # infer_obj = Inference(
-    #     model,
-    #     test_loader,
-    #     device,
-    #     num_classes,
-    #     testset,
-    #     dataset_name,
-    #     labels_map=classes,
-    #     image_size=image_size,
-    #     channels=train_config["channels"],
-    #     destination_dir="data",
-    #     log_dir=log_dir,  # log_dir
-    # )
-    # infer_obj.infer_plot_roc()
-    # infer_obj.generate_plot_confusion_matrix()
 
 
 if __name__ == "__main__":
