@@ -365,6 +365,7 @@ def TransformerModels(
             drop_path_rate=kwargs["drop_path_rate"],
             depths=kwargs["depths"],
             num_heads=kwargs["num_heads"],
+            mlp_ratio=kwargs["mlp_ratio"],
         )
 
     return model

@@ -29,7 +29,8 @@ SWIN_CONFIG = {
         "embed_dim": 96,
         "in_chans": 1,
         "drop_path_rate": 0.1,
-        "depths": (2, 2, 2, 2),
-        "num_heads": (3, 2, 2, 2),
+        "depths": (1, 1, 1, 1),
+        "num_heads": (1, 1, 1, 1),
+        "mlp_ratio": 2,
     },
 }
