@@ -5,12 +5,10 @@ import pandas as pd
 import matplotlib.pyplot as plt
 import seaborn as sns
 from tqdm import tqdm
-import albumentations as A
-from albumentations.pytorch import ToTensorV2
 from sklearn.metrics import classification_report, confusion_matrix
 from sklearn.metrics import roc_auc_score, roc_curve, auc
 
-from utils import device, calculate_accuracy
+from utils import device, calculate_accuracy, transforms
 from model import EffNetB1_backbone_model
 from dataloader import create_data_loaders
 from config import  BATCH_SIZE, MODEL_PATH, TRAIN_DATA_PATH, TEST_DATA_PATH
@@ -63,13 +61,6 @@ def flatten_list(x):
 
 if __name__ == '__main__':
 
-    #pre-processing transformation
-    transforms = A.Compose(
-            [
-                A.CenterCrop(height = 50, width = 50, p=1.0),
-                ToTensorV2()
-            ]
-        )
     criterion = nn.CrossEntropyLoss()
     model = EffNetB1_backbone_model().to(device)
 
