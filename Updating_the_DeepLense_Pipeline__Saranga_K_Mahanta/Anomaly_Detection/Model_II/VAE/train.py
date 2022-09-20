@@ -120,6 +120,10 @@ def plot_ae_outputs(model, dataloader, n = 10):
 
 def fit_model(model, checkpoint_path):
     
+<<<<<<< HEAD
+=======
+
+>>>>>>> 3e766e076bb0754e9e764e03244fcb57e4a077d0
         optimizer = optim.Adam(model.parameters(), lr = LEARNING_RATE)
         scheduler = optim.lr_scheduler.OneCycleLR(optimizer, LEARNING_RATE, epochs = EPOCHS, steps_per_epoch = len(train_loader), verbose = False)
         criterion = nn.MSELoss()
@@ -150,8 +154,13 @@ def fit_model(model, checkpoint_path):
             loss_dict['train_kld_loss'].append(train_kld_loss)
             loss_dict['val_kld_loss'].append(test_kld_loss)
 
+<<<<<<< HEAD
             if epoch % 10 == 0 or epoch + 1 == EPOCHS:
                 plot_ae_outputs(model, val_loader, 10)
+=======
+            # if epoch % 10 == 0 or epoch + 1 == EPOCHS:
+            plot_ae_outputs(model, val_loader, 10)
+>>>>>>> 3e766e076bb0754e9e764e03244fcb57e4a077d0
 
         return model, loss_dict 
 
