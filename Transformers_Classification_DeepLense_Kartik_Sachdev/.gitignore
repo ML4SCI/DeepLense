@@ -1,0 +1,14 @@
+# Folders to ignore
+**/__pycache__/*
+**/lenses/*
+**/dataset/*
+/data/*
+*.ipynb_checkpoints/*
+wandb/*
+
+# Files to ignore
+*.zip
+*.tgz
+*.DS_Store
+*.npz
+*.pt

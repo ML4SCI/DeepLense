@@ -1,0 +1,43 @@
+
+# Usage: pip install -r requirements.txt
+# pip3 install --user --upgrade pip 
+# pip3 install --user --upgrade -r requirements.txt
+
+# Base 
+matplotlib>=3.2.2
+numpy>=1.18.5
+opencv-python>=4.1.1
+Pillow>=8.2.0
+PyYAML>=5.3.1
+requests>=2.25.1
+scipy>=1.4.1  
+torch>=1.7.0
+vit-pytorch==0.27.0
+torchvision>=0.7.0
+torchinfo
+tqdm>=4.41.0
+timm>=0.5.4
+transformers>=4.18.0
+e2cnn==0.1.9
+
+# Logging 
+tensorboard>=2.4.1
+wandb
+
+# Plotting
+pandas>=1.1.4
+seaborn>=0.11.0
+
+# Export 
+# onnx>=1.9.0  
+# onnx-simplifier>=0.3.6 
+scikit-learn 
+
+# Extras 
+ipython  
+psutil  
+thop 
+albumentations>=1.0.3
+gdown
+split-folders
+ipywidgets
