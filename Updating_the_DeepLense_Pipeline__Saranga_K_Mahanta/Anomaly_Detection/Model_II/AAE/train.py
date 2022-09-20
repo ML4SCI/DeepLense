@@ -3,7 +3,6 @@ import torch.nn as nn
 import torch.optim as optim
 
 import sys
-import random
 import numpy as np
 from tqdm import tqdm
 import matplotlib.pyplot as plt
@@ -166,7 +165,6 @@ def fit_model(model, checkpoint_path):
             print(f"Epoch {epoch+1}/{EPOCHS}:")
             model, train_rec_loss, disc_loss, gen_loss, example_ct = train_epoch(model, train_loader, ae_criterion, optimizers, example_ct)
             _, _, val_rec_loss  = test_epoch(model, val_loader, ae_criterion)
-#             scheduler.step()
 
             print(f'Train Recon loss: {train_rec_loss}, Val Recon loss: {val_rec_loss}, \n Disc loss: {disc_loss}, Gen loss: {gen_loss}\n')
             
@@ -184,7 +182,7 @@ def fit_model(model, checkpoint_path):
             loss_dict['disc_loss'].append(disc_loss)
             loss_dict['gen_loss'].append(gen_loss)
 
-            if epoch % 5 == 0 or epoch + 1 == EPOCHS:
+            if epoch % 10 == 0 or epoch + 1 == EPOCHS:
                 plot_ae_outputs(model, val_loader, 10)
 
         return model, loss_dict
