@@ -5,15 +5,9 @@ from tqdm import tqdm
 
 import torch
 from torch.utils.data import Dataset, DataLoader
-<<<<<<< HEAD
 import albumentations as A
 from albumentations.pytorch import ToTensorV2
 
-=======
-
-from config import *
-from utils import *
->>>>>>> 3e766e076bb0754e9e764e03244fcb57e4a077d0
 
 def img_paths_list(root_dir):
     root_list = glob.glob(root_dir)
@@ -76,7 +70,6 @@ def create_full_test_dataloader(full_test_data_path, test_transforms, batch_size
 
 
 if __name__ == '__main__':
-<<<<<<< HEAD
     FULL_TEST_DATA_PATH = r'C:\Users\Saranga\Desktop\ML4SCI\Work\Model_III_test\*\*'
     BATCH_SIZE = 256
     
@@ -85,7 +78,5 @@ if __name__ == '__main__':
                     ToTensorV2()
                 ]
             )
-=======
->>>>>>> 3e766e076bb0754e9e764e03244fcb57e4a077d0
     full_test_loader, class_map = create_full_test_dataloader(FULL_TEST_DATA_PATH, test_transforms, BATCH_SIZE)
     
