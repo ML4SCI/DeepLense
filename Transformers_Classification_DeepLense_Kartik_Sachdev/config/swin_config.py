@@ -26,11 +26,11 @@ SWIN_CONFIG = {
     "network_config": {
         "patch_size": 4,
         "window_size": 4,
-        "embed_dim": 96,
+        "embed_dim": 50,
         "in_chans": 1,
         "drop_path_rate": 0.1,
         "depths": (1, 1, 1, 1),
         "num_heads": (1, 1, 1, 1),
-        "mlp_ratio": 2,
+        "mlp_ratio": 1,
     },
 }
