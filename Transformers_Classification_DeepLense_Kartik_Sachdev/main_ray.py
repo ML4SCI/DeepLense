@@ -195,7 +195,7 @@ def main():
         "api_key": "0eab39620668aed6d80d5cc8e58407d2509af0eb",  # os.environ["WANDB_KEY"]
     }
 
-    train_config["classes"] = classes
+    train_config["labels_map"] = classes
     scheduler = ASHAScheduler(
         metric="best_accuracy",
         max_t=epochs,
