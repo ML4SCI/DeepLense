@@ -169,20 +169,6 @@ def train(
     )
     # path = f"{os.path.dirname(os.path.abspath(__file__))}/../{path}"
 
-    infer_obj = Inference(
-        model,
-        valid_loader,
-        device,
-        num_classes,
-        testset,
-        dataset_name,
-        labels_map=config["labels_map"],
-        image_size=image_size,
-        channels=config["channels"],
-        destination_dir="data",
-        log_dir=log_dir,
-    )
-
     steps = 0
     all_train_loss = []
     all_val_loss = []
@@ -269,6 +255,20 @@ def train(
             wandb.run.summary["best_step"] = steps
             wandb.save(path)
             torch.save(best_model.state_dict(), path)
+
+            infer_obj = Inference(
+                best_model,
+                valid_loader,
+                device,
+                num_classes,
+                testset,
+                dataset_name,
+                labels_map=config["labels_map"],
+                image_size=image_size,
+                channels=config["channels"],
+                destination_dir="data",
+                log_dir=log_dir,
+            )
 
             infer_obj.infer_plot_roc()
             infer_obj.generate_plot_confusion_matrix()
