@@ -160,10 +160,10 @@ def train(
     os.makedirs(f"{log_dir}", exist_ok=True)
     os.makedirs(f"{log_dir}/checkpoint", exist_ok=True)
 
+    current_time = time.strftime("%Y-%m-%d-%H-%M-%S", time.localtime())
     with open(f"{log_dir}/config_{current_time}.json", "w",) as fp:
         json.dump(config, fp)
 
-    current_time = time.strftime("%Y-%m-%d-%H-%M-%S", time.localtime())
     path = os.path.join(
         f"{log_dir}/checkpoint", f"{network_type}_{dataset_name}_{current_time}.pt",
     )
