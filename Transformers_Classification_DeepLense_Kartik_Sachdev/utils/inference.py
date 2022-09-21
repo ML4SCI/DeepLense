@@ -43,6 +43,7 @@ class Inference(object):
         channels: int,
         log_dir: str,
         destination_dir="data",
+        current_time=None,
     ) -> None:
         """Class for infering the trained model. \n 
         Plots `Confusion matrix`, computes `AUC` and `ROC` score.  `normalize=True`
@@ -86,6 +87,7 @@ class Inference(object):
         self.image_size = image_size
         self.channels = channels
         self.log_dir = log_dir
+        self.current_time = current_time
 
     def to_one_hot_vector(self, label):
         """Converts labels to one-hot encoding
@@ -195,7 +197,10 @@ class Inference(object):
         plt.ylabel("True Positive Rate")
         plt.title("Transformer ROC")
         plt.legend(loc="lower right")
-        plt.savefig(f"{self.log_dir}/roc.png", dpi=150)
+        if self.current_time:
+            plt.savefig(f"{self.log_dir}/roc_{self.current_time}.png", dpi=150)
+        else:
+            plt.savefig(f"{self.log_dir}/roc.png", dpi=150)
         plt.show()
         # fig.savefig(f"{self.log_dir}/roc.png", dpi=150)
 
@@ -246,7 +251,12 @@ class Inference(object):
         plt.ylabel("True label")
         plt.xlabel("Predicted label")
         plt.tight_layout()
-        plt.savefig(f"{self.log_dir}/confusion_matrix.png", dpi=150)
+        if self.current_time:
+            plt.savefig(
+                f"{self.log_dir}/confusion_matrix_{self.current_time}.png", dpi=150
+            )
+        else:
+            plt.savefig(f"{self.log_dir}/confusion_matrix.png", dpi=150)
         plt.show()
 
     def generate_plot_confusion_matrix(self):

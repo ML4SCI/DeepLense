@@ -268,6 +268,7 @@ def train(
                 channels=config["channels"],
                 destination_dir="data",
                 log_dir=log_dir,
+                current_time=current_time,
             )
 
             infer_obj.infer_plot_roc()
