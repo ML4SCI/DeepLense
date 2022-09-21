@@ -209,7 +209,7 @@ def main():
         metric_columns=["best_accuracy"]
     )
 
-    num_samples = args.num_workers
+    num_samples = args.num_samples
 
     trainable = tune.with_parameters(
         train,
