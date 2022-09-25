@@ -80,7 +80,16 @@ __More details and instructions to train/test the Model data of specific tasks c
 
 |  | Model I | Model II | Model III |
 |:---:|:---:|:---:|---|
-| ROC-AUC plots | <img src="./imgs/Classi__Model_I.png"/> | <img src="./imgs/Classi__Model_II.png"/> | <img src="./imgs/model-I-resnet34-300.png"/> |
+| ROC-AUC plots | <img src="./imgs/Classi__Model_I.png"/> | <img src="./imgs/Classi__Model_II.png"/> | <img src="./imgs/Classi__Model_III.png"/> |
+
+
+### Regression
+
+|  | Model I | Model II | Model III |
+|:---:|:---:|:---:|---|
+| Predictions vs True Masses scatter plots | <img src="./imgs/Reg__Model_I.png"/> | <img src="./imgs/Reg__Model_II.png"/> | <img src="./imgs/Reg__Model_III.png"/> |
+
+
 
 
 
