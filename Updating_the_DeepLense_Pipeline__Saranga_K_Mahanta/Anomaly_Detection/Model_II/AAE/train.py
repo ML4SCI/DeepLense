@@ -9,7 +9,7 @@ import matplotlib.pyplot as plt
 
 sys.path.append('../')
 from utils import device, set_seed, train_transforms, test_transforms
-from config import EPOCHS, LEARNING_RATE, BATCH_SIZE, MODEL_PATH, TRAIN_DATA_PATH, TEST_DATA_PATH, SAVE_MODEL
+from config import EPOCHS, LEARNING_RATE, BATCH_SIZE, MODEL_PATH, TRAIN_DATA_PATH, TEST_DATA_PATH, SAVE_MODEL, LOAD_PRETRAINED_MODEL
 from train_dataloaders import create_dataloaders
 from model import Encoder, Decoder, Discriminator
 
@@ -199,9 +199,22 @@ if __name__ == "__main__":
     encoder = Encoder().to(device)
     decoder = Decoder().to(device)
     disc = Discriminator().to(device)
+
+    if LOAD_PRETRAINED_MODEL:
+        if device != 'cpu':
+            encoder.load_state_dict(torch.load(MODEL_PATH + 'encoder.pth'))
+            decoder.load_state_dict(torch.load(MODEL_PATH + 'decoder.pth'))
+            disc.load_state_dict(torch.load(MODEL_PATH + 'discriminator.pth'))
+
+        else:
+            encoder.load_state_dict(torch.load(MODEL_PATH + 'encoder.pth', map_location = torch.device('cpu')))
+            decoder.load_state_dict(torch.load(MODEL_PATH + 'decoder.pth', map_location = torch.device('cpu')))
+            disc.load_state_dict(torch.load(MODEL_PATH + 'discriminator.pth', map_location = torch.device('cpu')))
+
     model = {'enc':encoder,
             'dec': decoder,
             'disc': disc}
+
     model, loss_dict = fit_model(model, checkpoint_path = MODEL_PATH)
 
     # Plot losses

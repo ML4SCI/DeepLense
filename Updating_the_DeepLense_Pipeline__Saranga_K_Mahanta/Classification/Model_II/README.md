@@ -1,29 +1,40 @@
-# Model II
+## Configuration (before training)
 
-This data set constitutes simulations that are close to those in our original papers but with changes to the instument systematics to approximate an Euclid survey.
+Make your required changes in config.py (placeholders provided)
 
-## Source galaxy
-- Modeled with simple Sersic light profile 
-- Single channel
+__(all fields are required)__
 
-## Instrument
-- Images are 64 x 64 pixels
-- Modeled after Euclid observation characteristics as done by default in lenstronomy.
+*EPOCHS* = No. of training iterations (INT)
 
-## Dark matter classes
-- No substructure
-- Axion (vortex)
-- CDM (point mass subhalos)
+*LEARNING_RATE* = Learning rate of the optimizer (FLOAT)
 
+*BATCH_SIZE* = Batch size for mini-batch gradient descent (INT)
 
-## Model II Data set
+*LOAD_PRETRAINED_MODEL* = If you want to load a pre-trained model (residing in your MODEL_PATH) and train it further (True/False)
 
-30,000 images per class. Axion files have extra data corresponding to mass of axion used in simulation.
+*SAVE_MODEL* = If you want to save your model post training (True/False)
 
-Training data is found [here](https://drive.google.com/file/d/1HYPkdtVUj9xsoGzFDxT4rhl37KmqDCg4/view?usp=sharing)
+<br>
 
-## Model II Test set
+*MODEL_PATH* = 'Path to save model (if you do not have a .pth file already in the directory, choose a name for your model with .pth extension)'
 
-5,000 images per class. Axion files have extra data corresponding to mass of axion used in simulation.
+**TRAIN_DATA_PATH* = 'Path to your training data folder ('\\\*\\\*' is necessary at the end because the dataloader is using the glob package to access all files)'
 
-Testing data is found [here](https://drive.google.com/file/d/1PFdpqk7XOAKtg0Cnav4HTzyJiudx9dZv/view?usp=sharing)
+*TEST_DATA_PATH* = 'Path to your testing data folder ('\\\*\\\*' is necessary at the end because the dataloader is using the glob package to access all files)'
+
+<br>
+
+## Training
+
+```
+cd to_particular_model_directory_having_train.py
+python train.py
+```
+<br>
+
+## Testing 
+
+```
+cd to_particular_model_directory_having_test.py
+python test.py
+```

@@ -11,7 +11,7 @@ from ranger import Ranger
 from utils import device, set_seed, train_transforms, test_transforms
 from model import Regressor
 from dataloader import create_dataloaders
-from config import EPOCHS, LEARNING_RATE, BATCH_SIZE, SAVE_MODEL, MODEL_PATH, TRAIN_DATA_PATH, TEST_DATA_PATH
+from config import EPOCHS, LEARNING_RATE, BATCH_SIZE, SAVE_MODEL, MODEL_PATH, TRAIN_DATA_PATH, TEST_DATA_PATH, LOAD_PRETRAINED_MODEL
 
 
 def train_epoch(model, dataloader, criterion, optimizer, scheduler, example_ct):
@@ -138,6 +138,13 @@ if __name__ == "__main__":
         )
 
     model = Regressor().to(device)
+
+    if LOAD_PRETRAINED_MODEL:
+        if device != 'cpu':
+            model.load_state_dict(torch.load(MODEL_PATH))
+        else:
+            model.load_state_dict(torch.load(MODEL_PATH, map_location = torch.device('cpu')))
+            
     model, loss_dict = fit_model(model, checkpoint_path = MODEL_PATH)
 
     # Plot losses
