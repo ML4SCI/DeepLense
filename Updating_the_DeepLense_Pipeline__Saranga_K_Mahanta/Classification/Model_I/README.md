@@ -18,9 +18,9 @@ __(all fields are required)__
 
 *MODEL_PATH* = 'Path to save model (if you do not have a .pth file already in the directory, choose a name for your model with .pth extension)'
 
-*TRAIN_DATA_PATH* = 'Path to your training data folder ('\*\*' is necessary at the end because the dataloader is using the glob package to access all files)'
+*TRAIN_DATA_PATH* = 'Path to your training data folder ('\\\*\\\*' is necessary at the end because the dataloader is using the glob package to access all files)'
 
-*TEST_DATA_PATH* = 'Path to your testing data folder ('\*\*' is necessary at the end because the dataloader is using the glob package to access all files)'
+*TEST_DATA_PATH* = 'Path to your testing data folder ('\\\*\\\*' is necessary at the end because the dataloader is using the glob package to access all files)'
 
 <br>
 
