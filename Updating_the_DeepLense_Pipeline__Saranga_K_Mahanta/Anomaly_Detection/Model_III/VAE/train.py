@@ -9,7 +9,7 @@ import matplotlib.pyplot as plt
 
 sys.path.append('../')
 from utils import device, set_seed, train_transforms, test_transforms
-from config import EPOCHS, LEARNING_RATE, BATCH_SIZE, MODEL_PATH, TRAIN_DATA_PATH, TEST_DATA_PATH, SAVE_MODEL
+from config import EPOCHS, LEARNING_RATE, BATCH_SIZE, MODEL_PATH, TRAIN_DATA_PATH, TEST_DATA_PATH, SAVE_MODEL, LOAD_PRETRAINED_MODEL
 from train_dataloaders import create_dataloaders
 from model import Encoder, Decoder, VAE
 
@@ -169,6 +169,13 @@ if __name__ == "__main__":
     encoder = Encoder().to(device)
     decoder = Decoder().to(device)
     model = VAE(encoder, decoder).to(device)
+
+    if LOAD_PRETRAINED_MODEL:
+        if device != 'cpu':
+            model.load_state_dict(torch.load(MODEL_PATH))
+        else:
+            model.load_state_dict(torch.load(MODEL_PATH, map_location = torch.device('cpu')))
+            
     model, loss_dict = fit_model(model, checkpoint_path = MODEL_PATH)
 
     # Plot losses
