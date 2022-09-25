@@ -90,6 +90,16 @@ __More details and instructions to train/test the Model data of specific tasks c
 | Predictions vs True Masses scatter plots | <img src="./imgs/Reg__Model_I.png"/> | <img src="./imgs/Reg__Model_II.png"/> | <img src="./imgs/Reg__Model_III.png"/> |
 
 
+### Anomaly Detection
+
+| Network Architecture 	| Model II 	| Model III 	|
+|:---:	|:---:	|:---:	|
+| Basic Convolutional Autoencoder 	| AUC: 0.96077  <img src = "./imgs/AD__Model_II_AE.png"/> 	| AUC: 0.99248  <img src = "./imgs/AD__Model_III_AE.png"/>	|
+| Variational Convolutional Autoencoder 	| AUC: 0.99892  <img src = "./imgs/AD__Model_II_VAE.png"/>	| AUC: 0.99873  <img src = "./imgs/AD__Model_III_VAE.png"/>	|
+| Adversarial Convolutional Autoencoder 	| AUC: 0.99510  <img src = "./imgs/AD__Model_II_AAE.png"/>	| AUC: 0.99889  <img src = "./imgs/AD__Model_III_AAE.png"/>	|
+
+
+
 
 
 
