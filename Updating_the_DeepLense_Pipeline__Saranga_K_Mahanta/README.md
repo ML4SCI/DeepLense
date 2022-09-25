@@ -3,7 +3,7 @@
 Strong gravitational lensing is a potential way to learn more about dark matter's basic nature by probing its substructure.
 The DeepLense pipeline combines state-of-the-art deep learning models with strong lensing simulations based on lenstronomy. The focus of this project is updating the previous results of DeepLense with new dark matter simulations (Models I, II, III).
 
- This is a PyTorch-based library for performing Regression, Classification, and Anomaly Detection on the new dark matter simulation models. It is one of the projects under __Google Summer of Code 2022__. For more info on the project [Click Here](https://summerofcode.withgoogle.com/programs/2022/projects/iFKJMj0t)
+ This is a PyTorch-based library for performing Regression, Classification, and Anomaly Detection on the new dark matter simulation models. It is one of the projects under [Google Summer of Code 2022](https://summerofcode.withgoogle.com/). For more info on the project [Click Here](https://summerofcode.withgoogle.com/programs/2022/projects/iFKJMj0t)
 <br>
 
 ## Datasets
@@ -67,5 +67,14 @@ Activate virtual environment and install the necessary packages from the provide
 pip install -r requirements.txt
 ```
 
+#### Model weights
+
+Download all model weights from [here](https://mega.nz/folder/SHZ0CLKQ#gQtyY9Yx9CuwWUEH_pbu8w)
+
 __You're ready!__
 __More details and instructions to train/test the Model data of specific tasks can be found in their respective folders.__
+
+## Results
+
+
+
