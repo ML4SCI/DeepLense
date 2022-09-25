@@ -74,7 +74,7 @@ Download all model weights from [here](https://mega.nz/folder/SHZ0CLKQ#gQtyY9Yx9
 __You're ready!__
 
 ## Training/Testing
-Details and instructions to train/test the Model data of specific tasks can be found in their respective folders.
+Details, example jupyter notebooks, and instructions to train/test the Model data of specific tasks can be found in their respective directories.
 
 ## Results
 
@@ -99,6 +99,66 @@ Details and instructions to train/test the Model data of specific tasks can be f
 | Basic Convolutional Autoencoder 	| AUC: 0.96077  <img src = "./imgs/AD__Model_II_AE.png"/> 	| AUC: 0.99248  <img src = "./imgs/AD__Model_III_AE.png"/>	|
 | Variational Convolutional Autoencoder 	| AUC: 0.99892  <img src = "./imgs/AD__Model_II_VAE.png"/>	| AUC: 0.99873  <img src = "./imgs/AD__Model_III_VAE.png"/>	|
 | Adversarial Convolutional Autoencoder 	| AUC: 0.99510  <img src = "./imgs/AD__Model_II_AAE.png"/>	| AUC: 0.99889  <img src = "./imgs/AD__Model_III_AAE.png"/>	|
+
+
+## Citations
+
+
+```bibtex
+@article{alexander2020decoding,
+  title={Decoding Dark Matter Substructure without Supervision},
+  author={Alexander, Stephon and Gleyzer, Sergei and Parul, Hanna and Reddy, Pranath and Toomey, Michael W and Usai, Emanuele and Von Klar, Ryker},
+  journal={arXiv preprint arXiv:2008.12731},
+  year={2020}
+}
+```
+
+```bibtex
+@article{alexander2020deep,
+  title={Deep Learning the Morphology of Dark Matter Substructure},
+  author={Alexander, Stephon and Gleyzer, Sergei and McDonough, Evan and Toomey, Michael W and Usai, Emanuele},
+  journal={The Astrophysical Journal},
+  volume={893},
+  number={1},
+  pages={15},
+  year={2020},
+  publisher={IOP Publishing}
+}
+```
+
+```bibtex
+  @misc{rw2019timm,
+  author = {Ross Wightman},
+  title = {PyTorch Image Models},
+  year = {2019},
+  publisher = {GitHub},
+  journal = {GitHub repository},
+  doi = {10.5281/zenodo.4414861},
+  howpublished = {\url{https://github.com/rwightman/pytorch-image-models}}
+  }
+  ```
+
+  ```bibtex
+  @misc{Ranger,
+  author = {Wright, Less},
+  title = {Ranger - a synergistic optimizer.},
+  year = {2019},
+  publisher = {GitHub},
+  journal = {GitHub repository},
+  howpublished = {\url{https://github.com/lessw2020/Ranger-Deep-Learning-Optimizer}}
+}
+```
+
+```bibtex
+@inproceedings{woo2018cbam,
+  title={Cbam: Convolutional block attention module},
+  author={Woo, Sanghyun and Park, Jongchan and Lee, Joon-Young and Kweon, In So},
+  booktitle={Proceedings of the European conference on computer vision (ECCV)},
+  pages={3--19},
+  year={2018}
+}
+```
+
 
 
 
