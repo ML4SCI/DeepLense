@@ -39,7 +39,7 @@ All the data are available [here](https://github.com/mwt5345/DeepLenseSim).
 Clone the repository and enter the project folder.
 
 ```
-cd https://github.com/ML4SCI/DeepLense.git
+git clone https://github.com/ML4SCI/DeepLense.git
 cd DeepLense
 cd Updating_the_DeepLense_Pipeline__Saranga_K_Mahanta
 ```
@@ -53,8 +53,8 @@ python -m venv /path/to/new/virtual/environment
 Activate virtual environment and install the necessary packages from the provided requirements.txt.
 
 ```
-pip install -r /path/to/requirements.txt
+pip install -r requirements.txt
 ```
 
-You're ready!
-More details and instructions to train/test the Model data of specific tasks can be found in their respective folders.
+__You're ready!__
+__More details and instructions to train/test the Model data of specific tasks can be found in their respective folders.__
