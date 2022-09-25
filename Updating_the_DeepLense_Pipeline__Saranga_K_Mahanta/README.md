@@ -67,14 +67,20 @@ Activate virtual environment and install the necessary packages from the provide
 pip install -r requirements.txt
 ```
 
-#### Model weights
+### Model weights
 
-Download all model weights from [here](https://mega.nz/folder/SHZ0CLKQ#gQtyY9Yx9CuwWUEH_pbu8w)
+Download all model weights from [here](https://mega.nz/folder/SHZ0CLKQ#gQtyY9Yx9CuwWUEH_pbu8w).
 
 __You're ready!__
 __More details and instructions to train/test the Model data of specific tasks can be found in their respective folders.__
 
 ## Results
+
+### Classification
+
+|  | Model I | Model II | Model III |
+|:---:|:---:|:---:|---|
+| ROC-AUC plots | <img src="./imgs/Classi__Model_I.png"/> | <img src="./imgs/Classi__Model_II.png"/> | <img src="./imgs/model-I-resnet34-300.png"/> |
 
 
 
