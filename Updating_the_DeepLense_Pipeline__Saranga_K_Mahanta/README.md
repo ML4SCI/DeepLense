@@ -15,22 +15,33 @@ The models are trained on mainly 3 datasets consisting of ~30,000 images (single
 
 *Note: The Axion files have an extra datapoint corresponding to mass of axion used in simulation. This mass is used for the Regression task on the axion class of the Models.*
 
-All the data are available [here](https://github.com/mwt5345/DeepLenseSim).
+The links to the simulation data are available in the [DeepLenseSim](https://github.com/mwt5345/DeepLenseSim) repo.
 
 ### __Model_I__
 - 150 x 150 dimensional images
 - Modeled with a Gaussian point spread function
 - Added background and noise for SNR of around 25
 
+Training data can be found [here](https://drive.google.com/file/d/1QMVLpqag6S9JWqzmGM_pK4C0F1eBVIfV/view?usp=sharing).
+Testing data can be found [here](https://drive.google.com/file/d/1rUAKLLS3p9jDaL9R9m84JVKvMcUuVsO1/view?usp=sharing).
+
+
 ### __Model_II__
 - 64 x 64 dimensional images
 - Modeled after Euclid observation characteristics as done by default in lenstronomy
 - Modeled with simple Sersic light profile
 
+Training data can be found [here](https://drive.google.com/file/d/1HYPkdtVUj9xsoGzFDxT4rhl37KmqDCg4/view?usp=sharing).
+Testing data can be found [here](https://drive.google.com/file/d/1PFdpqk7XOAKtg0Cnav4HTzyJiudx9dZv/view?usp=sharing).
+
+
 ### __Model_III__
 - 64 x 64 dimensional images.
 - Modeled after HST observation characteristics as done by default in lenstronomy.
 - Modeled with simple Sersic light profile
+
+Training data can be found [here](https://drive.google.com/file/d/1ynKMJoEeKKJqLfuKRR1Y7rQjeBMM0w94/view?usp=sharing).
+Testing data can be found [here](https://drive.google.com/file/d/18BuCv40t6qmiNnhjJF1y9rqSBhBOfDon/view?usp=sharing).
 
 <br>
 
