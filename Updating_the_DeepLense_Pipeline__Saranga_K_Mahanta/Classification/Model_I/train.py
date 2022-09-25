@@ -8,7 +8,7 @@ import matplotlib.pyplot as plt
 
 
 from utils import device, calculate_accuracy, transforms
-from config import EPOCHS, LEARNING_RATE, BATCH_SIZE, MODEL_PATH, TRAIN_DATA_PATH, TEST_DATA_PATH, SAVE_MODEL
+from config import EPOCHS, LEARNING_RATE, BATCH_SIZE, MODEL_PATH, TRAIN_DATA_PATH, TEST_DATA_PATH, SAVE_MODEL, LOAD_PRETRAINED_MODEL
 from dataloader import create_data_loaders
 from model import EffNetB2_backbone_model
 
@@ -63,9 +63,7 @@ def val_epoch(model, dataloader,criterion):
             loss = criterion(y_pred, y_truth)
             accuracy = calculate_accuracy(y_pred, y_truth)
 
-
             #batch loss and accuracy
-            # print(f'Partial train loss: {loss.data}')
             val_loss.append(loss.detach().cpu().numpy())
             val_accuracy.append(accuracy.detach().cpu().numpy())
             
@@ -77,9 +75,6 @@ def fit_model(model, criterion, optimizer):
     
     scheduler = CosineAnnealingWarmRestarts(optimizer,T_0 = 15, T_mult = 1,eta_min = 1e-6, verbose=True)
     
-#     scheduler = ReduceLROnPlateau(optimizer, 'min',patience=2,factor=0.3,verbose=True)
-
-
     for epoch in range(EPOCHS):
         print(f"Epoch {epoch+1}/{EPOCHS}:")
         model, train_loss, train_accuracy = train_epoch(model, train_loader, criterion, optimizer)
@@ -103,10 +98,17 @@ if __name__ == '__main__':
                                                                 transforms = transforms)
 
     model = EffNetB2_backbone_model().to(device)
+
+    if LOAD_PRETRAINED_MODEL:
+        if device != 'cpu':
+            model.load_state_dict(torch.load(MODEL_PATH))
+        else:
+            model.load_state_dict(torch.load(MODEL_PATH, map_location = torch.device('cpu')))
+
     criterion = nn.CrossEntropyLoss()
     optimizer = optim.Adam(model.parameters(),lr = LEARNING_RATE)
 
-    model, loss_dict, acc_dict = fit_model(model,criterion,optimizer)
+    model, loss_dict, acc_dict = fit_model(model, criterion, optimizer)
     if SAVE_MODEL:
         torch.save(model.state_dict(), MODEL_PATH)
 

@@ -72,7 +72,9 @@ pip install -r requirements.txt
 Download all model weights from [here](https://mega.nz/folder/SHZ0CLKQ#gQtyY9Yx9CuwWUEH_pbu8w).
 
 __You're ready!__
-__More details and instructions to train/test the Model data of specific tasks can be found in their respective folders.__
+
+## Training/Testing
+Details and instructions to train/test the Model data of specific tasks can be found in their respective folders.
 
 ## Results
 
