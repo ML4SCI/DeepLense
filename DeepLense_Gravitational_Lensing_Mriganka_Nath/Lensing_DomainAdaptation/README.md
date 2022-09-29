@@ -1,10 +1,10 @@
-# ML4SCI_Deeplense_Gravitational_Lensing
+## Files
 
-## Results
+| Files          |Description   | 
+| -------------  | ---------------  |
+|dataset.py| contatins the Dataset classes  |
+|models.py| Model classes |
+|utils.py| Hyperparameters and other utilities| 
+|algorithms| Contains the implemented domain daptation algorithms|
 
-|                | Efficientnet_b2  | Resnet34  |  Densenet_121 |  ECNN  |
-| -------------  | ---------------  | --------  |  ------------ |  ----- |
-| ADDA           |                  |           |               |        |
-| AdaMtch        |                  |           |               |        |
-| Self-Ensembling|                  |           |               |        |
              
