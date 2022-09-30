@@ -29,8 +29,6 @@ pandas>=1.1.4
 seaborn>=0.11.0
 
 # Export 
-# onnx>=1.9.0  
-# onnx-simplifier>=0.3.6 
 scikit-learn 
 
 # Extras 

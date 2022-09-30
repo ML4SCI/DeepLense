@@ -1,6 +1,4 @@
-import math
-
-PRETRAINED_CONFIG = {
+T2TViT_CONFIG = {
     "network_type": "T2TViT",
     "pretrained": False,
     "image_size": 224,

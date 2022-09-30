@@ -228,7 +228,8 @@ def TransformerModels(
     CaiT: https://arxiv.org/pdf/2103.17239.pdf \n
     CrossViT: https://arxiv.org/pdf/2103.14899.pdf \n
     PiT: https://arxiv.org/pdf/2103.16302.pdf \n
-    Swin: \n
+    Swin: https://arxiv.org/pdf/2103.14030.pdf \n
+    T2TViT: https://arxiv.org/pdf/2101.11986v3.pdf \n
     """
 
     assert transformer_type in [
@@ -239,6 +240,7 @@ def TransformerModels(
         "CrossViT",
         "PiT",
         "Swin",
+        "T2TViT",
     ]
 
     if transformer_type == "CCT":
@@ -366,6 +368,18 @@ def TransformerModels(
             depths=kwargs["depths"],
             num_heads=kwargs["num_heads"],
             mlp_ratio=kwargs["mlp_ratio"],
+        )
+
+    elif transformer_type == "T2TViT":
+        model = T2TViT(
+            image_size=img_size,
+            channels=num_channels,
+            num_classes=num_classes,
+            dim=kwargs["dim"],
+            depth=kwargs["depth"],
+            heads=kwargs["heads"],
+            mlp_dim=kwargs["mlp_dim"],
+            t2t_layers=kwargs["t2t_layers"],
         )
 
     return model

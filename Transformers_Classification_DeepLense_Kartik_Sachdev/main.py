@@ -21,7 +21,6 @@ from utils.inference import Inference
 from argparse import ArgumentParser
 from config.data_config import DATASET
 from config.eqcvt_config import EQCVT_CONFIG
-from config.pretrained_config import PRETRAINED_CONFIG
 from utils.augmentation import get_transform_test, get_transform_train
 from torch.utils.data import DataLoader
 from models.cnn_zoo import Model, ConViT
@@ -48,6 +47,8 @@ from config.cait_config import CAIT_CONFIG
 from config.crossvit_config import CROSSVIT_CONFIG
 from config.pit_config import PIT_CONFIG
 from config.swin_config import SWIN_CONFIG
+from config.t2tvit_config import T2TViT_CONFIG
+
 import json
 
 
@@ -73,7 +74,7 @@ parser.add_argument(
     type=str,
     default="CCT",
     help="transformer config",
-    choices=["CCT", "TwinsSVT", "LeViT", "CaiT", "CrossViT", "PiT", "Swin"],
+    choices=["CCT", "TwinsSVT", "LeViT", "CaiT", "CrossViT", "PiT", "Swin", "T2TViT"],
 )
 
 parser.add_argument("--cuda", action="store_true", help="whether to use cuda")
@@ -108,8 +109,10 @@ def main():
         train_config = PIT_CONFIG
     elif train_config_name == "Swin":
         train_config = SWIN_CONFIG
+    elif train_config_name == "T2TViT":
+        train_config = T2TViT_CONFIG
     else:
-        train_config = CCT_CONFIG  # temporary
+        train_config = CCT_CONFIG
 
     network_type = train_config["network_type"]
     network_config = train_config["network_config"]
@@ -166,8 +169,7 @@ def main():
     sample = next(iter(train_loader))
     print(sample[0].shape)
 
-    num_classes = len(classes)  # number of classes to be classified
-    # image size (129x129)
+    num_classes = len(classes)
     print(num_classes)
     print(f"Train Data: {len(trainset)}")
     print(f"Val Data: {len(testset)}")
@@ -224,11 +226,11 @@ def main():
         json.dump(train_config, fp)
 
     train(
-        epochs=epochs,  # train_config["num_epochs"],
+        epochs=epochs,
         model=model,
         device=device,
         train_loader=train_loader,
-        valid_loader=test_loader,  # change to val-loader
+        valid_loader=test_loader,
         criterion=criterion,
         optimizer=optimizer,
         use_lr_schedule=train_config["lr_schedule_config"]["use_lr_schedule"],
@@ -250,7 +252,7 @@ def main():
         image_size=image_size,
         channels=train_config["channels"],
         destination_dir="data",
-        log_dir=log_dir,  # log_dir
+        log_dir=log_dir,
     )
     infer_obj.infer_plot_roc()
     infer_obj.generate_plot_confusion_matrix()
