@@ -1,25 +1,8 @@
 from __future__ import print_function
 import os
-from os import listdir
-from os.path import join
-import random
-import logging
 import time
-import copy
 
-import matplotlib.pyplot as plt
-import numpy as np
-import pandas as pd
-import torch
 import torch.nn as nn
-import torch.nn.functional as F
-import torch.optim as optim
-from PIL import Image
-from torch.optim.lr_scheduler import StepLR, ReduceLROnPlateau
-from torchinfo import summary
-from sklearn.metrics import roc_curve, auc, confusion_matrix
-
-# from models.cvt import CvT, EqCvT
 from typing import *
 from utils.util import (
     make_directories,
@@ -27,32 +10,12 @@ from utils.util import (
     get_device,
     init_logging_handler,
 )
-from utils.dataset import download_dataset, DeepLenseDataset, visualize_samples
+from utils.dataset import DeepLenseDataset
 from utils.train_ray import train
-from utils.inference import Inference
 from argparse import ArgumentParser
 from config.data_config import DATASET
-from config.eqcvt_config import EQCVT_CONFIG
-from config.pretrained_config import PRETRAINED_CONFIG
-from utils.augmentation import get_transform_test, get_transform_train
-from torch.utils.data import DataLoader
-import timm
-from torchvision import models
-from models.cnn_zoo import Model, ConViT
-import math
-import albumentations as A
-from albumentations.pytorch import ToTensorV2
-from torch.utils.data import DataLoader, Dataset
-from torch.utils.data import DataLoader, Dataset, random_split
-from models.transformer_zoo import (
-    GetCrossFormer,
-    GetTwinsSVT,
-    GetLeViT,
-    GetPiT,
-    GetCCT,
-    GetT2TViT,
-    TransformerModels,
-)
+from utils.augmentation import get_transform_train
+from torch.utils.data import random_split
 
 from config.cct_config import CCT_CONFIG
 from config.twinssvt_config import TWINSSVT_CONFIG, TWINSSVT_RAY_CONFIG
@@ -62,15 +25,10 @@ from config.crossvit_config import CROSSVIT_CONFIG
 from config.pit_config import PIT_CONFIG
 from config.swin_config import SWIN_CONFIG
 
-import json
-
-import wandb
-
 from ray import tune
 from ray.tune import CLIReporter
 import ray
 
-# from ray.tune.integration.wandb import WandbLogger
 from ray.tune.schedulers import ASHAScheduler
 
 parser = ArgumentParser()
@@ -142,10 +100,7 @@ def main():
         train_config = CCT_CONFIG  # temporary
 
     network_type = train_config["network_type"]
-    network_config = train_config["network_config"]
     image_size = train_config["image_size"]
-    optimizer_config = train_config["optimizer_config"]
-    lr_schedule_config = train_config["lr_schedule_config"]
 
     make_directories([dataset_dir])
 
@@ -180,7 +135,7 @@ def main():
         f"{log_dir}/checkpoint", f"{network_type}_{dataset_name}_{current_time}.pt"
     )
 
-    num_classes = len(classes)  # number of classes to be classified
+    num_classes = len(classes)
 
     print(num_classes)
     print(f"Train Data: {len(trainset)}")
@@ -192,7 +147,7 @@ def main():
 
     train_config["wandb"] = {
         "project": f"{network_type}_{dataset_name}_hpo",
-        "api_key": "0eab39620668aed6d80d5cc8e58407d2509af0eb",  # os.environ["WANDB_KEY"]
+        "api_key": os.environ["WANDB_KEY"],
     }
 
     train_config["labels_map"] = classes
@@ -204,10 +159,7 @@ def main():
         mode="max",
     )
 
-    reporter = CLIReporter(
-        # parameter_columns=["l1", "l2", "lr", "batch_size"],
-        metric_columns=["best_accuracy"]
-    )
+    reporter = CLIReporter(metric_columns=["best_accuracy"])
 
     num_samples = args.num_samples
 
@@ -232,18 +184,14 @@ def main():
         name=f"{train_config_name}_{current_time}",
         config=train_config,
         scheduler=scheduler,
-        # search_alg=algo,
-        resources_per_trial={"cpu": num_workers, "gpu": 1},  # num_workers
+        resources_per_trial={"cpu": num_workers, "gpu": 1},
         stop={"training_iteration": epochs,},
         verbose=1,
         num_samples=num_samples,
-        # reuse_actors=True,  # keep to true to check how training progresses
-        # fail_fast=True,  # fail on first error
         keep_checkpoints_num=2,
         progress_reporter=reporter,
         checkpoint_score_attr="best_accuracy",
         local_dir="Tune-Best-Test",
-        # loggers=[WandbLogger],
     )
 
     ray.shutdown()

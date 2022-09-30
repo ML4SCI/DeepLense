@@ -1,4 +1,3 @@
-"""temporary trainer"""
 from __future__ import print_function
 import logging
 import copy
@@ -170,11 +169,8 @@ def train(
     # path = f"{os.path.dirname(os.path.abspath(__file__))}/../{path}"
 
     steps = 0
-    all_train_loss = []
     all_val_loss = []
-    all_train_accuracy = []
     all_val_accuracy = []
-    all_test_accuracy = []
     all_epoch_loss = []
 
     best_accuracy = 0.0
@@ -183,12 +179,8 @@ def train(
     for epoch in range(epochs):
         model.train()
         epoch_loss = 0
-        epoch_accuracy = 0
-        tr_loss_epoch = []
-        running_loss = 0
 
         for data, label in tqdm(train_loader):
-            # for step, (data, label) in loop:
             steps += 1
             data = data.to(device)
             label = label.to(device)
@@ -206,8 +198,6 @@ def train(
 
         epoch_loss = epoch_loss / len(train_loader)
         all_epoch_loss.append(epoch_loss)
-
-        correct = 0
 
         with torch.no_grad():
             model.eval()
@@ -233,7 +223,6 @@ def train(
             f"Epoch : {epoch+1} - LR {optimizer.param_groups[0]['lr']:.8f} - loss : {epoch_loss:.4f} - val_loss : {epoch_val_loss:.4f} - val_acc: {epoch_val_accuracy:.4f} \n"
         )
 
-        # logging frequency = each epoch
         loss = loss.cpu().detach().numpy()
         epoch_val_loss = epoch_val_loss.cpu().detach().numpy()
         epoch_val_accuracy = epoch_val_accuracy.cpu().detach().numpy()
@@ -274,7 +263,6 @@ def train(
             infer_obj.infer_plot_roc()
             infer_obj.generate_plot_confusion_matrix()
 
-        # session.report({"best_accuracy": best_accuracy})
         tune.report(best_accuracy=best_accuracy)
 
     if best_accuracy > BEST_ACC_OVERALL:
