@@ -1,23 +1,11 @@
 from __future__ import print_function
 import os
-from os import listdir
-from os.path import join
-import random
-import logging
 import time
-import copy
 
-import matplotlib.pyplot as plt
-import numpy as np
-import pandas as pd
-import torch
 import torch.nn as nn
-import torch.nn.functional as F
 import torch.optim as optim
-from PIL import Image
 from torch.optim.lr_scheduler import StepLR, ReduceLROnPlateau
 from torchinfo import summary
-from sklearn.metrics import roc_curve, auc, confusion_matrix
 
 # from models.cvt import CvT, EqCvT
 from typing import *
@@ -36,8 +24,6 @@ from config.eqcvt_config import EQCVT_CONFIG
 from config.pretrained_config import PRETRAINED_CONFIG
 from utils.augmentation import get_transform_test, get_transform_train
 from torch.utils.data import DataLoader
-import timm
-from torchvision import models
 from models.cnn_zoo import Model, ConViT
 import math
 from transformers import get_cosine_schedule_with_warmup
@@ -62,11 +48,8 @@ from config.cait_config import CAIT_CONFIG
 from config.crossvit_config import CROSSVIT_CONFIG
 from config.pit_config import PIT_CONFIG
 from config.swin_config import SWIN_CONFIG
-
-
 import json
 
-import wandb
 
 parser = ArgumentParser()
 parser.add_argument(
