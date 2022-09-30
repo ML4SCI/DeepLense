@@ -48,6 +48,7 @@ from config.crossvit_config import CROSSVIT_CONFIG
 from config.pit_config import PIT_CONFIG
 from config.swin_config import SWIN_CONFIG
 from config.t2tvit_config import T2TViT_CONFIG
+from config.cvt_config import CvT_CONFIG
 
 import json
 
@@ -72,9 +73,19 @@ parser.add_argument(
 parser.add_argument(
     "--train_config",
     type=str,
-    default="CCT",
+    default="CvT",
     help="transformer config",
-    choices=["CCT", "TwinsSVT", "LeViT", "CaiT", "CrossViT", "PiT", "Swin", "T2TViT"],
+    choices=[
+        "CvT",
+        "CCT",
+        "TwinsSVT",
+        "LeViT",
+        "CaiT",
+        "CrossViT",
+        "PiT",
+        "Swin",
+        "T2TViT",
+    ],
 )
 
 parser.add_argument("--cuda", action="store_true", help="whether to use cuda")
@@ -112,7 +123,7 @@ def main():
     elif train_config_name == "T2TViT":
         train_config = T2TViT_CONFIG
     else:
-        train_config = CCT_CONFIG
+        train_config = CvT_CONFIG
 
     network_type = train_config["network_type"]
     network_config = train_config["network_config"]

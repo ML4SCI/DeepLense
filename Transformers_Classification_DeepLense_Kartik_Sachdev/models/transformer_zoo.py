@@ -5,6 +5,7 @@ from .pit import PiT
 from .cait import CaiT
 from .cross_vit import CrossViT
 from .swin import SwinTransformer
+from .cvt import CvT
 from vit_pytorch.cct import CCT
 from vit_pytorch.t2t import T2TViT
 from typing import Any
@@ -201,7 +202,7 @@ def TransformerModels(
 
     Args:
         transformer_type (str): 
-            name of the transformer ["CCT", "TwinsSVT", "LeViT", "CaiT", "CrossViT", "PiT"]
+            name of the transformer ["CvT", "CCT", "TwinsSVT", "LeViT", "CaiT", "CrossViT", "PiT"]
         num_classes (int): # of classes for classification 
         num_channels (int): # of channels of input image 
         img_size (int): size of input image
@@ -222,6 +223,7 @@ def TransformerModels(
         >>>         "mlp_mult": 2,
         >>>         "dropout": 0.1})
     
+    CvT: https://arxiv.org/pdf/2103.15808.pdf \n
     CCT: https://arxiv.org/pdf/2104.05704v4.pdf \n
     TwinsSVT: https://arxiv.org/pdf/2104.13840.pdf \n
     LeViT: https://openaccess.thecvf.com/content/ICCV2021/papers/Graham_LeViT_A_Vision_Transformer_in_ConvNets_Clothing_for_Faster_Inference_ICCV_2021_paper.pdf \n
@@ -233,6 +235,7 @@ def TransformerModels(
     """
 
     assert transformer_type in [
+        "CvT",
         "CCT",
         "TwinsSVT",
         "LeViT",
@@ -381,6 +384,28 @@ def TransformerModels(
             mlp_dim=kwargs["mlp_dim"],
             t2t_layers=kwargs["t2t_layers"],
         )
-
+    elif transformer_type == "CvT":
+        model = CvT(
+            channels=num_channels,
+            num_classes=num_classes,
+            s1_emb_dim=kwargs["s1_emb_dim"],
+            s1_emb_kernel=kwargs["s1_emb_kernel"],
+            s1_emb_stride=kwargs["s1_emb_stride"],
+            s1_proj_kernel=kwargs["s1_proj_kernel"],
+            s1_kv_proj_stride=kwargs["s1_kv_proj_stride"],
+            s1_heads=kwargs["s1_heads"],
+            s1_depth=kwargs["s1_depth"],
+            s1_mlp_mult=kwargs["s1_mlp_mult"],
+            s2_emb_dim=kwargs["s2_emb_dim"],
+            s2_emb_kernel=kwargs["s2_emb_kernel"],
+            s2_emb_stride=kwargs["s2_emb_stride"],
+            s2_proj_kernel=kwargs["s2_proj_kernel"],
+            s2_kv_proj_stride=kwargs["s2_kv_proj_stride"],
+            s2_heads=kwargs["s2_heads"],
+            s2_depth=kwargs["s2_depth"],
+            s2_mlp_mult=kwargs["s2_mlp_mult"],
+            mlp_last=kwargs["mlp_last"],
+            dropout=kwargs["dropout"],
+        )
     return model
 
