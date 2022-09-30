@@ -6,6 +6,7 @@
 *.ipynb_checkpoints/*
 wandb/*
 /logger/*
+Tune-Best-Test/*
 
 # Files to ignore
 *.zip
