@@ -12,9 +12,9 @@ RUN apt-get update && apt-get install -y \
     libsm6 \ 
     libxext6
 
-RUN mkdir -p GSoC-2022 
-COPY . GSoC-2022/
-WORKDIR GSoC-2022
+RUN mkdir -p DeepLense 
+COPY . DeepLense/
+WORKDIR DeepLense
 
 RUN pip install --upgrade -r requirements.txt
 RUN mkdir -p logger
