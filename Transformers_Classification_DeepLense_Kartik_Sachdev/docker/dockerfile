@@ -7,11 +7,15 @@ RUN rm /etc/apt/sources.list.d/nvidia-ml.list
 
 RUN apt-get update && apt-get install -y \
     git \
-    vim
+    vim \
+    ffmpeg \
+    libsm6 \ 
+    libxext6
 
 RUN mkdir -p GSoC-2022 
 COPY . GSoC-2022/
 WORKDIR GSoC-2022
 
 RUN pip install --upgrade -r requirements.txt
+RUN mkdir -p logger
 
