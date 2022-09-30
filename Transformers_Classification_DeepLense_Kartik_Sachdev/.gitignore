@@ -14,3 +14,4 @@ Tune-Best-Test/*
 *.DS_Store
 *.npz
 *.pt
+*output.*
