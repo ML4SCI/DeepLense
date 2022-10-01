@@ -2,7 +2,9 @@
   
  PyTorch-based library for performing image classification of the simulated strong lensing images to predict substructures of dark matter halos. The project involves implementation and benchmarking of various versions of Vision Transformers to achieve a robust architecture with high metrics for classification namely Validation Accuracy, ROC and AUC scores.
 
-This is an ongoing __Google Summer of Code (GSoC) 2022__ project. For more info on the project [Click Here](https://summerofcode.withgoogle.com/programs/2022/projects/L557jFPL) <br>
+It is one of __Google Summer of Code (GSoC) 2022__ project in association with [Machine Learning for Science (ML4Sci)](https://ml4sci.org/). More information about the project can be found [here](https://summerofcode.withgoogle.com/programs/2022/projects/L557jFPL) <br>
+
+A brief summary of the project along with technical background, and key takeaways can be found in the [Medium Blog Post](https://medium.com/@sachdev.kartik25/benchmarking-vision-transformers-for-classification-of-dark-matter-substructure-gsoc-2022-with-6ec7711cc32d)
 <br>
 
 # __Datasets__
@@ -33,42 +35,60 @@ ___Note__: Axion files have extra data corresponding to mass of axion used in si
 # __Installation__
 To install locally, using pip:
 ```bash
-git clone https://github.com/sachdevkartik/GSoC-2022.git
-cd GSoC-2022
-git checkout epic/official_project
+git clone https://github.com/ML4SCI/DeepLense.git
+cd DeepLense/Transformers_Classification_DeepLense_Kartik_Sachdev
+git checkout PR_kartik_transformers
 pip3 install --user --upgrade -r requirements.txt
-```
-
-To install locally, using setup tools/pip:
-```bash
-git clone https://github.com/sachdevkartik/GSoC-2022.git
-cd GSoC-2022
-git checkout epic/official_project
-pip3 install .  
 ```
 
 <br>
 
 # __Training__
 
-### __Locally__
-Modify the configuration of the model and training scheme from the [config](/config/) folder. Then, the script can be run locally. Example: 
+### __Train with custom config__
+Modify the configuration of the model and training scheme from `T2TViT_CONFIG` in the [config file](/config/). Then, the script can be run locally, for example:
+
 ```bash
-cd GSoC-2022
+cd DeepLense/Transformers_Classification_DeepLense_Kartik_Sachdev
 python3 -u main.py \
---num_workers 20 \
---dataset_name Model_II \
---train_config TwinsSVT \
---cuda   
+  --num_workers 20 \
+  --dataset_name Model_II \
+  --train_config TwinsSVT \
+  --cuda   
+```
+
+| Arguments | Description |
+| :---  | :--- | 
+| num_workers | Number of workers available for training |
+| dataset_name | Name of the dataset type for DeepLense project |
+| save | Path where the dataset is stored |
+| train_config | Transformer config: [CvT, CCT, TwinsSVT, LeViT, CaiT, CrossViT, PiT, Swin, T2TViT, CrossFormer] |
+| cuda | Use cuda |
+| no-cuda | Not use cuda |
+
+<br>
+
+### __Hyperparameter optimization__
+Modify the configuration of the model and training scheme from `T2TViT_RAY_CONFIG` in the [config file](/config/t2tvit_config.py). Then, the script can be run, for example: 
+
+```bash
+cd DeepLense/Transformers_Classification_DeepLense_Kartik_Sachdev
+python3 main_ray.py \
+  --num_workers 20 \
+  --dataset_name Model_II \
+  --train_config TwinsSVT \
+  --cuda \
+  --num_samples 10
 ```
 | Arguments | Description |
 | :---  | :--- | 
 | num_workers | Number of workers available for training |
 | dataset_name | Name of the dataset type for DeepLense project |
 | save | Path where the dataset is stored |
-| train_config | Transformer config: [CCT, TwinsSVT, LeViT, CaiT, CrossViT, PiT] |
+| train_config | Transformer config: [CvT, CCT, TwinsSVT, LeViT, CaiT, CrossViT, PiT, Swin, T2TViT, CrossFormer] |
 | cuda | Use cuda |
 | no-cuda | Not use cuda |
+| num_samples | Number of samples for [ASHA scheduler](https://docs.ray.io/en/latest/tune/api_docs/schedulers.html)  |
 
 
 ### __Jupyterfile__
@@ -159,7 +179,7 @@ So, far 9 different versions of Vision Transformers have been tested. Results ar
   | Dataset | Acc (%) | AUC (axion) | AUC (cdm) | AUC (no_sub) 
   | :---:  | :---: | :---: | :---: | :---: | 
   | Model I   |   88.12 | 0.9706  | 0.6502 | 0.9902 |
-  | Model II  |  - | -  | - | - |
+  | Model II  |  94.33  | 0.9883  | 0.9095 | 0.9983 |
   | Model III |  77.29   | 0.6515  | 0.9737 | 0.8980 |
 
 
@@ -168,10 +188,11 @@ So, far 9 different versions of Vision Transformers have been tested. Results ar
   | Dataset | Acc (%) | AUC (axion) | AUC (cdm) | AUC (no_sub) 
   | :---:  | :---: | :---: | :---: | :---: | 
   | Model I   |  40.63   | 0.5981  | 0.5584 | 0.6580|
-  | Model II  |   33.60  | 0.5351 | 0.2022 | 0.5378 |
+  | Model II  |   33.60  | 0.5351 | 0.5022 | 0.5378 |
   | Model III | 34.18    | 0.5176  | 0.5153 | 0.5294 |
 
-
+### Trained models and logs:
+https://mega.nz/fm/tHtGERDY
 
 <br>
 
