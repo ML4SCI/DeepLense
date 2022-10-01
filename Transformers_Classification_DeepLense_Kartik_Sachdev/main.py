@@ -49,6 +49,7 @@ from config.pit_config import PIT_CONFIG
 from config.swin_config import SWIN_CONFIG
 from config.t2tvit_config import T2TViT_CONFIG
 from config.cvt_config import CvT_CONFIG
+from config.crossformer_config import CROSSFORMER_CONFIG
 
 import json
 
@@ -85,6 +86,7 @@ parser.add_argument(
         "PiT",
         "Swin",
         "T2TViT",
+        "CrossFormer",
     ],
 )
 
@@ -122,6 +124,8 @@ def main():
         train_config = SWIN_CONFIG
     elif train_config_name == "T2TViT":
         train_config = T2TViT_CONFIG
+    elif train_config_name == "CrossFormer":
+        train_config = CROSSFORMER_CONFIG
     else:
         train_config = CvT_CONFIG
 

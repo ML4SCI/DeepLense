@@ -244,6 +244,7 @@ def TransformerModels(
         "PiT",
         "Swin",
         "T2TViT",
+        "CrossFormer",
     ]
 
     if transformer_type == "CCT":
@@ -406,6 +407,15 @@ def TransformerModels(
             s2_mlp_mult=kwargs["s2_mlp_mult"],
             mlp_last=kwargs["mlp_last"],
             dropout=kwargs["dropout"],
+        )
+    elif transformer_type == "CrossFormer":
+        model = CrossFormer(
+            num_classes=num_classes,
+            channels=num_channels,
+            dim=kwargs["dim"],
+            depth=kwargs["depth"],
+            global_window_size=kwargs["global_window_size"],
+            local_window_size=kwargs["local_window_size"],
         )
     return model
 
