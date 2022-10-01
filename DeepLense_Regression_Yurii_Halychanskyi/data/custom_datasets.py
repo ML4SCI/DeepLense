@@ -1,5 +1,6 @@
 from fastai.data.core import Datasets
 import torch
+import numpy as np
 
 class RegressionNumpyArrayDataset(Datasets):
   def __init__(self,x,y,indexes=None,x_transforms_func = None):
@@ -15,9 +16,10 @@ class RegressionNumpyArrayDataset(Datasets):
 
   def __getitem__(self, idx):
     image, label = self.x[idx], self.y[idx]
-    
-    image = torch.tensor(image).float()
-    label = torch.tensor(label).float()
+
+    img_min = image.min()
+    image = torch.tensor((image-img_min)/(image.max()-img_min), dtype=torch.float32)
+    label = torch.tensor(np.log10(label), dtype=torch.float32)
 
     if self.x_transforms!=None:
       image= self.x_transforms(image)
