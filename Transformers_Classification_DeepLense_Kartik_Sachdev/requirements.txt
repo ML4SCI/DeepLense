@@ -20,7 +20,7 @@ timm>=0.5.4
 transformers>=4.18.0
 e2cnn==0.1.9
 ray
-protobuf<4.0dev
+protobuf<3.20
 
 # Logging 
 tensorboard>=2.4.1
