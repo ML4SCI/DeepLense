@@ -2,7 +2,7 @@
   
  PyTorch-based library for performing image classification of the simulated strong lensing images to predict substructures of dark matter halos. The project involves implementation and benchmarking of various versions of Vision Transformers to achieve a robust architecture with high metrics for classification namely Validation Accuracy, ROC and AUC scores.
 
-It is one of __Google Summer of Code (GSoC) 2022__ project in association with [Machine Learning for Science (ML4Sci)](https://ml4sci.org/). More information about the project can be found [here](https://summerofcode.withgoogle.com/programs/2022/projects/L557jFPL) <br>
+It is one of __Google Summer of Code (GSoC) 2022__ project in association with [__Machine Learning for Science (ML4Sci)__](https://ml4sci.org/). More information about the project can be found [here](https://summerofcode.withgoogle.com/programs/2022/projects/L557jFPL) <br>
 
 A brief summary of the project along with technical background, and key takeaways can be found in the [Medium Blog Post](https://medium.com/@sachdev.kartik25/benchmarking-vision-transformers-for-classification-of-dark-matter-substructure-gsoc-2022-with-6ec7711cc32d)
 <br>
@@ -38,7 +38,7 @@ To install locally, using pip:
 git clone https://github.com/ML4SCI/DeepLense.git
 cd DeepLense/Transformers_Classification_DeepLense_Kartik_Sachdev
 git checkout PR_kartik_transformers
-pip3 install --user --upgrade -r requirements.txt
+pip3 install --upgrade -r requirements.txt
 ```
 
 <br>
@@ -46,7 +46,7 @@ pip3 install --user --upgrade -r requirements.txt
 # __Training__
 
 ### __Train with custom config__
-Modify the configuration of the model and training scheme from `T2TViT_CONFIG` in the [config file](/config/). Then, the script can be run locally, for example:
+Modify the configuration of the chosen model and training scheme from e.g. `TwinsSVT_CONFIG` in the [config file](/config/twinssvt_config.py). Then, the script can be run locally, for example:
 
 ```bash
 cd DeepLense/Transformers_Classification_DeepLense_Kartik_Sachdev
@@ -69,7 +69,7 @@ python3 -u main.py \
 <br>
 
 ### __Hyperparameter optimization__
-Modify the configuration of the model and training scheme from `T2TViT_RAY_CONFIG` in the [config file](/config/t2tvit_config.py). Then, the script can be run, for example: 
+Modify the configuration of the model and training scheme from e.g. `TwinsSVT_RAY_CONFIG` in the [config file](/config/twinssvt_config.py). Then, the script can be run, for example: 
 
 ```bash
 cd DeepLense/Transformers_Classification_DeepLense_Kartik_Sachdev
@@ -91,12 +91,15 @@ python3 main_ray.py \
 | num_samples | Number of samples for [ASHA scheduler](https://docs.ray.io/en/latest/tune/api_docs/schedulers.html)  |
 
 
+<br>
+
 ### __Jupyterfile__
 
 Run the [example file](example.ipynb)  
 
-___Note__: To view the dataset, ROC curve and confusion matrix in the jupyter file, please comment out: `matplotlib.use("Agg")` from  `utils/inference.py` file. This is will automated in the future version._
+___Note__: To view the dataset, ROC curve and confusion matrix in the jupyter file, please comment out: `matplotlib.use("Agg")` from  [`utils/inference.py`](utils/inference.py) file._
 
+<br>
 
 ### __Cluster__
 Modify the file `jobscript.sh` as per the system and user specifics and then, train using __SLURM__. Example: 
@@ -191,56 +194,18 @@ So, far 9 different versions of Vision Transformers have been tested. Results ar
   | Model II  |   33.60  | 0.5351 | 0.5022 | 0.5378 |
   | Model III | 34.18    | 0.5176  | 0.5153 | 0.5294 |
 
-### Trained models and logs:
-https://mega.nz/fm/tHtGERDY
+### __[Swin](https://arxiv.org/pdf/2103.14030.pdf)__
+
+  | Dataset | Acc (%) | AUC (axion) | AUC (cdm) | AUC (no_sub) 
+  | :---:  | :---: | :---: | :---: | :---: | 
+  | Model I   |  34.16   | 0.5066  | 0.4886 | 0.4945 |
+  | Model II  |   33.72  | 0.5056 | 0.4922 | 0.5022 |
+  | Model III | 33.56    | 0.4357  | 0.6116 | 0.5909 |
 
 <br>
 
-# __Previous work (Evaluation Tests)__
-### __Equivariant Convolutional Vision Transformer__ ##
-
-An Equivariant Convolutional Vision Transformer is built for binary classification using PyTorch. Approach and strategy are discussed in [test2_e2c_vit.ipynb](./test2_e2c_vit.ipynb)
-
-* **Dataset**: The Dataset consists of simulated strong gravitational lensing images with and without substructure. 
-
-* **Solution**: The notebook can be open on [GoogleColab](https://colab.research.google.com/github/sachdevkartik/GSoC-2022/blob/main/test2_e2c_vit.ipynb)
-
-* **Model Weights**: [e2cnn_vit_2022-04-04-23-41-30.pt](model/e2cnn_vit_2022-04-04-23-41-30.pt)
-
-* **Inference**: Please use [test2_e2cnn_vit_inference.ipynb](./test2_e2cnn_vit_inference.ipynb) file for inference.
-
-* **Results**:
-
-    | S.No | Metric | Value |
-    | --- | --- | --- |
-    | 1. | Best validation accuracy | 97.10% |
-    | 2. | AUC (with sub structure)  | 0.9961 |
-    | 3. | AUC (without sub structure)  | 0.9975 |
-
-<br>
-
-
-### __Convolutional Vision Transformer (CvT)__ ##
-
-An efficient Convolutional Vision Transformer (CvT) is built for binary classification using PyTorch. Approach and strategy are discussed in [test2.ipynb](./test2.ipynb)
-
-* **Dataset**: The Dataset consists of simulated strong gravitational lensing images with and without substructure. 
-
-* **Solution**: The notebook can be open on [GoogleColab](https://colab.research.google.com/github/sachdevkartik/GSoC-2022/blob/main/test2.ipynb)
-
-* **Model Weights**: [ConvTransformer_2022-04-05-21-20-09.pt](model/ConvTransformer_2022-03-15-13-40-54.pt)
-
-* **Inference**: Please use [test2_inference.ipynb](./test2_inference.ipynb) file for inference.
-
-* **Results**:
-
-  | S.No | Metric | Value |
-  | --- | --- | --- |
-  | 1. | Best validation accuracy | 98.12% |
-  | 2. | AUC (with sub structure)  | 0.9988 |
-  | 3. | AUC (without sub structure)  | 0.9989 |
-
-<br>
+# __Trained Models__
+Trained models and logs can be found here: https://mega.nz/fm/tHtGERDY
 
 <br>
 
@@ -372,6 +337,17 @@ An efficient Convolutional Vision Transformer (CvT) is built for binary classifi
         author={Weiler, Maurice and Cesa, Gabriele},
         booktitle={Conference on Neural Information Processing Systems (NeurIPS)},
         year={2019},
+    }
+    ```
+
+* [Swin Transformer](https://arxiv.org/pdf/2103.14030.pdf)
+
+    ```bibtex
+    @inproceedings{liu2021Swin,
+      title={Swin Transformer: Hierarchical Vision Transformer using Shifted Windows},
+      author={Liu, Ze and Lin, Yutong and Cao, Yue and Hu, Han and Wei, Yixuan and Zhang, Zheng and Lin, Stephen and Guo, Baining},
+      booktitle={Proceedings of the IEEE/CVF International Conference on Computer Vision (ICCV)},
+      year={2021}
     }
     ```
 
