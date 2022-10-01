@@ -1,12 +1,19 @@
 # folders to ignore
-**/data/*
+/data/*
+**/dataset/*
 **/checkpoints/*
 */.ipynb_checkpoints
 */__pycache__
+wandb/*
+/logger/*
+Tune-Best-Test/*
 
 # files to ignore
 *.tgz
 *.tar
 *.zip
+*.DS_Store
+*.npz
+*.pt
 
 

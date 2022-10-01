@@ -5,8 +5,8 @@ from setuptools import find_packages, setup
 # Package meta-data.
 NAME = "deeplense-transformers"
 DESCRIPTION = "DeepLense library for classiying Dark Matter Halos using transformers"
-URL = "https://github.com/sachdevkartik/GSoC-2022/tree/epic/official_project"
-EMAIL = "kartik,sachdev125@gmail.com"
+URL = "https://github.com/sachdevkartik/DeepLense/tree/PR_kartik_transformers"
+EMAIL = "kartik,sachdev25@gmail.com"
 AUTHOR = "Kartik Sachdev"
 REQUIRES_PYTHON = ">=3.6.0"
 
