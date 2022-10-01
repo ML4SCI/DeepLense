@@ -17,13 +17,17 @@ from config.data_config import DATASET
 from utils.augmentation import get_transform_train
 from torch.utils.data import random_split
 
-from config.cct_config import CCT_CONFIG
-from config.twinssvt_config import TWINSSVT_CONFIG, TWINSSVT_RAY_CONFIG
-from config.levit_config import LEVIT_CONFIG
-from config.cait_config import CAIT_CONFIG
-from config.crossvit_config import CROSSVIT_CONFIG
-from config.pit_config import PIT_CONFIG
-from config.swin_config import SWIN_CONFIG
+from config.twinssvt_config import TWINSSVT_RAY_CONFIG
+from config.cct_config import CCT_RAY_CONFIG
+from config.levit_config import LEVIT_RAY_CONFIG
+from config.cait_config import CAIT_RAY_CONFIG
+from config.crossvit_config import CROSSVIT_RAY_CONFIG
+from config.pit_config import PIT_RAY_CONFIG
+from config.swin_config import SWIN_RAY_CONFIG
+from config.t2tvit_config import T2TViT_RAY_CONFIG
+from config.crossformer_config import CROSSFORMER_RAY_CONFIG
+from config.cvt_config import CvT_RAY_CONFIG
+
 
 from ray import tune
 from ray.tune import CLIReporter
@@ -59,9 +63,20 @@ parser.add_argument(
 parser.add_argument(
     "--train_config",
     type=str,
-    default="CCT",
+    default="CvT",
     help="transformer config",
-    choices=["CCT", "TwinsSVT", "LeViT", "CaiT", "CrossViT", "PiT", "Swin"],
+    choices=[
+        "CvT",
+        "CCT",
+        "TwinsSVT",
+        "LeViT",
+        "CaiT",
+        "CrossViT",
+        "PiT",
+        "Swin",
+        "T2TViT",
+        "CrossFormer",
+    ],
 )
 
 parser.add_argument("--cuda", action="store_true", help="whether to use cuda")
@@ -83,21 +98,25 @@ def main():
     classes = DATASET[f"{dataset_name}"]["classes"]
 
     if train_config_name == "CCT":
-        train_config = CCT_CONFIG
+        train_config = CCT_RAY_CONFIG
     elif train_config_name == "TwinsSVT":
         train_config = TWINSSVT_RAY_CONFIG
     elif train_config_name == "LeViT":
-        train_config = LEVIT_CONFIG
+        train_config = LEVIT_RAY_CONFIG
     elif train_config_name == "CaiT":
-        train_config = CAIT_CONFIG
+        train_config = CAIT_RAY_CONFIG
     elif train_config_name == "CrossViT":
-        train_config = CROSSVIT_CONFIG
+        train_config = CROSSVIT_RAY_CONFIG
     elif train_config_name == "PiT":
-        train_config = PIT_CONFIG
+        train_config = PIT_RAY_CONFIG
     elif train_config_name == "Swin":
-        train_config = SWIN_CONFIG
+        train_config = SWIN_RAY_CONFIG
+    elif train_config_name == "T2TViT":
+        train_config = T2TViT_RAY_CONFIG
+    elif train_config_name == "CrossFormer":
+        train_config = CROSSFORMER_RAY_CONFIG
     else:
-        train_config = CCT_CONFIG  # temporary
+        train_config = CvT_RAY_CONFIG
 
     network_type = train_config["network_type"]
     image_size = train_config["image_size"]
