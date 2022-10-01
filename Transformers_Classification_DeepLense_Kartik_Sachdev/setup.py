@@ -5,7 +5,7 @@ from setuptools import find_packages, setup
 # Package meta-data.
 NAME = "deeplense-transformers"
 DESCRIPTION = "DeepLense library for classiying Dark Matter Halos using transformers"
-URL = "https://github.com/sachdevkartik/DeepLense/tree/PR_kartik_transformers"
+URL = "https://github.com/sachdevkartik/DeepLense/tree/PR_kartik_transformers/Transformers_Classification_DeepLense_Kartik_Sachdev"
 EMAIL = "kartik,sachdev25@gmail.com"
 AUTHOR = "Kartik Sachdev"
 REQUIRES_PYTHON = ">=3.6.0"
@@ -18,7 +18,7 @@ about = {}
 ROOT_DIR = Path(__file__).resolve().parent
 REQUIREMENTS_DIR = ROOT_DIR
 PACKAGE_DIR = ROOT_DIR
-with open(PACKAGE_DIR) as f:
+with open("VERSION") as f:
     _version = f.read().strip()
     about["__version__"] = _version
 
