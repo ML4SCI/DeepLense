@@ -50,7 +50,7 @@ Modify the configuration of the chosen model and training scheme from e.g. `Twin
 
 ```bash
 cd DeepLense/Transformers_Classification_DeepLense_Kartik_Sachdev
-python3 -u main.py \
+python3 main.py \
   --num_workers 20 \
   --dataset_name Model_II \
   --train_config TwinsSVT \
@@ -110,7 +110,7 @@ sbatch < jobscript.sh
 
 # __Results__
 
-So, far 9 different versions of Vision Transformers have been tested. Results are as follows:
+10 different versions of Vision Transformers have been tested. Results are as follows:
 
 
 ### __[CvT](https://arxiv.org/pdf/2103.15808.pdf)__
