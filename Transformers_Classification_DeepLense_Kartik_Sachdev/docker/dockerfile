@@ -16,7 +16,5 @@ RUN mkdir -p DeepLense
 COPY . DeepLense/
 WORKDIR DeepLense
 
-RUN pip install --upgrade pip -y
-RUN pip install --upgrade -r requirements.txt
+RUN pip3 install .
 RUN mkdir -p logger data
-

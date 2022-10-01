@@ -23,7 +23,7 @@ from torch.utils.data import DataLoader, Dataset
 from typing import *
 
 
-matplotlib.use("Agg")
+# matplotlib.use("Agg")
 
 
 class Inference(object):
