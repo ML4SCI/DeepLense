@@ -4,12 +4,12 @@
 
 A FastAI-based tool for performing regression on strong lensing images to predict axion mass density of galaxies.
 
-This is a Google Summer of Code (GSoC) 2021 project.
+This is a Google Summer of Code (GSoC) 2021 / 2022 project.
 
 ## Project Description
 The goal of the project is to apply deep regression techniques to explore the properties of dark matter. We approximated the mass density of vortex substructure of dark matter condensates on simulated strong lensing images. The images are generated with PyAutoLense.
 
-You can find more information about the project in this [blog post](https://medium.com/@yuriihalyc/gsoc-2021-with-ml4sci-deep-regression-for-exploring-dark-matter-32691c46adfa).
+You can find more information about the project in the following blog posts: [GSOC 2021](https://medium.com/@yuriihalyc/gsoc-2021-with-ml4sci-deep-regression-for-exploring-dark-matter-32691c46adfa), [GSOC 2022](https://medium.com/@yuriihalyc/gsoc-2022-with-ml4sci-deep-regression-for-exploring-dark-matter-3f2f1badb60f).
 
 ## Installation
 
@@ -43,6 +43,23 @@ Images are stored in a .npy file with the following dimensions: *(250000,1,150,
 Labels are stored in a separate .npy file and have the following dimensions: *(250000,1)*.
 
 You can find the dataset [here](https://drive.google.com/drive/folders/1NPf7Mui5Qt_vVm5wtlNq17vKnto-Nqkc?usp=sharing).
+
+Create a single .npy file from multiple .npy files where every file contains an image and the correponding mass, 
+please run 
+
+```bash
+python ./data/preprocess_dataset.py --path_to_images '/path_to_files' 
+                --result_path '/result_dir'   
+```
+
+
+| Argument       |                                                                           Description                                                                           |
+|:---------------|:---------------------------------------------------------------------------------------------------------------------------------------------------------------:|
+| path_to_images |                                                   The path to a directory where a multiple .npy files stored                                                    |
+| result_path    |                                              The path to a directory where a final single .npy file will be stored                                              |
+
+
+preprocess_data.py located in ./data
 ### Weights
 We trained xResnetHybrid101 on the given dataset with the following parameters:
 * batch size=64
@@ -61,26 +78,35 @@ python train.py --path_to_images '/images.npy'
                 --output_dir 'output_dir/'
                 --batch_size 64
                 --num_of_epochs 120
-                --lr 1e-2       
+                --lr 1e-2
+                --image_shape 150 150
+                --image_dtype 'uint16'
+                --files_number 28000       
 ```
 You can optionally add *--mmap_mode* flag.
 
-| Argument | Description |
-| :---         |     :---:      |
+| Argument       |                                                Description                                                |
+|:---------------|:---------------------------------------------------------------------------------------------------------:|
 | path_to_images | The path to a .npy file with images. It has to have the following dimensions: (num_of_elements,1,150,150) |
 | path_to_labels | The path to a .npy file with density masses. It has to have the following dimensions: (num_of_elements,1) |
-| output_dir | The directory where the best_model.pth (weights of the model) file will be stored after training |
-| batch_size | Batch siz |
-| num_of_epochs | Number of epochs |
-| lr | Learning rate |
-| mmap_mode | Use the flag if you cannot fit the whole dataset in the RAM |
+| output_dir     |     The directory where the best_model.pth (weights of the model) file will be stored after training      |
+| batch_size     |                                                 Batch siz                                                 |
+| num_of_epochs  |                                             Number of epochs                                              |
+| lr             |                                               Learning rate                                               |
+| files_number   |                                     Number of samples in the dataset                                      |
+| image_dtype    |                               Data type of a single image from the dataset                                |
+| image_shape    |                                  Shape of a singe image from the dataset                                  |
+| mmap_mode      |                        Use the flag if you cannot fit the whole dataset in the RAM                        |
 
 ### Inference
 The script takes path to images and outputs predicted mass densities as a .npy file in the output directory. 
 ```bash
 python inference.py --path_to_images '/images.npy' 
                        --path_to_weights '/weights.pth'
-                       --output_dir 'output_dir/'       
+                       --output_dir 'output_dir/' 
+                       --image_shape 150 150
+                       --image_dtype 'uint16'
+                       --files_number 1000      
 ```
 You can optionally add *--mmap_mode* flag.
 
@@ -90,6 +116,61 @@ You can optionally add *--mmap_mode* flag.
 | path_to_weights | The path to a .pth file with trained weights for XResnetHybrid101 |
 | output_dir | The directory where the model will output predicted mass densities in a .npy file |
 | mmap_mode | Use the flag if you cannot fit the whole dataset in the RAM |
+| files_number   |                                     Number of samples in the dataset                                      |
+| image_dtype    |                               Data type of a single image from the dataset                                |
+| image_shape    |                                  Shape of a singe image from the dataset                                  |
+
+## Experiments GSoC 2022
+
+### NN Architectures
+
+In the following table, Model I, Model II, and Model III represent datasets which the model was trained/tested on. 
+
+Every value in the table is MAE of the corresponding NN architecture on the corresponding test dataset. Every architecture was trained with **batch_size=64**, **lr=1e-3** for **200 epochs**.
+
+| NN Architecture | Model I | Model II | Model III | Train time (hours) <br/>Model III |
+|:----------------|:-------:|:--------:|:---------:|:---------------------------------:|
+| XResNet18Hybrid  | 0.2737  |  0.2209  |  0.1262   |                2.6                |
+| CmtTi           | 0.2743  |  0.2393  |  0.1442   |                7.2                |
+
+
+| NN Architecture |                                                     Model I                                                      |                          Model II                           |                          Model III                          |
+|:----------------|:----------------------------------------------------------------------------------------------------------------:|:-----------------------------------------------------------:|:-----------------------------------------------------------:|
+| ResNet18Hybrid  |                           ![model 1](imgs/model_1_ResnetHybrid_0_2737_epochs_300.png)                            | ![model 2](imgs/model_2_ResnetHybrid_0_2209_epochs_300.png) | ![model 3](imgs/model_3_ResnetHybrid_0_1262_epochs_300.png) |
+| CmtTi   |                           ![model 1](imgs/model_1_CMT_TI_0_2743_epochs_300.png)                            | ![model 2](imgs/model_2_CMT_TI_0_2393_epochs_300.png) |    ![model 3](imgs/model_3_CMT_TI_0_1442_epochs_300.png)    |
+
+
+### Training Hyperparameters
+
+The table contains results of **XResnetHybrid18** trained with **batch_size=64**, **lr=8e-3** on the **Model I** dataset for **50 epochs**.
+
+
+| Weight Decay  | Momentum range | MAE |
+|:----------------|:-------:|:--------:
+| None  | (0.95,0.85) | 0.330613*|
+| 0.1           | (0.95,0.85)| 0.550189|
+| 0.01  | (0.95,0.85) |0.342670 |
+| 0.001           | (0.95,0.85)| 0.337203|
+| None  | (0.85,0.75) | 0.338351|
+| 0.1           | (0.85,0.75)| 0.551220|
+| 0.01  | (0.85,0.75)| 0.342421|
+| 0.001           | (0.85,0.75)| 0.337694|
+| None  | (0.75,0.65) | 0.434603 |
+| 0.1           | (0.75,0.65) | 0.704964|
+| 0.01  | (0.75,0.65) |0.472101  |
+| 0.001           | (0.75,0.65) |0.472942  |
+
+### Loss Function
+
+The table contains results of **XResnetHybrid18** trained with **batch_size=64**, **lr=1e-3**, **wd=None**, **moms=(0.95,0.85)** on the **Model I** dataset for **50 epochs**.
+
+| Loss function | MAE |
+|:----------------|:-------:|
+| RMSE  | 0.330613  | 
+| MSE  |  0.332601 | 
+| MAE  | 0.335310  | 
+| SmoothL1Loss   | 0.330053* |
+
 ## Cite
 The regression pipeline was inspired by this work.
 ```
