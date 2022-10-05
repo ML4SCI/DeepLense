@@ -41,3 +41,4 @@ albumentations>=1.0.3
 gdown
 split-folders
 ipywidgets
+einops
