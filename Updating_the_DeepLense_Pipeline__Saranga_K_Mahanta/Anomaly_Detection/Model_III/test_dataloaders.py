@@ -5,9 +5,9 @@ from tqdm import tqdm
 
 import torch
 from torch.utils.data import Dataset, DataLoader
+import albumentations as A
+from albumentations.pytorch import ToTensorV2
 
-from config import *
-from utils import *
 
 def img_paths_list(root_dir):
     root_list = glob.glob(root_dir)
@@ -70,5 +70,13 @@ def create_full_test_dataloader(full_test_data_path, test_transforms, batch_size
 
 
 if __name__ == '__main__':
+    FULL_TEST_DATA_PATH = r'C:\Users\Saranga\Desktop\ML4SCI\Work\Model_III_test\*\*'
+    BATCH_SIZE = 256
+    
+    test_transforms = A.Compose(
+                [
+                    ToTensorV2()
+                ]
+            )
     full_test_loader, class_map = create_full_test_dataloader(FULL_TEST_DATA_PATH, test_transforms, BATCH_SIZE)
     

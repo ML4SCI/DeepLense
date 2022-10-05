@@ -7,9 +7,8 @@ import matplotlib.pyplot as plt
 import torch
 from torchvision import utils
 from torch.utils.data import Dataset, DataLoader
-
-from config import *
-from utils import *
+import albumentations as A
+from albumentations.pytorch import ToTensorV2
 
 
 def img_paths_list(root_dir):
@@ -73,6 +72,24 @@ def create_dataloaders(train_data_path, test_data_path, train_transforms, test_t
 
 
 if __name__ == '__main__':
+    BATCH_SIZE = 256
+    TRAIN_DATA_PATH = r'C:\Users\Saranga\Desktop\ML4SCI\Work\Model_III_subset\no_sub\*'
+    TEST_DATA_PATH = r'C:\Users\Saranga\Desktop\ML4SCI\Work\Model_III_test\no_sub\*'
+
+    train_transforms = A.Compose(
+            [
+                A.HorizontalFlip(p = 0.5),
+                A.VerticalFlip(p = 0.5),
+                A.Rotate(limit = 360, p = 0.4),
+                ToTensorV2()
+            ]
+        )
+    test_transforms = A.Compose(
+                [
+                    ToTensorV2()
+                ]
+            )
+
     train_loader, val_loader, test_loader = create_dataloaders(
         TRAIN_DATA_PATH, TEST_DATA_PATH, 
         train_transforms, test_transforms, 

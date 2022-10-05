@@ -9,7 +9,7 @@ import matplotlib.pyplot as plt
 
 sys.path.append('../')
 from utils import device, set_seed, train_transforms, test_transforms
-from config import EPOCHS, LEARNING_RATE, BATCH_SIZE, MODEL_PATH, TRAIN_DATA_PATH, TEST_DATA_PATH, SAVE_MODEL
+from config import EPOCHS, LEARNING_RATE, BATCH_SIZE, MODEL_PATH, TRAIN_DATA_PATH, TEST_DATA_PATH, SAVE_MODEL, LOAD_PRETRAINED_MODEL
 from train_dataloaders import create_dataloaders
 from model import Encoder, Decoder, VAE
 
@@ -118,9 +118,8 @@ def plot_ae_outputs(model, dataloader, n = 10):
     plt.draw()  
 
 
-def fit_model(model,checkpoint_path):
+def fit_model(model, checkpoint_path):
     
-
         optimizer = optim.Adam(model.parameters(), lr = LEARNING_RATE)
         scheduler = optim.lr_scheduler.OneCycleLR(optimizer, LEARNING_RATE, epochs = EPOCHS, steps_per_epoch = len(train_loader), verbose = False)
         criterion = nn.MSELoss()
@@ -151,8 +150,8 @@ def fit_model(model,checkpoint_path):
             loss_dict['train_kld_loss'].append(train_kld_loss)
             loss_dict['val_kld_loss'].append(test_kld_loss)
 
-            # if epoch % 10 == 0 or epoch + 1 == EPOCHS:
-            plot_ae_outputs(model, val_loader, 10)
+            if epoch % 10 == 0 or epoch + 1 == EPOCHS:
+                plot_ae_outputs(model, val_loader, 10)
 
         return model, loss_dict 
 
@@ -169,6 +168,13 @@ if __name__ == "__main__":
     encoder = Encoder().to(device)
     decoder = Decoder().to(device)
     model = VAE(encoder, decoder).to(device)
+
+    if LOAD_PRETRAINED_MODEL:
+        if device != 'cpu':
+            model.load_state_dict(torch.load(MODEL_PATH))
+        else:
+            model.load_state_dict(torch.load(MODEL_PATH, map_location = torch.device('cpu')))
+
     model, loss_dict = fit_model(model, checkpoint_path = MODEL_PATH)
 
     # Plot losses

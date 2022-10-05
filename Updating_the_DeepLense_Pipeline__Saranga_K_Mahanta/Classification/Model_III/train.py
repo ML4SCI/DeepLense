@@ -1,4 +1,3 @@
-
 import torch
 import torch.nn as nn
 import torch.optim as optim
@@ -9,7 +8,7 @@ import matplotlib.pyplot as plt
 
 
 from utils import device, calculate_accuracy, transforms
-from config import EPOCHS, LEARNING_RATE, BATCH_SIZE, MODEL_PATH, TRAIN_DATA_PATH, TEST_DATA_PATH, SAVE_MODEL
+from config import EPOCHS, LEARNING_RATE, BATCH_SIZE, MODEL_PATH, TRAIN_DATA_PATH, TEST_DATA_PATH, SAVE_MODEL, LOAD_PRETRAINED_MODEL
 from dataloader import create_data_loaders
 from model import EffNetB1_backbone_model
 
@@ -104,6 +103,13 @@ if __name__ == '__main__':
                                                                 transforms = transforms)
 
     model = EffNetB1_backbone_model().to(device)
+
+    if LOAD_PRETRAINED_MODEL:
+        if device != 'cpu':
+            model.load_state_dict(torch.load(MODEL_PATH))
+        else:
+            model.load_state_dict(torch.load(MODEL_PATH, map_location = torch.device('cpu')))
+
     criterion = nn.CrossEntropyLoss()
     optimizer = optim.Adam(model.parameters(),lr = LEARNING_RATE)
 
