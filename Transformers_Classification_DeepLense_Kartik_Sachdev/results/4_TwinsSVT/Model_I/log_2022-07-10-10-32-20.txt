@@ -1,0 +1,30 @@
+ERROR:wandb.jupyter:Failed to detect the name of this notebook, you can set it manually with the WANDB_NOTEBOOK_NAME environment variable to enable code saving.
+DEBUG:urllib3.connectionpool:Starting new HTTPS connection (1): api.wandb.ai:443
+DEBUG:urllib3.connectionpool:https://api.wandb.ai:443 "POST /graphql HTTP/1.1" 200 None
+DEBUG:urllib3.connectionpool:Starting new HTTPS connection (1): api.wandb.ai:443
+DEBUG:urllib3.connectionpool:https://api.wandb.ai:443 "POST /graphql HTTP/1.1" 200 None
+DEBUG:git.cmd:Popen(['git', 'cat-file', '--batch-check'], cwd=/home/kartik/git/GSoC-2022, universal_newlines=False, shell=None, istream=<valid stream>)
+DEBUG:root:Epoch : 1 - LR 0.00033333 - loss : 0.8663 - val_loss : 0.9185 - val_acc: 0.5408 
+
+DEBUG:root:Epoch : 2 - LR 0.00066667 - loss : 0.4822 - val_loss : 0.4303 - val_acc: 0.8196 
+
+DEBUG:root:Epoch : 3 - LR 0.00100000 - loss : 0.4396 - val_loss : 0.4111 - val_acc: 0.8104 
+
+DEBUG:root:Epoch : 4 - LR 0.00095048 - loss : 0.4112 - val_loss : 0.4141 - val_acc: 0.8124 
+
+DEBUG:root:Epoch : 5 - LR 0.00081174 - loss : 0.3767 - val_loss : 0.3789 - val_acc: 0.8418 
+
+DEBUG:root:Epoch : 6 - LR 0.00061126 - loss : 0.3436 - val_loss : 0.3145 - val_acc: 0.8654 
+
+DEBUG:root:Epoch : 7 - LR 0.00038874 - loss : 0.3039 - val_loss : 0.3157 - val_acc: 0.8670 
+
+DEBUG:root:Epoch : 8 - LR 0.00018826 - loss : 0.2672 - val_loss : 0.2397 - val_acc: 0.9003 
+
+DEBUG:root:Epoch : 9 - LR 0.00004952 - loss : 0.2315 - val_loss : 0.2192 - val_acc: 0.9082 
+
+DEBUG:root:Epoch : 10 - LR 0.00000000 - loss : 0.2063 - val_loss : 0.2116 - val_acc: 0.9108 
+
+DEBUG:matplotlib.colorbar:locator: <matplotlib.colorbar._ColorbarAutoLocator object at 0x7fe542ca5520>
+DEBUG:matplotlib.colorbar:Using auto colorbar locator on colorbar
+DEBUG:matplotlib.colorbar:locator: <matplotlib.colorbar._ColorbarAutoLocator object at 0x7fe542ca5520>
+DEBUG:matplotlib.colorbar:Setting pcolormesh

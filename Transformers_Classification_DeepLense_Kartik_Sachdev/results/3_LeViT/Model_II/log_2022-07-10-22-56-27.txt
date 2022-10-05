@@ -1,0 +1,40 @@
+ERROR:wandb.jupyter:Failed to detect the name of this notebook, you can set it manually with the WANDB_NOTEBOOK_NAME environment variable to enable code saving.
+DEBUG:urllib3.connectionpool:Starting new HTTPS connection (1): api.wandb.ai:443
+DEBUG:urllib3.connectionpool:https://api.wandb.ai:443 "POST /graphql HTTP/1.1" 200 None
+DEBUG:urllib3.connectionpool:Starting new HTTPS connection (1): api.wandb.ai:443
+DEBUG:urllib3.connectionpool:https://api.wandb.ai:443 "POST /graphql HTTP/1.1" 200 None
+DEBUG:git.cmd:Popen(['git', 'cat-file', '--batch-check'], cwd=/home/kartik/git/GSoC-2022, universal_newlines=False, shell=None, istream=<valid stream>)
+DEBUG:root:Epoch : 1 - LR 0.00003333 - loss : 1.0778 - val_loss : 0.8610 - val_acc: 0.5874 
+
+DEBUG:root:Epoch : 2 - LR 0.00006667 - loss : 0.6159 - val_loss : 2.4717 - val_acc: 0.3898 
+
+DEBUG:root:Epoch : 3 - LR 0.00010000 - loss : 0.4701 - val_loss : 2.3038 - val_acc: 0.5224 
+
+DEBUG:root:Epoch : 4 - LR 0.00009830 - loss : 0.3762 - val_loss : 16.0321 - val_acc: 0.3339 
+
+DEBUG:root:Epoch : 5 - LR 0.00009330 - loss : 0.2969 - val_loss : 0.3507 - val_acc: 0.8608 
+
+DEBUG:root:Epoch : 6 - LR 0.00008536 - loss : 0.2505 - val_loss : 6.9293 - val_acc: 0.3300 
+
+DEBUG:root:Epoch : 7 - LR 0.00007500 - loss : 0.2153 - val_loss : 0.9313 - val_acc: 0.7880 
+
+DEBUG:root:Epoch : 8 - LR 0.00006294 - loss : 0.1914 - val_loss : 50.3243 - val_acc: 0.3296 
+
+DEBUG:root:Epoch : 9 - LR 0.00005000 - loss : 0.1948 - val_loss : 21.7618 - val_acc: 0.3287 
+
+DEBUG:root:Epoch : 10 - LR 0.00003706 - loss : 0.1523 - val_loss : 8.5158 - val_acc: 0.3682 
+
+DEBUG:root:Epoch : 11 - LR 0.00002500 - loss : 0.1337 - val_loss : 15.4430 - val_acc: 0.4886 
+
+DEBUG:root:Epoch : 12 - LR 0.00001464 - loss : 0.1175 - val_loss : 7.8610 - val_acc: 0.4005 
+
+DEBUG:root:Epoch : 13 - LR 0.00000670 - loss : 0.1031 - val_loss : 1.6069 - val_acc: 0.7512 
+
+DEBUG:root:Epoch : 14 - LR 0.00000170 - loss : 0.0959 - val_loss : 0.6005 - val_acc: 0.6873 
+
+DEBUG:root:Epoch : 15 - LR 0.00000000 - loss : 0.0914 - val_loss : 0.0746 - val_acc: 0.9712 
+
+DEBUG:matplotlib.colorbar:locator: <matplotlib.colorbar._ColorbarAutoLocator object at 0x7fa2f52b3b50>
+DEBUG:matplotlib.colorbar:Using auto colorbar locator on colorbar
+DEBUG:matplotlib.colorbar:locator: <matplotlib.colorbar._ColorbarAutoLocator object at 0x7fa2f52b3b50>
+DEBUG:matplotlib.colorbar:Setting pcolormesh

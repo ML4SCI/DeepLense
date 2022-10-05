@@ -122,6 +122,7 @@ sbatch < jobscript.sh
   | Model III |  99.04   | 0.9986  | 0.9992 | 1.0000 |
 
 
+
 ### __[CrossFormer](https://arxiv.org/pdf/2203.13387.pdf)__
 
   | Dataset | Acc (%) | AUC (axion) | AUC (cdm) | AUC (no_sub) 
@@ -205,7 +206,7 @@ sbatch < jobscript.sh
 <br>
 
 # __Trained Models__
-Trained models and logs can be found here: https://mega.nz/fm/tHtGERDY
+Trained models and resulting plots can be found here: https://mega.nz/fm/tHtGERDY
 
 <br>
 
