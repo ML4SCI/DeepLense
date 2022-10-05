@@ -68,7 +68,7 @@ def get_device(use_cuda=True, cuda_idx=0):
     return device
 
 
-def init_logging_handler(log_dir, current_time, extra=""):
+def init_logging_handler(log_dir, current_time, extra="", use_ray = False):
     """Initializes the handler for logger. Create the logger directory if it doest exists. 
         Define the format of logging
         DEBUG logging level being used
@@ -96,5 +96,6 @@ def init_logging_handler(log_dir, current_time, extra=""):
 
     logging.getLogger("matplotlib.font_manager").disabled = True
 
-    os.makedirs(f"{log_dir}/{current_time}/checkpoint", exist_ok=True)
+    if not use_ray:
+        os.makedirs(f"{log_dir}/{current_time}/checkpoint", exist_ok=True)
 

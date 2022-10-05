@@ -5,6 +5,8 @@
 /data/*
 *.ipynb_checkpoints/*
 wandb/*
+/logger/*
+Tune-Best-Test/*
 
 # Files to ignore
 *.zip
@@ -12,3 +14,4 @@ wandb/*
 *.DS_Store
 *.npz
 *.pt
+*output.*

@@ -1,0 +1,39 @@
+DEBUG:git.cmd:Popen(['git', 'rev-parse', '--show-toplevel'], cwd=/rwthfs/rz/cluster/home/mn073246/GSoC-2022, universal_newlines=False, shell=None, istream=None)
+DEBUG:urllib3.connectionpool:Starting new HTTPS connection (1): api.wandb.ai:443
+DEBUG:urllib3.connectionpool:https://api.wandb.ai:443 "POST /graphql HTTP/1.1" 200 None
+DEBUG:urllib3.connectionpool:Starting new HTTPS connection (1): api.wandb.ai:443
+DEBUG:urllib3.connectionpool:https://api.wandb.ai:443 "POST /graphql HTTP/1.1" 200 None
+DEBUG:git.cmd:Popen(['git', 'cat-file', '--batch-check'], cwd=/rwthfs/rz/cluster/home/mn073246/GSoC-2022, universal_newlines=False, shell=None, istream=<valid stream>)
+DEBUG:root:Epoch : 1 - LR 0.00033333 - loss : 0.9838 - val_loss : 0.6999 - val_acc: 0.6841 
+
+DEBUG:root:Epoch : 2 - LR 0.00066667 - loss : 0.6055 - val_loss : 0.5001 - val_acc: 0.7910 
+
+DEBUG:root:Epoch : 3 - LR 0.00100000 - loss : 0.5561 - val_loss : 0.5496 - val_acc: 0.7423 
+
+DEBUG:root:Epoch : 4 - LR 0.00098296 - loss : 0.4999 - val_loss : 0.4838 - val_acc: 0.8023 
+
+DEBUG:root:Epoch : 5 - LR 0.00093301 - loss : 0.4625 - val_loss : 0.4434 - val_acc: 0.8119 
+
+DEBUG:root:Epoch : 6 - LR 0.00085355 - loss : 0.4215 - val_loss : 0.4269 - val_acc: 0.8272 
+
+DEBUG:root:Epoch : 7 - LR 0.00075000 - loss : 0.3910 - val_loss : 0.3806 - val_acc: 0.8389 
+
+DEBUG:root:Epoch : 8 - LR 0.00062941 - loss : 0.3585 - val_loss : 0.3308 - val_acc: 0.8641 
+
+DEBUG:root:Epoch : 9 - LR 0.00050000 - loss : 0.3328 - val_loss : 0.3172 - val_acc: 0.8715 
+
+DEBUG:root:Epoch : 10 - LR 0.00037059 - loss : 0.3092 - val_loss : 0.3055 - val_acc: 0.8790 
+
+DEBUG:root:Epoch : 11 - LR 0.00025000 - loss : 0.2826 - val_loss : 0.2883 - val_acc: 0.8835 
+
+DEBUG:root:Epoch : 12 - LR 0.00014645 - loss : 0.2648 - val_loss : 0.2787 - val_acc: 0.8823 
+
+DEBUG:root:Epoch : 13 - LR 0.00006699 - loss : 0.2446 - val_loss : 0.2580 - val_acc: 0.8933 
+
+DEBUG:root:Epoch : 14 - LR 0.00001704 - loss : 0.2287 - val_loss : 0.2489 - val_acc: 0.8948 
+
+DEBUG:root:Epoch : 15 - LR 0.00000000 - loss : 0.2229 - val_loss : 0.2471 - val_acc: 0.8971 
+
+DEBUG:matplotlib.colorbar:locator: <matplotlib.colorbar._ColorbarAutoLocator object at 0x2b8033ba4908>
+DEBUG:matplotlib.colorbar:Using auto colorbar locator <matplotlib.colorbar._ColorbarAutoLocator object at 0x2b8033ba4908> on colorbar
+DEBUG:matplotlib.colorbar:Setting pcolormesh

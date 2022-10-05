@@ -1,0 +1,26 @@
+DEBUG:git.cmd:Popen(['git', 'rev-parse', '--show-toplevel'], cwd=/rwthfs/rz/cluster/home/mn073246/GSoC-2022, universal_newlines=False, shell=None, istream=None)
+DEBUG:wandb:no default config file found in config-defaults.yaml
+INFO:wandb:Watching
+DEBUG:root:Epoch : 1 - LR 0.00033333 - loss : 1.0072 - val_loss : 0.7573 - val_acc: 0.6521 
+
+DEBUG:root:Epoch : 2 - LR 0.00066667 - loss : 0.9891 - val_loss : 1.0967 - val_acc: 0.3509 
+
+DEBUG:root:Epoch : 3 - LR 0.00100000 - loss : 1.0740 - val_loss : 1.0859 - val_acc: 0.3361 
+
+DEBUG:root:Epoch : 4 - LR 0.00095048 - loss : 1.0210 - val_loss : 1.0217 - val_acc: 0.4478 
+
+DEBUG:root:Epoch : 5 - LR 0.00081174 - loss : 0.9125 - val_loss : 0.7941 - val_acc: 0.5858 
+
+DEBUG:root:Epoch : 6 - LR 0.00061126 - loss : 0.8349 - val_loss : 0.7870 - val_acc: 0.6160 
+
+DEBUG:root:Epoch : 7 - LR 0.00038874 - loss : 0.7677 - val_loss : 0.7195 - val_acc: 0.6480 
+
+DEBUG:root:Epoch : 8 - LR 0.00018826 - loss : 0.6584 - val_loss : 0.6522 - val_acc: 0.6920 
+
+DEBUG:root:Epoch : 9 - LR 0.00004952 - loss : 0.5815 - val_loss : 0.5380 - val_acc: 0.7592 
+
+DEBUG:root:Epoch : 10 - LR 0.00000000 - loss : 0.5262 - val_loss : 0.5170 - val_acc: 0.7729 
+
+DEBUG:matplotlib.colorbar:locator: <matplotlib.colorbar._ColorbarAutoLocator object at 0x2abb7ef46518>
+DEBUG:matplotlib.colorbar:Using auto colorbar locator <matplotlib.colorbar._ColorbarAutoLocator object at 0x2abb7ef46518> on colorbar
+DEBUG:matplotlib.colorbar:Setting pcolormesh

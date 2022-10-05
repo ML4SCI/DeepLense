@@ -1,0 +1,14 @@
+DEBUG:root:Epoch : 1 - LR 0.00033333 - loss : 0.7101 - val_loss : 0.6148 - val_acc: 0.7546 
+
+DEBUG:root:Epoch : 2 - LR 0.00066667 - loss : 0.3825 - val_loss : 2.2428 - val_acc: 0.3747 
+
+DEBUG:root:Epoch : 3 - LR 0.00100000 - loss : 0.3726 - val_loss : 0.8914 - val_acc: 0.5970 
+
+DEBUG:root:Epoch : 4 - LR 0.00085355 - loss : 0.3540 - val_loss : 0.3244 - val_acc: 0.8647 
+
+DEBUG:root:Epoch : 5 - LR 0.00050000 - loss : 0.3051 - val_loss : 0.2834 - val_acc: 0.8821 
+
+DEBUG:root:Epoch : 6 - LR 0.00014645 - loss : 0.2543 - val_loss : 0.2129 - val_acc: 0.9107 
+
+DEBUG:root:Epoch : 7 - LR 0.00000000 - loss : 0.2173 - val_loss : 0.1966 - val_acc: 0.9154 
+

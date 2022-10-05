@@ -1,0 +1,24 @@
+DEBUG:root:Epoch : 1 - LR 0.00033333 - loss : 0.4882 - val_loss : 6.1030 - val_acc: 0.3549 
+
+DEBUG:root:Epoch : 2 - LR 0.00066667 - loss : 0.2316 - val_loss : 0.7583 - val_acc: 0.6632 
+
+DEBUG:root:Epoch : 3 - LR 0.00100000 - loss : 0.1819 - val_loss : 8.4417 - val_acc: 0.3384 
+
+DEBUG:root:Epoch : 4 - LR 0.00095048 - loss : 0.1572 - val_loss : 0.5033 - val_acc: 0.8388 
+
+DEBUG:root:Epoch : 5 - LR 0.00081174 - loss : 0.1294 - val_loss : 2.9032 - val_acc: 0.6119 
+
+DEBUG:root:Epoch : 6 - LR 0.00061126 - loss : 0.1011 - val_loss : 0.2505 - val_acc: 0.9282 
+
+DEBUG:root:Epoch : 7 - LR 0.00038874 - loss : 0.0769 - val_loss : 0.0531 - val_acc: 0.9856 
+
+DEBUG:root:Epoch : 8 - LR 0.00018826 - loss : 0.0505 - val_loss : 0.7442 - val_acc: 0.6997 
+
+DEBUG:root:Epoch : 9 - LR 0.00004952 - loss : 0.0364 - val_loss : 0.0317 - val_acc: 0.9894 
+
+DEBUG:root:Epoch : 10 - LR 0.00000000 - loss : 0.0300 - val_loss : 0.0295 - val_acc: 0.9904 
+
+DEBUG:matplotlib.colorbar:locator: <matplotlib.colorbar._ColorbarAutoLocator object at 0x7fdb30132b80>
+DEBUG:matplotlib.colorbar:Using auto colorbar locator on colorbar
+DEBUG:matplotlib.colorbar:locator: <matplotlib.colorbar._ColorbarAutoLocator object at 0x7fdb30132b80>
+DEBUG:matplotlib.colorbar:Setting pcolormesh
