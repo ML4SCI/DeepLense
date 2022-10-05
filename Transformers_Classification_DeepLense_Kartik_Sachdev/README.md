@@ -37,8 +37,30 @@ To install locally, using pip:
 ```bash
 git clone https://github.com/ML4SCI/DeepLense.git
 cd DeepLense/Transformers_Classification_DeepLense_Kartik_Sachdev
-git checkout PR_kartik_transformers
+
+sudo apt-get update && apt-get install python3-pip
 pip3 install --upgrade -r requirements.txt
+```
+
+# __Docker__
+
+## __Build__
+
+```bash
+docker build -f docker/dockerfile -t deeplense .
+```
+
+## __Run__
+
+```bash
+mkdir -p logger data
+docker run -it \
+    -e WANDB_API_KEY=$WANDB_API_KEY \
+    -v $PWD/logger:/workspace/DeepLense/logger \
+    -v $PWD/data:/workspace/DeepLense/data \
+    --gpus all \
+    --privileged \
+    deeplense:latest bash 
 ```
 
 <br>
