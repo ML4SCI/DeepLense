@@ -1,15 +1,15 @@
 # __DeepLense Classification Using Vision Transformers__
   
- PyTorch-based library for performing image classification of the simulated strong lensing images to predict substructures of dark matter halos. The project involves implementation and benchmarking of various versions of Vision Transformers from [pytorch-image-models](https://github.com/rwightman/pytorch-image-models) and logging metrics like loss and AUROC (class-wise and overall) scores on [Weights and Biases](https://wandb.ai/site).
+ PyTorch-based library for performing image classification of the strong lensing images to predict the type of dark matter substructure. The code contains implementation and benchmarking of various versions of Vision Transformers (especially hybrid ones) from [pytorch-image-models](https://github.com/rwightman/pytorch-image-models) and logging metrics like loss and AUROC (class-wise and overall) scores on [Weights and Biases](https://wandb.ai/site).
 
-This is an ongoing __Google Summer of Code (GSoC) 2022__ project. For more info on the project [Click Here](https://summerofcode.withgoogle.com/programs/2022/projects/iFKJMj0t) <br>
+This was a __Google Summer of Code (GSoC) 2022__ project. For more info on the project [Click Here](https://summerofcode.withgoogle.com/programs/2022/projects/iFKJMj0t) <br>
 <br>
 
 # __Datasets__
-The models are tested on mainly 3 datasets consisting of 30,000 images (single channel) per class. All the dataset consists of 3 classes namely: 
-- No substructure
-- Axion (vortex)
-- CDM (point mass subhalos)
+The models are trained on 3 datasets -- namely Model I, Model II, and Model III -- consisting of ~30,000 train and ~5000 test images in each dataset. All images are single channel images with the size being 150x150 for Model I and 64x64 for Model II and Model III both. All dataasets consis of 3 classes, namely:
+- Axion (Vortex substructure)
+- CDM (Cold Dark Matter, point mass subhalos)
+- No substructure (this doesn’t occur observationally as there is always a substructure in reality, but we use this simulated class as a baseline)
 
 ___Note__: Axion files have extra data corresponding to mass of axion used in simulation._
 
@@ -32,24 +32,24 @@ ___Note__: Axion files have extra data corresponding to mass of axion used in si
 
 # __Training__
 
-Use the train.py script to train a particular model. The script will ask for a WandB login key, hence a WandB account is needed. Example: 
+Use the train.py script to train a particular model (using timm model name). The script will ask for a WandB login key, hence a WandB account is needed. Example: 
 ```bash
 python3 train.py \
 --dataset Model_I \
 --model_source timm \
---model_name convit_small \
+--model_name efficientformer_l3 \
 --pretrained 1 \
 --tune 1 \
---device cuda
+--device cuda \
+--project ml4sci_deeplense_final
 ```
 | Arguments | Description |
-| :---  | :--- | 
+| :---  | :--- |
 | dataset | Name of dataset i.e. Model_I, Model_II or Model_III |
-| model_source | Where to pick the model from. Currently supported values are "baseline" and "timm" |
 | model_name | Name of the model from pytorch-image-models |
 | complex | 0 if use model from pytorch-image-models directly, 1 if add some additional layers at the end of the model |
 | pretrained | Picked pretrained weights or train from scratch |
-| tune | 0 if only tune the last layers of the model, 1 if tune all layers |
+| tune | Whether to further tune (1) pretrained model (if any) or freeze the pretrained weights (0) |
 | batch_size | Batch Size |
 | lr | Learning Rate |
 | dropout | Dropout Rate |
@@ -59,7 +59,8 @@ python3 train.py \
 | random_zoom | Random zoom for augmentation |
 | random_rotation | Random rotation for augmentation (in degreees) |
 | log_interval | Log interval for logging to weights and biases |
-| device | Device: cuda or mps or cpu |
+| project | Project name in Weight and Biases
+| device | Device: cuda or mps or cpu or best |
 | seed | Random seed |
 
 # __Evaluation__
@@ -68,62 +69,112 @@ Run evaluation of trained model on test sets using eval.py script. Pass the run_
 ```bash
 python3 eval.py \
 --run_id 1g9hi3n6 \
---device cuda
+--device cuda \
+-- project ml4sci_deeplense_final
 ```
 
 <br>
 
 # __Results__
 
-So far, a baseline CNN model and 3 variants of vision transformers (along with 2 subvariants in 2 of them) have been tested. Results are as follows:
+So far, around 9 model families (including EfficientNet as baseline and 8 transformer families). Different variants of models from the same families were tested and the results are as follows:
 
-### __[Simple CNN Baseline__
+## __[EfficientNet](https://arxiv.org/abs/1905.11946)__
 
-  | Dataset | AUC (axion) | AUC (cdm) | AUC (no_sub) 
-  | :---:  | :---: | :---: | :---: | 
-  | Model I   |  0.9923  | 0.9856 | 0.9971 |
-  | Model II  | 0.9988  | 0.9978 | 0.9997 |
-  | Model III |  1.0000  | 1.0000 | 1.0000 |
+### Model I
+![Alt text](https://github.com/archilk/ml4sci-gsoc22/blob/main/deeplense/results/Model_I/efficientnet_b1__complex.png?raw=true)
 
-### __[ConViT (Tiny version)](https://arxiv.org/abs/2103.10697)__
+### Model II
+![Alt text](https://github.com/archilk/ml4sci-gsoc22/blob/main/deeplense/results/Model_II/efficientnet_b1__complex.png?raw=true)
 
-  | Dataset | AUC (axion) | AUC (cdm) | AUC (no_sub) 
-  | :---:  | :---: | :---: | :---: | 
-  | Model I   |  0.9522  | 0.9216 | 0.9909 |
-  | Model II  | 0.9445  | 0.8475 | 0.9617 |
-  | Model III |  0.9910  | 0.9668 | 0.9856 |
-  
-### __[ConViT (Small version)](https://arxiv.org/abs/2103.10697)__
+### Model III
+![Alt text](https://github.com/archilk/ml4sci-gsoc22/blob/main/deeplense/results/Model_III/efficientnet_b1__complex.png?raw=true)
 
-  | Dataset | AUC (axion) | AUC (cdm) | AUC (no_sub) 
-  | :---:  | :---: | :---: | :---: | 
-  | Model I   |  0.9633  | 0.9221 | 0.9892 |
-  | Model II  | 0.9407  | 0.7223 | 0.9452 |
-  | Model III |  0.9901  | 0.9582 | 0.9876 |
+## __[ViT](https://arxiv.org/abs/2010.11929)__
 
-### __ViT-ResNet Hybrid (Tiny version)__
+### Model I
+![Alt text](https://github.com/archilk/ml4sci-gsoc22/blob/main/deeplense/results/Model_I/vit_tiny_r_s16_p8_224.png?raw=true)
 
-  | Dataset | AUC (axion) | AUC (cdm) | AUC (no_sub) 
-  | :---:  | :---: | :---: | :---: | 
-  | Model I   |  0.9447  | 0.8863 | 0.9881 |
-  | Model II  | 0.9410  | 0.8391 | 0.9500 |
-  | Model III |  0.9888  | 0.9695 | 0.9912 |
+### Model II
 
-### __ViT-ResNet Hybrid (Small version)__
+### Model III
+![Alt text](https://github.com/archilk/ml4sci-gsoc22/blob/main/deeplense/results/Model_III/vit_tiny_r_s16_p8_224__complex.png?raw=true)
 
-  | Dataset | AUC (axion) | AUC (cdm) | AUC (no_sub) 
-  | :---:  | :---: | :---: | :---: | 
-  | Model I   |  0.9781  | 0.9680 | 0.9978 |
-  | Model II  | 0.9553  | 0.8714 | 0.9633 |
-  | Model III |  0.9991  | 0.9908 | 0.9952 |
+## __[ConViT](https://arxiv.org/abs/2103.10697)__
 
-### __[Bottleneck Transformers](https://arxiv.org/abs/2101.11605)__
+### Model I
+![Alt text](https://github.com/archilk/ml4sci-gsoc22/blob/main/deeplense/results/Model_I/convit_tiny__complex.png?raw=true)
 
-  | Dataset | AUC (axion) | AUC (cdm) | AUC (no_sub) 
-  | :---:  | :---: | :---: | :---: | 
-  | Model I   |  0.9911  | 0.9845 | 0.9995 |
-  | Model II  | 0.9607  | 0.9043 | 0.9772 |
-  | Model III |  0.9992  | 0.9927 | 0.9976 |
+### Model II
+![Alt text](https://github.com/archilk/ml4sci-gsoc22/blob/main/deeplense/results/Model_II/convit_tiny.png?raw=true)
+
+### Model III
+![Alt text](https://github.com/archilk/ml4sci-gsoc22/blob/main/deeplense/results/Model_III/convit_tiny__complex.png?raw=true)
+
+## __[CrossViT](https://arxiv.org/abs/2103.14899)__
+
+### Model I
+![Alt text](https://github.com/archilk/ml4sci-gsoc22/blob/main/deeplense/results/Model_I/crossvit_small_240.png?raw=true)
+
+### Model II
+![Alt text](https://github.com/archilk/ml4sci-gsoc22/blob/main/deeplense/results/Model_II/crossvit_small_240__complex.png?raw=true)
+
+### Model III
+![Alt text](https://github.com/archilk/ml4sci-gsoc22/blob/main/deeplense/results/Model_III/crossvit_small_240.png?raw=true)
+
+## __[Bottleneck Transformers](https://arxiv.org/abs/2101.11605)__
+
+### Model I
+![Alt text](https://github.com/archilk/ml4sci-gsoc22/blob/main/deeplense/results/Model_I/botnet_26t_256.png?raw=true)
+
+### Model II
+![Alt text](https://github.com/archilk/ml4sci-gsoc22/blob/main/deeplense/results/Model_II/botnet_26t_256.png?raw=true)
+
+### Model III
+![Alt text](https://github.com/archilk/ml4sci-gsoc22/blob/main/deeplense/results/Model_III/botnet_26t_256.png?raw=true)
+
+## __[EfficientFormer](https://arxiv.org/abs/2206.01191)__
+
+### Model I
+![Alt text](https://github.com/archilk/ml4sci-gsoc22/blob/main/deeplense/results/Model_I/efficientformer_l3.png?raw=true)
+
+### Model II
+![Alt text](https://github.com/archilk/ml4sci-gsoc22/blob/main/deeplense/results/Model_II/efficientformer_l3.png?raw=true)
+
+### Model III
+![Alt text](https://github.com/archilk/ml4sci-gsoc22/blob/main/deeplense/results/Model_III/efficientformer_l3.png?raw=true)
+
+## __[CoaT](https://arxiv.org/abs/2104.06399)__
+
+### Model I
+![Alt text](https://github.com/archilk/ml4sci-gsoc22/blob/main/deeplense/results/Model_I/coat_lite_small__complex.png?raw=true)
+
+### Model II
+![Alt text](https://github.com/archilk/ml4sci-gsoc22/blob/main/deeplense/results/Model_II/coat_lite_small.png?raw=true)
+
+### Model III
+![Alt text](https://github.com/archilk/ml4sci-gsoc22/blob/main/deeplense/results/Model_III/coat_lite_small.png?raw=true)
+
+## __[CoAtNet](https://arxiv.org/abs/2106.04803)__
+
+### Model I
+![Alt text](https://github.com/archilk/ml4sci-gsoc22/blob/main/deeplense/results/Model_I/coatnet_nano_rw_224.png?raw=true)
+
+### Model II
+
+### Model III
+![Alt text](https://github.com/archilk/ml4sci-gsoc22/blob/main/deeplense/results/Model_III/coatnet_nano_rw_224.png?raw=true)
+
+## __[Swin](https://arxiv.org/abs/2103.14030)__
+
+### Model I
+![Alt text](https://github.com/archilk/ml4sci-gsoc22/blob/main/deeplense/results/Model_I/swinv2_tiny_window8_256%20.png?raw=true)
+
+### Model II
+![Alt text](https://github.com/archilk/ml4sci-gsoc22/blob/main/deeplense/results/Model_II/swinv2_tiny_window8_256.png?raw=true)
+
+### Model III
+![Alt text](https://github.com/archilk/ml4sci-gsoc22/blob/main/deeplense/results/Model_III/swinv2_tiny_window8_256%20.png?raw=true)
 
 <br>
 
@@ -140,36 +191,6 @@ So far, a baseline CNN model and 3 variants of vision transformers (along with 2
   journal = {GitHub repository},
   doi = {10.5281/zenodo.4414861},
   howpublished = {\url{https://github.com/rwightman/pytorch-image-models}}
-  }
-  ```
-
-* [ConViT (Soft Convolutional Inductive Biases Vision Transformers)](https://arxiv.org/abs/2103.10697)
-
-  ```bibtex
-  @misc{https://doi.org/10.48550/arxiv.2103.10697,
-  doi = {10.48550/ARXIV.2103.10697},
-  url = {https://arxiv.org/abs/2103.10697},
-  author = {d'Ascoli, Stéphane and Touvron, Hugo and Leavitt, Matthew and Morcos, Ari and Biroli, Giulio and Sagun, Levent},
-  keywords = {Computer Vision and Pattern Recognition (cs.CV), Machine Learning (cs.LG), Machine Learning (stat.ML), FOS: Computer and information sciences, FOS: Computer and information sciences},
-  title = {ConViT: Improving Vision Transformers with Soft Convolutional Inductive Biases},
-  publisher = {arXiv},
-  year = {2021},
-  copyright = {arXiv.org perpetual, non-exclusive license}
-  }
-  ```
-
-* [Bottleneck Transformers](https://arxiv.org/abs/2101.11605)
-
-  ```bibtex
-  @misc{https://doi.org/10.48550/arxiv.2101.11605,
-  doi = {10.48550/ARXIV.2101.11605},
-  url = {https://arxiv.org/abs/2101.11605},
-  author = {Srinivas, Aravind and Lin, Tsung-Yi and Parmar, Niki and Shlens, Jonathon and Abbeel, Pieter and Vaswani, Ashish},
-  keywords = {Computer Vision and Pattern Recognition (cs.CV), Artificial Intelligence (cs.AI), Machine Learning (cs.LG), FOS: Computer and information sciences, FOS: Computer and information sciences},
-  title = {Bottleneck Transformers for Visual Recognition},
-  publisher = {arXiv},
-  year = {2021},
-  copyright = {arXiv.org perpetual, non-exclusive license}
   }
   ```
   

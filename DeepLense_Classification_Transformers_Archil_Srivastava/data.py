@@ -7,39 +7,31 @@ import os
 from constants import *
 
 class LensDataset(Dataset):
-    def __init__(self, image_size, memmap_path, *args,
+    def __init__(self, root_dir, *args,
                  transform=None, mean=None, std=None, **kwargs):
         super().__init__(*args, **kwargs)
-        # Hack where shape of memmap is inferred by creating memmap object twice. TODO: Find cleaner way
-        self.x = np.memmap(os.path.join(memmap_path, 'images.npy'), dtype='int32', mode='r')
-        self.length = self.x.shape[0] // (image_size * image_size)
-        self.x = np.memmap(os.path.join(memmap_path, 'images.npy'), dtype='int32', mode='r',
-                           shape=(self.length, image_size, image_size))
-        self.y = np.load(os.path.join(memmap_path, 'labels.npy'))
-
-        self.mean = mean
-        if self.mean is None:
-            self.mean = np.mean(self.x)
-        
-        self.std = std
-        if self.std is None:
-            self.std = np.std(self.x)
+        self.image_paths, self.categories = [], []
+        for category_dir in os.scandir(root_dir):
+            for raw_image_file in os.scandir(category_dir.path):
+                self.image_paths.append(raw_image_file.path)
+                self.categories.append(category_dir.name)
 
         self.transform = transform
     
     def __len__(self):
-        return self.length
+        return len(self.image_paths)
     
     def __getitem__(self, idx):
-        img = (self.x[idx] - self.mean) / self.std
-        img = np.expand_dims(img, axis=0) # Add channel axis
-        img = torch.from_numpy(img)
-        if self.transform:
-            img = self.transform(img)
-        
-        label = self.y[idx]
+        image_path, category = self.image_paths[idx], self.categories[idx]
 
-        return img, label
+        image = np.load(image_path, allow_pickle=True)
+        if category == 'axion':
+            image = image[0]
+        
+        if self.transform:
+            image = self.transform(image)
+
+        return image, LABEL_MAP[category]
 
 class WrapperDataset(Dataset):
     def __init__(self, subset, *args, transform=None, **kwargs):
@@ -51,21 +43,27 @@ class WrapperDataset(Dataset):
         return len(self.subset)
 
     def __getitem__(self, idx):
-        img, label = self.subset[idx]
+        image, label = self.subset[idx]
         if self.transform:
-            img = self.transform(img)
-        return img, label 
+            image = self.transform(image)
+        return image, label 
 
 
-def get_transforms(config, final_size, mode='test'):
-    transform_pipeline = []
-    if mode == 'train':
-        transform_pipeline.extend([transforms.RandomHorizontalFlip(), transforms.RandomVerticalFlip()])
-        if config.random_rotation > 0:
-            transform_pipeline.append(transforms.RandomRotation(config.random_rotation, interpolation=transforms.InterpolationMode.BILINEAR))
-        if config.random_zoom < 1: # 1 is when the random crop is the whole image
-            transform_pipeline.append(transforms.RandomResizedCrop(final_size, scale=(config.random_zoom**2, 1.), ratio=(1., 1.)))
+def get_transforms(config, initial_size, final_size, mode='test'):
+    transform_pipeline = [transforms.ToTensor()]
+    # if mode == 'train':
+    #     transform_pipeline.extend([transforms.RandomHorizontalFlip(), transforms.RandomVerticalFlip()])
+    #     if config.random_rotation > 0:
+    #         transform_pipeline.append(transforms.RandomRotation(config.random_rotation, interpolation=transforms.InterpolationMode.BILINEAR))
+    #     if config.random_zoom < 1: # 1 is when the random crop is the whole image
+    #         transform_pipeline.append(transforms.RandomResizedCrop(final_size, scale=(config.random_zoom**2, 1.), ratio=(1., 1.)))
     
-    transform_pipeline.append(transforms.Resize(final_size))
+    if initial_size == 150: # Model I
+        transform_pipeline.append(transforms.CenterCrop(100))
+    else: # Model II and Model III
+        transform_pipeline.append(transforms.CenterCrop(50))
+    
+    if initial_size != final_size:
+        transform_pipeline.append(transforms.Resize(final_size))
 
     return transforms.Compose(transform_pipeline)
