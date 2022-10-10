@@ -2,13 +2,15 @@ import torch
 from torch.utils.data import DataLoader
 from torch.nn import CrossEntropyLoss
 from torchmetrics.functional import auroc as auroc_fn, accuracy as accuracy_fn
+from sklearn.metrics import ConfusionMatrixDisplay, roc_curve
 import wandb
 import numpy as np
+import matplotlib.pyplot as plt
 import argparse
 import os
 
 from models import get_timm_model
-from models.baseline import BaselineModel
+from models.transformers import get_transformer_model
 from data import LensDataset, get_transforms
 from constants import *
 from utils import get_device
@@ -27,7 +29,6 @@ def evaluate(model, data_loader, loss_fn, device):
     loss.append(loss_fn(logits, y))
     accuracy.append(accuracy_fn(logits, y, num_classes=NUM_CLASSES))
     class_auroc.append(auroc_fn(logits, y, num_classes=NUM_CLASSES, average=None))
-    #micro_auroc.append(auroc_fn(logits, y, num_classes=NUM_CLASSES, average='micro'))
     macro_auroc.append(auroc_fn(logits, y, num_classes=NUM_CLASSES, average='macro'))
 
     result = {
@@ -50,13 +51,15 @@ if __name__ == '__main__':
     parser = argparse.ArgumentParser()
     parser.add_argument('--runid', type=str, help='ID of train run')
     parser.add_argument('--device', choices=['cpu', 'mps', 'cuda', 'best'], default='best')
+    parser.add_argument('--project', type=str, default='ml4sci_deeplense_final')
     run_config = parser.parse_args()
 
-    with wandb.init(entity='_archil', id=run_config.runid, resume='must'):
+    with wandb.init(entity='_archil', project=run_config.project, id=run_config.runid, resume='must'):
         complex = bool(wandb.config.complex)
         pretrained = bool(wandb.config.pretrained)
         tune = bool(wandb.config.tune)
 
+        # Get best device on machine
         device = get_device(run_config.device)
         
         if wandb.config.dataset == 'Model_I':
@@ -66,23 +69,18 @@ if __name__ == '__main__':
         else:
             IMAGE_SIZE = None
 
-        INPUT_SIZE = IMAGE_SIZE
-        if wandb.config.model_source == 'baseline':
-            model = BaselineModel(image_size=INPUT_SIZE).to(device)
-        elif wandb.config.model_source == 'timm':
-            INPUT_SIZE = TIMM_IMAGE_SIZE[wandb.config.model_name]
-            model = get_timm_model(wandb.config.model_name, complex=complex).to(device)
-        else:
-            model = None
+        INPUT_SIZE = TIMM_IMAGE_SIZE[wandb.config.model_name]
+        model = get_timm_model(wandb.config.model_name, complex=complex).to(device)
+
+        # Fetch weights from wandb train run
         weights_file = wandb.restore('best_model.pt')
         model.load_state_dict(torch.load(os.path.join(wandb.run.dir, 'best_model.pt')))
 
-        datapath = os.path.join('./data', wandb.config.dataset, 'memmap', 'test')
-        dataset = LensDataset(image_size=IMAGE_SIZE, memmap_path=datapath,
-                              mean=wandb.run.summary['norm_mean'], std=wandb.run.summary['norm_std'],
-                              transform=get_transforms(wandb.config, final_size=INPUT_SIZE, mode='test'))
+        dataset = LensDataset(root_dir=os.path.join('./data', wandb.config.dataset, 'test'),
+                              transform=get_transforms(wandb.config, initial_size=IMAGE_SIZE, final_size=INPUT_SIZE, mode='test'))
         data_loader = DataLoader(dataset, batch_size=wandb.config.batchsize, shuffle=False)
 
+        # Parallelization across multiple GPUs, if available
         if device == 'cuda' and torch.cuda.device_count() > 1:
             device = 'cuda:0'
             model = torch.nn.DataParallel(model)
@@ -98,10 +96,36 @@ if __name__ == '__main__':
         wandb.run.summary['test_macro_auroc'] = metrics['macro_auroc']
         for label in LABELS:
             wandb.run.summary[f'test_{label}_auroc'] = metrics[f'{label}_auroc']
+        
+        
 
         wandb.log({
             'test_roc': wandb.plot.roc_curve(metrics['ground_truth'],
                                         torch.nn.functional.softmax(metrics['logits'], dim=-1),
                                         labels=LABELS)
         })
+
+        fig, axes = plt.subplots(nrows=1, ncols=2, figsize=(10, 5))
+
+        fpr = dict()
+        tpr = dict()
+        roc_auc = dict()
+        for idx, cls in enumerate(LABELS):
+            class_truth = (metrics['ground_truth'].numpy() == idx).astype(int)
+            class_pred = torch.nn.functional.softmax(metrics['logits']).numpy()[..., idx]
+            fpr[idx], tpr[idx], _ = roc_curve(class_truth, class_pred)
+            _ = axes[0].plot(fpr[idx], tpr[idx], label='{} ({:.2f}%)'.format(cls, metrics[f'{cls}_auroc'] * 100))
+        _ = axes[0].set_title('Test AUROC: {:.2f}%'.format(metrics['macro_auroc'] * 100))
+        _ = axes[0].legend()
+
+        disp = ConfusionMatrixDisplay.from_predictions(y_true=metrics['ground_truth'].numpy(),
+                                                       y_pred=np.argmax(metrics['logits'], axis=-1),
+                                                       display_labels=LABELS,
+                                                       cmap=plt.cm.Blues, colorbar=False, ax=axes[1])
+        
+        fig.tight_layout()
+
+        fig.savefig(f'{wandb.config.model_name}__plots.jpg')
+
+        wandb.log({'confusion_matrix': fig})
 

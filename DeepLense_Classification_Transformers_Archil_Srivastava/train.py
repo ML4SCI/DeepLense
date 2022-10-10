@@ -1,6 +1,6 @@
 import torch
 from torch.utils.data import DataLoader, random_split
-from torch.optim import Adam, SGD
+from torch.optim import AdamW, Adam, SGD
 from torch.optim.lr_scheduler import CosineAnnealingWarmRestarts
 from torch.nn import CrossEntropyLoss
 from tqdm import tqdm
@@ -12,24 +12,26 @@ import wandb
 from data import LensDataset, WrapperDataset, get_transforms
 from constants import *
 from models import get_timm_model
-from models.baseline import BaselineModel
+from models.transformers import get_transformer_model
 from utils import get_device, set_seed
 from eval import evaluate
 
 def train_step(model, images, labels, optimizer, scheduler, criterion, device='cpu'):
+    # Send to device
     images, labels = images.to(device, dtype=torch.float), labels.type(torch.LongTensor).to(device)
-    model.train()
-    optimizer.zero_grad()
-    logits = model(images)
-    loss = criterion(logits, labels)
-    loss.backward()
-    optimizer.step()
+    model.train() # Set train mode
+    optimizer.zero_grad() # Reset gradients
+    logits = model(images) # Forward pass
+    loss = criterion(logits, labels) # Compute loss
+    loss.backward() # Backward pass
+    optimizer.step() # Optimize weights step
     if scheduler is not None:
-        scheduler.step(loss)
+        scheduler.step(loss) # Modify learning rate if scheduler is set
     return loss
 
 
 def train(model, train_loader, val_loader, criterion, optimizer, scheduler, epochs, device, log_interval=100):
+    _ = model(next(iter(train_loader))[0].to(device, dtype=torch.float)) # Used to initialize parameters in lazy layers
     wandb.watch(model, criterion, log='all', log_freq=log_interval)
     best_val_auroc, best_val_metrics = 0., dict()
     batch_num = 0
@@ -40,7 +42,7 @@ def train(model, train_loader, val_loader, criterion, optimizer, scheduler, epoc
             images, labels = batch_data
             loss = train_step(model, images, labels, optimizer, scheduler, criterion, device=device)
 
-            if batch_num % log_interval == 0:
+            if batch_num % log_interval == 0: # Compute metrics for validation data after every few epochs
                 val_metrics = evaluate(model, val_loader, criterion, device=device)
 
                 # Log in wandb
@@ -53,9 +55,11 @@ def train(model, train_loader, val_loader, criterion, optimizer, scheduler, epoc
                     'val/micro_auroc': val_metrics['micro_auroc'],
                     'val/macro_auroc': val_metrics['macro_auroc']
                 }
+                # Classwise validation AUROC
                 for label in LABELS:
                     log_dict[f'val/{label}_auroc'] = val_metrics[f'{label}_auroc']
                 wandb.log(log_dict, step=batch_num)
+                # Log ROC curve for validation data
                 wandb.log({
                     'roc': wandb.plot.roc_curve(val_metrics['ground_truth'],
                                                 torch.nn.functional.softmax(val_metrics['logits'], dim=-1),
@@ -84,95 +88,103 @@ if __name__ == '__main__':
     parser = argparse.ArgumentParser()
     # Fixed params
     parser.add_argument('--dataset', choices=['Model_I', 'Model_II', 'Model_III', 'Model_IV'], default='Model_I', help='which data model')
-    parser.add_argument('--epochs', type=int, default=200)
+    parser.add_argument('--epochs', type=int, default=25)
     parser.add_argument('--log_interval', type=int, default=100)
-    parser.add_argument('--model_source', choices=['baseline', 'timm'], default='timm')
+    parser.add_argument('--project', type=str, default='ml4sci_deeplense_final')
     # Timm Specific
     parser.add_argument('--model_name', type=str, default='vit_base_patch16_224')
     parser.add_argument('--complex', type=int, choices=[0, 1], default=1)
     parser.add_argument('--pretrained', type=int, choices=[0, 1], default=1)
     parser.add_argument('--tune', type=int, choices=[0, 1], default=1, help='Whether to further tune (1) pretrained model (if any) or freeze the pretrained weights (0)')
-    ###
+    # Run specific
     parser.add_argument('--seed', type=int)
     parser.add_argument('--device', choices=['cpu', 'mps', 'cuda', 'tpu', 'best'], default='best')
 
     # Augmentations
-    parser.add_argument('--random_zoom', type=float, default=0.9)
-    parser.add_argument('--random_rotation', type=float, default=90)
+    parser.add_argument('--random_zoom', type=float, default=1)
+    parser.add_argument('--random_rotation', type=float, default=0)
 
     # Common hyperparameters
-    parser.add_argument('--batchsize', type=int, default=128)
-    parser.add_argument('--lr', type=float, default=5e-4)
-    parser.add_argument('--dropout', type=float, default=0.5)
-    parser.add_argument('--optimizer', choices=['sgd', 'adam'], default='adam')
+    parser.add_argument('--batchsize', type=int, default=64)
+    parser.add_argument('--lr', type=float, default=3e-4)
+    parser.add_argument('--dropout', type=float, default=0.3)
+    parser.add_argument('--optimizer', choices=['sgd', 'adam', 'adamw'], default='adamw')
     parser.add_argument('--decay_lr', type=int, default=0)
 
     run_config = parser.parse_args()
 
+    # Convert {0, 1} integer options to boolean
     pretrained = bool(run_config.pretrained)
     tune = bool(run_config.tune) or not pretrained
     complex = bool(run_config.complex)
+    decay_lr = bool(run_config.decay_lr)
 
     # Group for wandb
-    group = 'baseline'
-    if run_config.model_source == 'timm':
-        group = f'timm-{run_config.model_name}'
-        if complex:
-            group = f'{group}-complex'
+    group = f'timm-{run_config.model_name}'
+    if complex:
+        group = f'{group}-complex'
 
-    with wandb.init(entity='_archil', config=run_config, group=group, job_type=f'{run_config.dataset}'):
+    # Start wandb run
+    with wandb.init(entity='_archil', project=run_config.project,
+                    config=run_config, group=group, job_type=f'{run_config.dataset}'):
+        # Set random seed
         if run_config.seed:
             set_seed(run_config.seed)
         
-        device = get_device(run_config.device)
-        
+        # Select image size based on dataset
         if run_config.dataset == 'Model_I':
             IMAGE_SIZE = 150
         elif run_config.dataset == 'Model_II' or run_config.dataset == 'Model_III':
             IMAGE_SIZE = 64
         else:
             IMAGE_SIZE = None
-
-        INPUT_SIZE = IMAGE_SIZE
-        if run_config.model_source == 'baseline':
-            model = BaselineModel(image_size=INPUT_SIZE, dropout_rate=run_config.dropout).to(device)
-        elif run_config.model_source == 'timm':
-            INPUT_SIZE = TIMM_IMAGE_SIZE[run_config.model_name]
-            model = get_timm_model(run_config.model_name, complex=complex,
-                                    dropout_rate=run_config.dropout, pretrained=pretrained, tune=tune).to(device)
-        else:
-            model = None
         
+        # Select best device on the machine
+        device = get_device(run_config.device)
+
+        # Get timm model
+        INPUT_SIZE = TIMM_IMAGE_SIZE[run_config.model_name]
+        model = get_timm_model(run_config.model_name, complex=complex,
+                                dropout_rate=run_config.dropout, pretrained=pretrained, tune=tune).to(device)
+        
+        # Parallelization across multiple GPUs, if available
         if device == 'cuda' and torch.cuda.device_count() > 1:
             model = torch.nn.DataParallel(model, device_ids=list(range(torch.cuda.device_count())))
         
-        datapath = os.path.join('./data', f'{run_config.dataset}', 'memmap', 'train')
-        train_dataset = LensDataset(image_size=IMAGE_SIZE, memmap_path=datapath)
-        wandb.run.summary['norm_mean'] = train_dataset.mean
-        wandb.run.summary['norm_std'] = train_dataset.std
+        # Initialize train dataset
+        train_dataset = LensDataset(root_dir=os.path.join('./data', f'{run_config.dataset}', 'train'))
+
         # 90%-10% Train-validation split
-        train_size = int(len(train_dataset) * 0.8)
+        train_size = int(len(train_dataset) * 0.9)
         val_size = len(train_dataset) - train_size
         train_dataset, val_dataset = random_split(train_dataset, [train_size, val_size])
 
-        train_dataset = WrapperDataset(train_dataset, transform=get_transforms(run_config, final_size=INPUT_SIZE, mode='train'))
-        val_dataset = WrapperDataset(val_dataset, transform=get_transforms(run_config, final_size=INPUT_SIZE, mode='test'))
+        # Initialize train and validation datasets
+        train_dataset = WrapperDataset(train_dataset, transform=get_transforms(run_config, initial_size=IMAGE_SIZE, final_size=INPUT_SIZE, mode='train'))
+        val_dataset = WrapperDataset(val_dataset, transform=get_transforms(run_config, initial_size=IMAGE_SIZE, final_size=INPUT_SIZE, mode='test'))
 
-        train_loader = DataLoader(train_dataset, batch_size=run_config.batchsize, shuffle=True)
+        train_loader = DataLoader(train_dataset, batch_size=run_config.batchsize, shuffle=True, drop_last=True)
         val_loader = DataLoader(val_dataset, batch_size=run_config.batchsize, shuffle=False)
 
+        # Initialize optimizer
         if run_config.optimizer == 'adam':
-            optimizer = Adam(model.parameters(), lr=run_config.lr)
+            optimizer = Adam(model.parameters(), lr=run_config.lr, weight_decay=0.01)
+        elif run_config.optimizer == 'sgd':
+            optimizer = SGD(model.parameters(), lr=run_config.lr, weight_decay=0.01)
+        elif run_config.optimizer == 'adamw':
+            optimizer = AdamW(model.parameters(), lr=run_config.lr, weight_decay=0.01)
         else:
-            optimizer = SGD(model.parameters(), lr=run_config.lr)
+            optimizer = None
         
+        # Loss function
         criterion = CrossEntropyLoss()
 
-        if run_config.decay_lr == 1:
-            scheduler = CosineAnnealingWarmRestarts(optimizer, T_0=5, T_mult=1, eta_min=1e-6, verbose=True)
+        # Scheduler
+        if decay_lr:
+            scheduler = CosineAnnealingWarmRestarts(optimizer, T_0=15, T_mult=1, eta_min=1e-6, verbose=True)
         else:
             scheduler = None
 
+        # Train the model and get the best validation metrics
         best_val_metrics = train(model, train_loader, val_loader, criterion, optimizer, scheduler, run_config.epochs,
                                  device, run_config.log_interval)
-
