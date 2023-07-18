@@ -1,0 +1,86 @@
+{
+    // Use IntelliSense to learn about possible attributes.
+    // Hover to view descriptions of existing attributes.
+    // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": "main_dl.py",
+            "type": "python",
+            "request": "launch",
+            "module": "torch.distributed.launch",
+            // "program": "${workspaceFolder}/main_dl.py",
+            "args": [
+                "--nproc_per_node",
+                "1",
+                "--master_port",
+                "12345",
+                "${workspaceFolder}/main_dl.py",
+                "--cfg",
+                "configs/moby_swin_tiny.yaml",
+                "--batch-size",
+                "8",
+                "--amp-opt-level",
+                "O0",
+                "--dataset_name",
+                "Model_II",
+            ],
+        },
+        {
+            "name": "moby_main_dl.py",
+            "type": "python",
+            "request": "launch",
+            "module": "torch.distributed.launch",
+            // "program": "${workspaceFolder}/main_dl.py",
+            "args": [
+                "--nproc_per_node",
+                "1",
+                "--master_port",
+                "12345",
+                "${workspaceFolder}/moby_main_dl.py",
+                "--cfg",
+                "configs/moby_swin_tiny.yaml",
+                "--batch-size",
+                "32",
+                "--amp-opt-level",
+                "O0",
+                "--dataset_name",
+                "Model_II",
+            ],
+        },
+        {
+            "name": "baselines.py",
+            "type": "python",
+            "request": "launch",
+            "program": "${workspaceFolder}/baselines.py",
+            "args": [],
+        },
+        {
+            "name": "pretrain.py",
+            "type": "python",
+            "request": "launch",
+            "program": "${workspaceFolder}/pretrain.py",
+            "console": "integratedTerminal"
+        },
+        {
+            "name": "current file",
+            "type": "python",
+            "request": "launch",
+            "program": "${file}",
+            "args": [],
+        },
+
+        {
+            "name": "main_ssl.py",
+            "type": "python",
+            "request": "launch",
+            "program": "${workspaceFolder}/main_ssl.py",
+            "args": [
+                "--dataset_name",
+                "Model_I",
+                "--train_config_path",
+                "/home/kartik/git/DeepLense/Transformers_Classification_DeepLense_Kartik_Sachdev/config/yaml/resnet18_model_test.yaml"
+            ],
+        },
+    ]
+}

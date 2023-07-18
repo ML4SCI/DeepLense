@@ -2,8 +2,8 @@ DATASET = {
     "Model_I": {
         "classes": {0: "axion", 1: "cdm", 2: "no_sub"},
         "image_size": {"height": 150, "width": 150},
-        "train_url": "https://drive.google.com/uc?id=1QMVLpqag6S9JWqzmGM_pK4C0F1eBVIfV",
-        "test_url": "https://drive.google.com/uc?id=1rUAKLLS3p9jDaL9R9m84JVKvMcUuVsO1",
+        "train_url": "https://drive.google.com/uc?id=1m7QzSzXyE8u_QoYplN9dIe-X2pf1KXxt",
+        "test_url": "https://drive.google.com/uc?id=1m7QzSzXyE8u_QoYplN9dIe-X2pf1KXxt",
     },
     "Model_II": {
         "classes": {0: "axion", 1: "cdm", 2: "no_sub"},
@@ -19,6 +19,12 @@ DATASET = {
     },
     "Model_IV": {
         "classes": {0: "axion", 1: "cdm", 2: "no_sub"},
+        "image_size": {"height": 64, "width": 64},
+        "train_url": "",
+        "test_url": "",
+    },
+    "Model_Test": {
+        "classes": {0: "sub", 1: "no_sub"},
         "image_size": {"height": 64, "width": 64},
         "train_url": "",
         "test_url": "",

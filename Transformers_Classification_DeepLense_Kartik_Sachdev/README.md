@@ -30,6 +30,7 @@ ___Note__: Axion files have extra data corresponding to mass of axion used in si
 - Modeled after HST observation characteristics as done by default in lenstronomy.
 - Modeled with simple Sersic light profile
 
+Datasets can be downloaded from the [Google Drive](https://drive.google.com/drive/folders/1m7QzSzXyE8u_QoYplN9dIe-X2pf1KXxt)
 <br>
 
 # __Installation__
@@ -67,7 +68,7 @@ docker run -it \
 
 # __Training__
 
-### __Train with custom config__
+### __Supervised Learning__
 Modify the configuration of the chosen model and training scheme from e.g. `TwinsSVT_CONFIG` in the [config file](/config/twinssvt_config.py). Then, the script can be run locally, for example:
 
 ```bash
@@ -87,6 +88,16 @@ python3 main.py \
 | train_config | Transformer config: [CvT, CCT, TwinsSVT, LeViT, CaiT, CrossViT, PiT, Swin, T2TViT, CrossFormer] |
 | cuda | Use cuda |
 | no-cuda | Not use cuda |
+
+
+### __Self-Supervised Learning__
+
+```bash
+
+python3 main_ssl.py \
+--dataset_name Model_I \
+--train_config_path /home/kartik/git/DeepLense/Transformers_Classification_DeepLense_Kartik_Sachdev/config/yaml/resnet18_model_test.yaml
+```
 
 <br>
 
