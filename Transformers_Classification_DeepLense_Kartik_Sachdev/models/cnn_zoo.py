@@ -69,22 +69,31 @@ class CustomResNet(nn.Module):
         device: Optional[str] = "cuda",
     ):
         super(CustomResNet, self).__init__()
-        self.model = resnet18(pretrained=True)
+        self.model = resnet18(pretrained=False)
         self.device = device
         self.num_channels = num_channels
+
+        # TODO: add conv layer depending on channel else use pretrained model
         self.model.conv1 = nn.Conv2d(
             num_channels, 64, kernel_size=7, stride=2, padding=3, bias=False
         )
         self.model.to(device)
 
     def add_head(self, head: Optional[nn.Module] = None, freeze_backbone=False):
-        requires_grad = not (freeze_backbone)
+        requires_grad = not freeze_backbone
         for param in self.model.parameters():
             param.requires_grad = requires_grad
 
         self.model.fc = nn.Identity() if head is None else head
         self.model.fc.to(self.device)
         # self.model.to(self.device)
+
+    def append_layer(self, layer, freeze_backbone=True):
+        requires_grad = not freeze_backbone
+
+        self.model = nn.Sequential(self.model, layer)
+        # Freezing network Sequential at index 0
+        self.model[0].requires_grad_(requires_grad)
 
     def forward(self, x):
         return self.model(x)

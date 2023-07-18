@@ -208,6 +208,10 @@ def train_contrastive(
             loss.backward()
             optimizer.step()
 
+            # TODO: for code testing
+            if batch_idx == 30:
+                break
+
             if batch_idx % 10 == 0:
                 print(
                     f"Epoch [{epoch}/{epochs}], Batch [{batch_idx}/{len(train_loader)}], Loss: {loss.item()}"

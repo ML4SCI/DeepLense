@@ -62,7 +62,11 @@ def get_transform_train(
         random_transform.append(RandomApply([transform], transform_prob))
 
     transform_simple = Compose(
-        [Resize(final_size), Grayscale(num_output_channels=1), ToTensor(),]
+        [
+            Resize(final_size),
+            Grayscale(num_output_channels=1),
+            ToTensor(),
+        ]
     )
 
     if channels == 3:
@@ -110,16 +114,25 @@ def get_transform_test(final_size: int, channels: Optional[int] = 1):
 
     Returns:
         Compose: transforms.Compose
-    
+
     Example:
         >>> get_transform_test(387, 224, 1)
     """
     if channels == 3:
-        transform_test = Compose([Resize(final_size), ToTensor(),])
+        transform_test = Compose(
+            [
+                Resize(final_size),
+                ToTensor(),
+            ]
+        )
         return transform_test
 
     transform_test = Compose(
-        [Resize(final_size), Grayscale(num_output_channels=1), ToTensor(),]
+        [
+            Resize(final_size),
+            Grayscale(num_output_channels=1),
+            ToTensor(),
+        ]
     )
 
     transform_effective = A.Compose(
@@ -128,6 +141,7 @@ def get_transform_test(final_size: int, channels: Optional[int] = 1):
 
     return transform_effective
 
+
 class GaussianBlur:
     """Gaussian Blur version 2"""
 
@@ -135,7 +149,7 @@ class GaussianBlur:
         sigma = np.random.uniform(0.1, 2.0)
         x = x.filter(ImageFilter.GaussianBlur(radius=sigma))
         return x
-    
+
 
 class DefaultTransformations:
     def __init__(self) -> None:
@@ -232,9 +246,44 @@ class DefaultTransformations:
 
         return [transform_train_1, transform_train_2]
 
+    def get_train_transforms_ssl(self):
+        transform_train_1 = Compose(
+            [
+                transforms.RandomCrop(128),
+                self.default_aug_cfg["pad"],
+                self.default_aug_cfg["resize1"],
+                RandomRotation(degrees=(0, 180), resample=Image.BILINEAR, expand=False),
+                RandomAffine(degrees=(20, 80), translate=(0.1, 0.2), scale=(0.4, 0.95)),
+                RandomPerspective(distortion_scale=0.3, p=0.1),
+                # transforms.RandomApply(random_transform, 0.9999),
+                Resize((224, 224)),
+                self.default_aug_cfg["togray"],
+                self.default_aug_cfg["totensor"],
+            ]
+        )
+
+        transform_train_2 = Compose(
+            [
+                transforms.RandomCrop(128),
+                self.default_aug_cfg["pad"],
+                self.default_aug_cfg["resize1"],
+                RandomRotation(degrees=(0, 180), resample=Image.BILINEAR, expand=False),
+                # RandomAffine(degrees=(20, 80), translate=(0.1, 0.2), scale=(0.4, 0.95)),
+                # transforms.RandomApply([transforms.ColorJitter(0.4, 0.4, 0.2, 0.1)], p=0.8),
+                # transforms.RandomApply(random_transform, 0.9999),
+                Resize((224, 224)),
+                self.default_aug_cfg["togray"],
+                self.default_aug_cfg["totensor"],
+            ]
+        )
+
+        return [transform_train_1, transform_train_2]
+
     def transform_factory(self):
         random_transform = []
-        normalize = transforms.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225])
+        normalize = transforms.Normalize(
+            mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225]
+        )
 
         transform_1 = transforms.Compose(
             [
@@ -260,7 +309,9 @@ class DefaultTransformations:
             [
                 transforms.RandomResizedCrop(150, scale=(0.08, 1.0)),
                 transforms.RandomHorizontalFlip(),
-                transforms.RandomApply([transforms.ColorJitter(0.4, 0.4, 0.2, 0.1)], p=0.8),
+                transforms.RandomApply(
+                    [transforms.ColorJitter(0.4, 0.4, 0.2, 0.1)], p=0.8
+                ),
                 transforms.RandomGrayscale(p=0.2),
                 transforms.RandomApply([GaussianBlur()], p=1.0),
                 transforms.ToTensor(),
@@ -271,7 +322,9 @@ class DefaultTransformations:
             [
                 transforms.RandomResizedCrop(150, scale=(0.08, 1.0)),
                 transforms.RandomHorizontalFlip(),
-                transforms.RandomApply([transforms.ColorJitter(0.4, 0.4, 0.2, 0.1)], p=0.8),
+                transforms.RandomApply(
+                    [transforms.ColorJitter(0.4, 0.4, 0.2, 0.1)], p=0.8
+                ),
                 transforms.RandomGrayscale(p=0.2),
                 transforms.RandomApply([GaussianBlur()], p=0.1),
                 transforms.RandomApply([ImageOps.solarize], p=0.2),
@@ -292,3 +345,28 @@ class DefaultTransformations:
             mean=(0.5, 0.5),
             std=(0.5, 0.5),
         )
+
+
+class TransformationsSLL:
+    
+    def get_train_transforms_ssl(self, final_size):
+        transform_1 = A.Compose(
+            [
+                A.HorizontalFlip(p=0.25),
+                A.VerticalFlip(p=0.25),
+                A.ShiftScaleRotate(shift_limit=0.05, scale_limit=0.05, rotate_limit=15, p=0.5),
+                A.Resize(final_size, final_size, p=1.0),
+                ToTensorV2(),
+            ]
+        )
+
+        transform_2 = A.Compose(
+            [
+                A.HorizontalFlip(p=0.25),
+                # A.VerticalFlip(p=0.25),
+                A.Resize(final_size, final_size, p=1.0),
+                ToTensorV2(),
+            ]
+        )
+
+        return [transform_1, transform_2]

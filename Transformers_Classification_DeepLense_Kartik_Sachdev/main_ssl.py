@@ -129,6 +129,7 @@ def main():
     # setup default dataset
     default_dataset_setup = DefaultDatasetSetupSSL()
     default_dataset_setup.setup(dataset_name=dataset_name)
+    default_dataset_setup.setup_transforms(image_size=image_size)
 
     # trainset
     train_dataset = default_dataset_setup.get_dataset(mode="train")
@@ -189,7 +190,7 @@ def main():
     finetune_head = nn.Sequential(
         nn.Linear(in_features, 256), nn.ReLU(), nn.Linear(256, num_classes)
     )
-    model.add_head(finetune_head, freeze_backbone=True)
+    model.append_layer(finetune_head, freeze_backbone=True)
     model.summarize()
 
     # optimizer and loss function for finetuning
@@ -226,6 +227,8 @@ def main():
 
     infer_obj.infer_plot_roc()
     infer_obj.generate_plot_confusion_matrix()
+
+    ########################## EOF ##########################
 
     # seed_everything(seed=42)
 

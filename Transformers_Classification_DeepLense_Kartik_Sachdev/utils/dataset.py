@@ -9,7 +9,7 @@ import matplotlib.pyplot as plt
 import torch
 from torchvision.transforms import ToPILImage
 import torchvision.transforms as T
-
+from typing import List, Optional, Tuple
 import os
 
 import gdown
@@ -22,7 +22,7 @@ from PIL import Image
 from torch.utils.data import DataLoader, Dataset
 from torchvision.transforms import ToPILImage
 
-from utils.augmentation import DefaultTransformations
+from utils.augmentation import DefaultTransformations, TransformationsSLL
 from utils.util import make_directories
 
 
@@ -531,24 +531,34 @@ class DeepLenseDatasetSSL(Dataset):
         image = (image - np.min(image)) / (np.max(image) - np.min(image))
         image = np.expand_dims(image, axis=2)
 
-        ret = []
-        if self.transforms is not None:
-            for t in self.transforms:
-                image_torch = torch.from_numpy(image)
-                image_torch.to(dtype=torch.int32)
-                image_torch = image_torch.permute(2, 0, 1)
+        self.ret = []
+        self.get_transformed_images_album(image)
+        self.ret.append(label)
 
-                transform_to_pil = T.ToPILImage()
-                image_torch_int = image_torch.to(dtype=torch.int32)
-                image_pil = transform_to_pil(image_torch_int)
-                image_t = t(image_pil)
-                image_t = image_t.float().clone().detach()
-                ret.append(image_t)
-        ret.append(label)
-        return ret
+        return self.ret
 
     def __len__(self):
         return len(self.labels)
+
+    def get_transformed_images_album(self, image):
+        if self.transforms is not None:
+            for t in self.transforms:
+                transformed = t(image=image)
+                image_t = transformed["image"]
+                image_t = image_t.float().clone().detach()
+                self.ret.append(image_t)
+
+    def get_transformed_images_pil(self, image):
+        image_torch = torch.from_numpy(image)
+        image_torch_int = image_torch.to(dtype=torch.int32)
+        image_torch_int = image_torch_int.permute(2, 0, 1)
+        image_pil = T.ToPILImage(image_torch_int)
+
+        if self.transforms is not None:
+            for t in self.transforms:
+                image_t = t(image_pil)
+                image_t = image_t.float().clone().detach()
+                self.ret.append(image)
 
 
 class DefaultDatasetSetupSSL:
@@ -558,8 +568,6 @@ class DefaultDatasetSetupSSL:
         parent_directory = os.path.dirname(current_file)
 
         self.data_dir = os.path.join(parent_directory, "../data")
-        self.default_transform = DefaultTransformations()
-        self.train_transforms = self.default_transform.get_train_transforms_ssl()
 
         # make data directory if doesnt exists
         make_directories([self.data_dir])
@@ -576,6 +584,12 @@ class DefaultDatasetSetupSSL:
         self.default_dataset_cfg["train_url"] = self.default_dataset_cfg["dataset"][
             "train_url"
         ]
+
+    def setup_transforms(self, image_size):
+        self.default_transform = TransformationsSLL()
+        self.train_transforms = self.default_transform.get_train_transforms_ssl(
+            final_size=image_size
+        )
 
     def get_dataset(self, mode="train"):
         assert mode in ["train", "test", "val"]
