@@ -1,0 +1,3 @@
+[submodule "Equivariant_Neural_Networks_for_DeepLense_Geo"]
+	path = Equivariant_Neural_Networks_for_DeepLense_Geo
+	url = https://github.com/kingjuno/GSoC-23.git
