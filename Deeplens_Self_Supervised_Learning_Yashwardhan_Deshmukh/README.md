@@ -5,7 +5,7 @@
 
 Click on this button below to read the detailed blog (Part 1): <br><br> [![medium](https://img.shields.io/badge/medium-000?style=for-the-badge&logo=medium&logoColor=white)](https://yaashwardhan.medium.com/self-supervised-learning-for-strong-gravitational-lensing-part1-5a049e976b51)
 
-<img src="Deeplens_Self_Supervised_Learning_Yashwardhan_Deshmukh/header.png">
+<img src="header.png">
 
 Code is written in: <br>[![WrittenIN](https://skillicons.dev/icons?i=python,tensorflow)](https://skillicons.dev)
 
@@ -13,13 +13,13 @@ Code is written in: <br>[![WrittenIN](https://skillicons.dev/icons?i=python,tens
 
 Contrastive learning is a type of self-supervised learning method, that tries to learn similar and dissimilar representations of data by contrasting positive and negative examples.
 
-<img src="Deeplens_Self_Supervised_Learning_Yashwardhan_Deshmukh/contrastive.png">
+<img src="contrastive.png">
 
 ## Bootstrap Your Own Latent (BYOL) Learning
 
 BYOL trains two networks, the target network and the online network, both in parallel. There are no positive or negative pairs here like there are in contrastive learning. Two different augmented views of the ‘same’ image are brought, and representations are learned using the online network, while the target network is a moving average of the online network, giving it a slower parameter update.
 
-<img src="Deeplens_Self_Supervised_Learning_Yashwardhan_Deshmukh/byol.png">
+<img src="byol.png">
 
 ## Classification Results
 The values in the Model columns represent AUC for axion, cdm and no_sub respectively.
