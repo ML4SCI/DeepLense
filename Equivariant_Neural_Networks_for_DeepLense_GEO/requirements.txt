@@ -1,0 +1,9 @@
+gdown
+e2cnn
+six
+# matplotlib
+# torch
+# torchvision
+# Pillow
+# sklearn
+# skimage
