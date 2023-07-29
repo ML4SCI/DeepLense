@@ -20,6 +20,7 @@ from torchvision.transforms import (
     Resize,
     ToTensor,
 )
+import numpy as np
 
 
 def get_transform_train(
@@ -348,13 +349,11 @@ class DefaultTransformations:
 
 
 class TransformationsSLL:
-    
     def get_train_transforms_ssl(self, final_size):
         transform_1 = A.Compose(
             [
                 A.HorizontalFlip(p=0.25),
                 A.VerticalFlip(p=0.25),
-                A.ShiftScaleRotate(shift_limit=0.05, scale_limit=0.05, rotate_limit=15, p=0.5),
                 A.Resize(final_size, final_size, p=1.0),
                 ToTensorV2(),
             ]
@@ -365,6 +364,31 @@ class TransformationsSLL:
                 A.HorizontalFlip(p=0.25),
                 # A.VerticalFlip(p=0.25),
                 A.Resize(final_size, final_size, p=1.0),
+                ToTensorV2(),
+            ]
+        )
+
+        return [transform_1, transform_2]
+
+    def get_transforms_multiple(self, final_size):
+        print(">>> Multiple Transforms")
+
+        transform_1 = A.Compose(
+            [
+                A.HorizontalFlip(p=0.25),
+                A.VerticalFlip(p=0.25),
+                A.Resize(final_size, final_size, p=1.0),
+                A.ToGray(),
+                A.augmentations.GaussianBlur(),
+                ToTensorV2(),
+            ]
+        )
+
+        transform_2 = A.Compose(
+            [
+                A.HorizontalFlip(p=0.5),
+                A.Resize(final_size, final_size, p=1.0),
+                A.augmentations.GaussNoise(var_limit=(0.002, 0.005), p=0.3),
                 ToTensorV2(),
             ]
         )

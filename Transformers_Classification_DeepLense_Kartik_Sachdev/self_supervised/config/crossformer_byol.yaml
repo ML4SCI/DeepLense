@@ -1,10 +1,10 @@
-network_type: Resnet
+network_type: CrossFormer
 image_size: 224
 channels: 1
-batch_size: 128
+batch_size: 32
 
 optimizer_config:
-  name: Adam
+  name: AdamW
   lr: 0.001
   weight_decay: 0.01
   momentum: 0.9

@@ -449,6 +449,7 @@ class InferenceSSL(InferenceABC):
 
     def infer_plot_roc(self):
         """Plots `ROC` curve"""
+        print("Inference started ...")
         total = 0
         all_test_loss = []
         all_test_accuracy = []

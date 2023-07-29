@@ -7,6 +7,7 @@
 wandb/*
 /logger/*
 Tune-Best-Test/*
+**/logger/*
 
 # Files to ignore
 *.zip

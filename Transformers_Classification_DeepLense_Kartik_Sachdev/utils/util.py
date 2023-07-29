@@ -116,7 +116,6 @@ def load_model_add_head(
     head: nn.Module,
     freeze_pretrain_layers: Optional[bool] = True,
 ) -> nn.Module:
-    
     pretrain_model.load_state_dict(torch.load(saved_model_path))
 
     requires_grad = not (freeze_pretrain_layers)
@@ -145,18 +144,82 @@ def count_parameters(model):
 
 
 def get_second_last_layer(model: nn.Module):
-    
     # Get the second last layer
     layers = list(model.children())
 
     layer_names = list(model._modules.keys())
-    second_last_layer_name = layer_names[-2]
+    second_last_layer_name = layer_names[-3]
     second_last_layer = model._modules[second_last_layer_name]
-    print("second last layer: ", second_last_layer)
+    return second_last_layer
 
     # second_last_layer = layers[-2]
+
 
 def second_last_layer(model):
     random_input = torch.randn(1, 1, 224, 224)
     (model.children())[:-1]
     print(random_input)
+
+
+def deactivate_requires_grad(model: nn.Module):
+    for param in model.parameters():
+        param.requires_grad = False
+
+
+def activate_requires_grad(model: nn.Module):
+    for param in model.parameters():
+        param.requires_grad = True
+
+
+@torch.no_grad()
+def update_momentum(model: nn.Module, model_ema: nn.Module, m: float):
+    """Updates parameters of `model_ema` with Exponential Moving Average of `model`
+
+    Momentum encoders are a crucial component fo models such as MoCo or BYOL.
+
+    Examples:
+        >>> backbone = resnet18()
+        >>> projection_head = MoCoProjectionHead()
+        >>> backbone_momentum = copy.deepcopy(moco)
+        >>> projection_head_momentum = copy.deepcopy(projection_head)
+        >>>
+        >>> # update momentum
+        >>> update_momentum(moco, moco_momentum, m=0.999)
+        >>> update_momentum(projection_head, projection_head_momentum, m=0.999)
+    """
+    for model_ema, model in zip(model_ema.parameters(), model.parameters()):
+        model_ema.data = model_ema.data * m + model.data * (1.0 - m)
+
+
+@torch.no_grad()
+def update_momentum(model: nn.Module, model_ema: nn.Module, m: float):
+    """Updates parameters of `model_ema` with Exponential Moving Average of `model`
+
+    Momentum encoders are a crucial component fo models such as MoCo or BYOL.
+
+    Examples:
+        >>> backbone = resnet18()
+        >>> projection_head = MoCoProjectionHead()
+        >>> backbone_momentum = copy.deepcopy(moco)
+        >>> projection_head_momentum = copy.deepcopy(projection_head)
+        >>>
+        >>> # update momentum
+        >>> update_momentum(moco, moco_momentum, m=0.999)
+        >>> update_momentum(projection_head, projection_head_momentum, m=0.999)
+    """
+    for model_ema, model in zip(model_ema.parameters(), model.parameters()):
+        model_ema.data = model_ema.data * m + model.data * (1.0 - m)
+
+
+def get_last_layer_features(model: nn.Module, num_input=1, device="cuda"):
+    random_input = []
+    for num in range(num_input):
+        random_input.append(torch.randn(1, 1, 224, 224).to(device))
+
+    if num_input == 1:
+        output = model(random_input[0])
+    elif num_input == 2:
+        output = model(random_input[0], random_input[1])
+
+    num_last_features = output.size(1)
+    return num_last_features

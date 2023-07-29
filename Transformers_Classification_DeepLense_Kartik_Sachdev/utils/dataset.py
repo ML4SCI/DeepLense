@@ -230,8 +230,8 @@ def visualize_samples_ssl(
     fig = plt.figure(figsize=(fig_height, fig_width))
 
     # Number of rows and columns for the outer subplots
-    num_rows_outer = 2
-    num_cols_outer = 2
+    num_rows_outer = 6
+    num_cols_outer = 6
 
     # Number of rows and columns for the inner subplots
     num_rows_inner = 1
@@ -244,6 +244,7 @@ def visualize_samples_ssl(
             outer_subplot = fig.add_subplot(
                 num_rows_outer, num_cols_outer, outer_subplot_index
             )
+            outer_subplot.set_xticklabels([])
 
             outer_subplot_index += 1
             sample_idx = torch.randint(len(dataset), size=(1,)).item()
@@ -266,10 +267,13 @@ def visualize_samples_ssl(
 
                     plot_img = img[inner_col].squeeze()
                     inner_subplot.imshow(plot_img)  # cmap="gray"
+
                     inner_subplot_index += 1
+                    plt.axis("off")
 
     # Add a title to the main figure
-    fig.suptitle("Main Figure")
+    fig.suptitle("Dataset")
+    fig.axes
 
     # Display the figure
     plt.show()
@@ -562,7 +566,7 @@ class DeepLenseDatasetSSL(Dataset):
 
 
 class DefaultDatasetSetupSSL:
-    def __init__(self) -> None:
+    def __init__(self, dataset_name="Model_II", image_size=224) -> None:
         # parent directory
         current_file = os.path.abspath(__file__)
         parent_directory = os.path.dirname(current_file)
@@ -572,7 +576,10 @@ class DefaultDatasetSetupSSL:
         # make data directory if doesnt exists
         make_directories([self.data_dir])
 
-    def setup(self, dataset_name="Model_III"):
+        self.setup(dataset_name=dataset_name)
+        self.setup_transforms(image_size=image_size)
+
+    def setup(self, dataset_name="Model_II"):
         self.default_dataset_cfg = {}
         self.default_dataset_cfg["dataset_name"] = dataset_name
         self.default_dataset_cfg["dataset"] = DATASET[
@@ -587,7 +594,7 @@ class DefaultDatasetSetupSSL:
 
     def setup_transforms(self, image_size):
         self.default_transform = TransformationsSLL()
-        self.train_transforms = self.default_transform.get_train_transforms_ssl(
+        self.train_transforms = self.default_transform.get_transforms_multiple(
             final_size=image_size
         )
 

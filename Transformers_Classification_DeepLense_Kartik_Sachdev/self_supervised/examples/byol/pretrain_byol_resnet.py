@@ -1,6 +1,7 @@
 from __future__ import print_function
 import os
 import time
+import copy
 
 import torch.nn as nn
 import torch.optim as optim
@@ -11,20 +12,18 @@ from utils.util import *
 from utils.inference import InferenceSSL
 from argparse import ArgumentParser
 from config.data_config import DATASET
-from torch.utils.data import DataLoader
-from torch.utils.data import DataLoader
 from torch.utils.data import DataLoader, random_split
 from models.cnn_zoo import CustomResNet
-from models.byol import BYOL
+from models.byol import BYOL, BYOLSingleChannel
 
 import json
 import yaml
 from utils.dataset import DefaultDatasetSetupSSL
-from utils.losses.contrastive_loss import (
+from self_supervised.losses.contrastive_loss import (
     ContrastiveLossEuclidean,
     ContrastiveLossEmbedding,
     SimCLR_Loss,
-    NegativeCosineSimilarity
+    NegativeCosineSimilarity,
 )
 from utils.train import (
     train_simplistic,
@@ -33,14 +32,16 @@ from utils.train import (
     train_contrastive_with_labels,
     train_contrastive,
 )
+from self_supervised.losses.sym_neg_cos_sim_loss import SymNegCosineSimilarityLoss
 
+from models.modules.head import BYOLProjectionHead, BYOLPredictionHead
 
 parser = ArgumentParser()
 parser.add_argument(
     "--dataset_name",
     metavar="Model_X",
     type=str,
-    default="Model_Test",
+    default="Model_II",
     choices=["Model_I", "Model_II", "Model_III", "Model_IV", "Model_Test"],
     help="dataset type for DeepLense project",
 )
@@ -49,7 +50,7 @@ parser.add_argument(
 )
 
 parser.add_argument(
-    "--num_workers", metavar="1", type=int, default=1, help="number of workers"
+    "--num_workers", metavar="1", type=int, default=8, help="number of workers"
 )
 
 parser.add_argument(
@@ -152,14 +153,14 @@ def main():
     train_dataset, val_set = random_split(train_dataset, [train_len, valid_len])
 
     train_loader = DataLoader(
-        dataset=train_dataset, batch_size=batch_size, shuffle=True, num_workers=8
+        dataset=train_dataset,
+        batch_size=batch_size,
+        shuffle=True,
+        num_workers=num_workers,
     )
 
     val_loader = DataLoader(
-        dataset=val_set,
-        batch_size=batch_size,
-        shuffle=True,
-        num_workers=8
+        dataset=val_set, batch_size=batch_size, shuffle=True, num_workers=num_workers
     )
 
     # Load test dataset
@@ -171,30 +172,25 @@ def main():
     print("num of classes: ", num_classes)
     print(sample[0].shape)
 
-    ########################## pretrain ##########################
+    ########################## Pretrain Model ##########################
 
     # Create pretrain model
-    resnet = torchvision.models.resnet18()
+    resnet = torchvision.models.resnet50()
     backbone = nn.Sequential(*list(resnet.children())[:-1])
-    model = BYOL(backbone)
+    model = BYOLSingleChannel(backbone, num_ftrs=2048)
 
     device = "cuda" if torch.cuda.is_available() else "cpu"
     model.to(device)
+    # summary(model, input_size=(1, 1, 224, 224), device="cuda")
 
-    # model = CustomResNet(num_channels, device="cuda")
-    # in_features = model.get_fc_in_features()
-    # head = nn.Identity()
-    # model.add_head(head=head, freeze_backbone=False)
-    # model.summarize()
+    ########################## Pretraining #############################
 
     # optimizer and loss function for pretrain
-    # optimizer_pretrain = optim.Adam(model.parameters(), lr=learning_rate)
     optimizer_pretrain = torch.optim.SGD(model.parameters(), lr=0.06)
-    
+
     # criterion
-    # criterion_pretrain = ContrastiveLossEmbedding(margin, device=device)
-    criterion_pretrain = NegativeCosineSimilarity()
-    # criterion_pretrain = SimCLR_Loss(batch_size=batch_size, temperature=temperature)
+    # criterion_pretrain = NegativeCosineSimilarity()s
+    criterion_pretrain = SymNegCosineSimilarityLoss()
 
     # pretraining
     train_byol(
@@ -204,7 +200,10 @@ def main():
         train_loader=train_loader,
         criterion=criterion_pretrain,
         optimizer=optimizer_pretrain,
+        saved_model_path=model_path_pretrained,
+        valid_loader=val_loader,
     )
+
     # train_contrastive_pair(
     #     epochs=epochs_pretrained,
     #     model=model,
@@ -214,92 +213,6 @@ def main():
     #     optimizer=optimizer_pretrain,
     #     saved_model_path=model_path_pretrained,
     #     batch_size=batch_size,
-    # )
-
-    ########################## finetune ##########################
-
-    # Create finetune model
-    # in_features = model.get_last_layer_features()
-    in_features = model.get_second_last_in_features()
-
-    finetune_head = nn.Sequential(
-        nn.Linear(512, 256), nn.ReLU(), nn.Linear(256, num_classes)
-    )
-    model = model.add_head(finetune_head, freeze_backbone=True)
-    summary(model, input_size=(1, 1, 224, 224), device="cuda")
-    model.to(device="cuda")
-
-    # optimizer and loss function for finetuning
-    optimizer_finetune = optim.Adam(model.parameters(), lr=learning_rate)
-    criterion_finetune = nn.CrossEntropyLoss()
-
-    # finetuning loop
-    train_simplistic(
-        epochs=epochs_finetuned,
-        model=model,
-        device="cuda",
-        train_loader=train_loader,
-        criterion=criterion_finetune,
-        optimizer=optimizer_finetune,
-        saved_model_path=model_path_finetune,
-        valid_loader=val_loader,
-    )
-
-    ########################## inference ##########################
-
-    # perform inference on finetuned model
-    infer_obj = InferenceSSL(
-        model,
-        val_loader,
-        device,
-        num_classes,
-        val_set,
-        dataset_name,
-        labels_map=classes,
-        image_size=image_size,
-        channels=num_channels,
-        destination_dir="data",
-        log_dir=log_dir,  # log_dir
-    )
-
-    infer_obj.infer_plot_roc()
-    infer_obj.generate_plot_confusion_matrix()
-
-    ########################## EOF ##########################
-
-    # seed_everything(seed=42)
-
-    # train_loader = DataLoader(
-    #     dataset=trainset,
-    #     batch_size=batch_size,
-    #     shuffle=True,
-    #     num_workers=num_workers,
-    # )
-
-    # num_classes = len(classes)
-    # print(num_classes)
-    # print(f"Train Data: {len(trainset)}")
-    # print(f"Val Data: {len(testset)}")
-
-    # # Transformer model
-    # model = TransformerModels(
-    #     transformer_type=train_config["network_type"],
-    #     num_channels=train_config["channels"],
-    #     num_classes=num_classes,
-    #     img_size=image_size,
-    #     **train_config["network_config"],
-    # )
-
-    # summary(model, input_size=(train_config["batch_size"], 1, image_size, image_size))
-
-    # # loss function
-    # criterion = nn.CrossEntropyLoss()
-
-    # # optimizer
-    # optimizer = optim.AdamW(
-    #     model.parameters(),
-    #     lr=optimizer_config["lr"],
-    #     weight_decay=optimizer_config["weight_decay"],
     # )
 
 

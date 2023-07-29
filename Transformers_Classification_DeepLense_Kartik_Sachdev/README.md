@@ -95,9 +95,27 @@ python3 main.py \
 ```bash
 
 python3 main_ssl.py \
---dataset_name Model_I \
+--dataset_name Model_II \
 --train_config_path /home/kartik/git/DeepLense/Transformers_Classification_DeepLense_Kartik_Sachdev/config/yaml/resnet18_model_test.yaml
 ```
+
+Losses <br>
+[]  BYOL <br>
+[]  SImsiam <br>
+[] 
+
+Process <br>
+[ ] Correct nn.Module <br>
+  - Value to the project : clean code
+  - Is it completely wrong : No 
+  - Impact factor : Min
+  - Time to complete: Min
+
+[ ] Loss function <br>
+  - Value to the project : does the main thing
+  - Is it completely wrong : Yes
+  - Impact factor : Max
+  - Time to complete: Max
 
 <br>
 

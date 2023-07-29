@@ -1,8 +1,8 @@
 import timm
 import torch.nn as nn
 import torch.nn as nn
-from torchvision.models import resnet18
-from utils.util import check_trainable_layers
+from torchvision.models import resnet18, resnet
+from utils.util import check_trainable_layers, get_second_last_layer
 from torchsummary import summary
 from typing import Optional
 import torch
@@ -86,6 +86,7 @@ class CustomResNet(nn.Module):
 
         self.model.fc = nn.Identity() if head is None else head
         self.model.fc.to(self.device)
+        return self.model
         # self.model.to(self.device)
 
     def append_layer(self, layer, freeze_backbone=True):
@@ -94,6 +95,7 @@ class CustomResNet(nn.Module):
         self.model = nn.Sequential(self.model, layer)
         # Freezing network Sequential at index 0
         self.model[0].requires_grad_(requires_grad)
+        return self.model
 
     def forward(self, x):
         return self.model(x)
@@ -107,7 +109,7 @@ class CustomResNet(nn.Module):
         ).to(self.device)
 
     def get_input_size(self):
-        return (1, self.num_channels, 224, 224)
+        return (10, self.num_channels, 224, 224)
 
     def summarize(self):
         # summarize whole network
@@ -129,6 +131,14 @@ class CustomResNet(nn.Module):
 
         return num_last_features
 
+    def get_fc_in_features(self):
+        return self.model.fc.in_features
+    
+    def get_second_last_in_features(self):
+        layer = get_second_last_layer(self.model)
+        return layer
+
+    
 
 if __name__ == "__main__":
     resnet = CustomResNet(num_channels=1)
