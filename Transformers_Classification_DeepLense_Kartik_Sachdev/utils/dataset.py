@@ -566,12 +566,17 @@ class DeepLenseDatasetSSL(Dataset):
 
 
 class DefaultDatasetSetupSSL:
-    def __init__(self, dataset_name="Model_II", image_size=224) -> None:
+    def __init__(self, dataset_name="Model_II", image_size=224, dir=None) -> None:
         # parent directory
         current_file = os.path.abspath(__file__)
         parent_directory = os.path.dirname(current_file)
+        # TODO: improve filepaths
+        if dir is None:
+            dir = "../data"
+            self.data_dir = os.path.join(parent_directory, "../data")
 
-        self.data_dir = os.path.join(parent_directory, "../data")
+        else:
+            self.data_dir = dir
 
         # make data directory if doesnt exists
         make_directories([self.data_dir])
