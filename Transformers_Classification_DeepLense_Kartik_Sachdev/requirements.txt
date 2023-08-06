@@ -5,7 +5,7 @@
 
 # Base 
 matplotlib>=3.2.2
-numpy>=1.18.5
+numpy
 opencv-python>=4.1.1
 Pillow>=8.2.0
 PyYAML>=5.3.1
@@ -16,7 +16,7 @@ vit-pytorch==0.27.0
 torchvision>=0.7.0
 torchinfo
 tqdm>=4.41.0
-timm>=0.5.4
+timm
 transformers>=4.18.0
 e2cnn==0.1.9
 ray[tune]
@@ -42,3 +42,4 @@ gdown
 split-folders
 ipywidgets
 einops
+protobuf==3.20.*
