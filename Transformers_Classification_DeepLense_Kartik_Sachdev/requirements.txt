@@ -43,3 +43,4 @@ split-folders
 ipywidgets
 einops
 protobuf==3.20.*
+lightly
