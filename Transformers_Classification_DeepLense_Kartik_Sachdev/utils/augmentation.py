@@ -22,7 +22,6 @@ from torchvision.transforms import (
 )
 import numpy as np
 
-
 def get_transform_train(
     upsample_size: int, final_size: int, channels: Optional[int] = 1
 ):

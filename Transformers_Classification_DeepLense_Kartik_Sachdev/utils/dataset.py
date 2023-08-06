@@ -214,7 +214,14 @@ def visualize_samples(
 
 
 def visualize_samples_ssl(
-    dataset, labels_map, fig_height=15, fig_width=15, num_cols=5, cols_rows=5
+    dataset,
+    labels_map,
+    fig_height=15,
+    fig_width=15,
+    num_cols=5,
+    cols_rows=5,
+    num_rows_inner=1,
+    num_cols_inner=2,
 ) -> None:
     """Visualize samples from dataset
 
@@ -230,12 +237,12 @@ def visualize_samples_ssl(
     fig = plt.figure(figsize=(fig_height, fig_width))
 
     # Number of rows and columns for the outer subplots
-    num_rows_outer = 6
-    num_cols_outer = 6
+    num_rows_outer = num_cols
+    num_cols_outer = cols_rows
 
     # Number of rows and columns for the inner subplots
-    num_rows_inner = 1
-    num_cols_inner = 2
+    num_rows_inner = num_rows_inner
+    num_cols_inner = num_cols_inner
 
     # Generate the outer subplots
     outer_subplot_index = 1
@@ -248,9 +255,13 @@ def visualize_samples_ssl(
 
             outer_subplot_index += 1
             sample_idx = torch.randint(len(dataset), size=(1,)).item()
-            img1, img2, label = dataset[sample_idx]
-            outer_subplot.set_title(f"{labels_map[label]}")
-            img = [img1, img2]
+            # img1, img2, label = dataset[sample_idx]
+            # outer_subplot.set_title(f"{labels_map[label]}")
+            # img = [img1, img2]
+
+            batch = dataset[sample_idx]
+            outer_subplot.set_title(f"{labels_map[batch[-1]]}")
+            img = batch[:-1]
 
             # Generate the inner subplots within the current outer subplot
             inner_subplot_index = 1
