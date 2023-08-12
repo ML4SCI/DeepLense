@@ -463,9 +463,9 @@ class InferenceSSL(InferenceABC):
         correct = 0
         with torch.no_grad():
             self.best_model.eval()
-            for i, (x, _, t) in enumerate(self.test_loader):
-                x = x.to(self.device)
-                t = t.to(self.device)
+            for batch_idx, batch in enumerate(self.test_loader):
+                x = batch[0].to(self.device)
+                t = batch[-1].to(self.device)
                 y = self.best_model(x)
 
                 self.pred_arr.append(y.cpu().numpy())
