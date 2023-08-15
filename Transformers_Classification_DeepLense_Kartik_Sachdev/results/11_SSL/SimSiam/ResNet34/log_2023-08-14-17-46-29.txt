@@ -1,0 +1,553 @@
+DEBUG:root:train data: 89104
+DEBUG:matplotlib.pyplot:Loaded backend module://matplotlib_inline.backend_inline version unknown.
+DEBUG:matplotlib.pyplot:Loaded backend module://matplotlib_inline.backend_inline version unknown.
+DEBUG:root:torch.Size([256, 1, 224, 224])
+DEBUG:root:Starting Training
+DEBUG:root:Epoch [0/15], Batch [0/262], Loss: -0.007793231401592493
+DEBUG:root:Epoch [0/15], Batch [10/262], Loss: -0.02198302187025547
+DEBUG:root:Epoch [0/15], Batch [20/262], Loss: -0.04969225823879242
+DEBUG:root:Epoch [0/15], Batch [30/262], Loss: -0.10373121500015259
+DEBUG:root:Epoch [0/15], Batch [40/262], Loss: -0.15354077517986298
+DEBUG:root:Epoch [0/15], Batch [50/262], Loss: -0.21956998109817505
+DEBUG:root:Epoch [0/15], Batch [60/262], Loss: -0.2759544849395752
+DEBUG:root:Epoch [0/15], Batch [70/262], Loss: -0.3213992714881897
+DEBUG:root:Epoch [0/15], Batch [80/262], Loss: -0.3815751373767853
+DEBUG:root:Epoch [0/15], Batch [90/262], Loss: -0.4254608154296875
+DEBUG:root:Epoch [0/15], Batch [100/262], Loss: -0.5089673399925232
+DEBUG:root:Epoch [0/15], Batch [110/262], Loss: -0.5595033168792725
+DEBUG:root:Epoch [0/15], Batch [120/262], Loss: -0.6149362325668335
+DEBUG:root:Epoch [0/15], Batch [130/262], Loss: -0.6949337124824524
+DEBUG:root:Epoch [0/15], Batch [140/262], Loss: -0.7372546792030334
+DEBUG:root:Epoch [0/15], Batch [150/262], Loss: -0.8139307498931885
+DEBUG:root:Epoch [0/15], Batch [160/262], Loss: -0.8755636215209961
+DEBUG:root:Epoch [0/15], Batch [170/262], Loss: -0.8839432001113892
+DEBUG:root:Epoch [0/15], Batch [180/262], Loss: -0.9083542227745056
+DEBUG:root:Epoch [0/15], Batch [190/262], Loss: -0.9046410322189331
+DEBUG:root:Epoch [0/15], Batch [200/262], Loss: -0.9288420081138611
+DEBUG:root:Epoch [0/15], Batch [210/262], Loss: -0.9156765937805176
+DEBUG:root:Epoch [0/15], Batch [220/262], Loss: -0.9242899417877197
+DEBUG:root:Epoch [0/15], Batch [230/262], Loss: -0.9261283874511719
+DEBUG:root:Epoch [0/15], Batch [240/262], Loss: -0.9361428618431091
+DEBUG:root:Epoch [0/15], Batch [250/262], Loss: -0.9027580618858337
+DEBUG:root:Epoch [0/15], Batch [260/262], Loss: -0.8947641849517822
+DEBUG:root:epoch: 00, loss: -0.59899
+DEBUG:root:Epoch [1/15], Batch [0/262], Loss: -0.9150974154472351
+DEBUG:root:Epoch [1/15], Batch [10/262], Loss: -0.9201281070709229
+DEBUG:root:Epoch [1/15], Batch [20/262], Loss: -0.9294420480728149
+DEBUG:root:Epoch [1/15], Batch [30/262], Loss: -0.9216741323471069
+DEBUG:root:Epoch [1/15], Batch [40/262], Loss: -0.9327138662338257
+DEBUG:root:Epoch [1/15], Batch [50/262], Loss: -0.9140744209289551
+DEBUG:root:Epoch [1/15], Batch [60/262], Loss: -0.9285731315612793
+DEBUG:root:Epoch [1/15], Batch [70/262], Loss: -0.8724750280380249
+DEBUG:root:Epoch [1/15], Batch [80/262], Loss: -0.8896645307540894
+DEBUG:root:Epoch [1/15], Batch [90/262], Loss: -0.8825042247772217
+DEBUG:root:Epoch [1/15], Batch [100/262], Loss: -0.8719651103019714
+DEBUG:root:Epoch [1/15], Batch [110/262], Loss: -0.9133106470108032
+DEBUG:root:Epoch [1/15], Batch [120/262], Loss: -0.9083799719810486
+DEBUG:root:Epoch [1/15], Batch [130/262], Loss: -0.9123954176902771
+DEBUG:root:Epoch [1/15], Batch [140/262], Loss: -0.9023711085319519
+DEBUG:root:Epoch [1/15], Batch [150/262], Loss: -0.9215108752250671
+DEBUG:root:Epoch [1/15], Batch [160/262], Loss: -0.9295517206192017
+DEBUG:root:Epoch [1/15], Batch [170/262], Loss: -0.9460448026657104
+DEBUG:root:Epoch [1/15], Batch [180/262], Loss: -0.9341832399368286
+DEBUG:root:Epoch [1/15], Batch [190/262], Loss: -0.9295035004615784
+DEBUG:root:Epoch [1/15], Batch [200/262], Loss: -0.9600307941436768
+DEBUG:root:Epoch [1/15], Batch [210/262], Loss: -0.9732404947280884
+DEBUG:root:Epoch [1/15], Batch [220/262], Loss: -0.9442012310028076
+DEBUG:root:Epoch [1/15], Batch [230/262], Loss: -0.9509583711624146
+DEBUG:root:Epoch [1/15], Batch [240/262], Loss: -0.9375627636909485
+DEBUG:root:Epoch [1/15], Batch [250/262], Loss: -0.9612703323364258
+DEBUG:root:Epoch [1/15], Batch [260/262], Loss: -0.9434502720832825
+DEBUG:root:epoch: 01, loss: -0.91955
+DEBUG:root:Epoch [2/15], Batch [0/262], Loss: -0.8962706923484802
+DEBUG:root:Epoch [2/15], Batch [10/262], Loss: -0.904412031173706
+DEBUG:root:Epoch [2/15], Batch [20/262], Loss: -0.9037058353424072
+DEBUG:root:Epoch [2/15], Batch [30/262], Loss: -0.9035782814025879
+DEBUG:root:Epoch [2/15], Batch [40/262], Loss: -0.9049627780914307
+DEBUG:root:Epoch [2/15], Batch [50/262], Loss: -0.8958331346511841
+DEBUG:root:Epoch [2/15], Batch [60/262], Loss: -0.9465417861938477
+DEBUG:root:Epoch [2/15], Batch [70/262], Loss: -0.9148504137992859
+DEBUG:root:Epoch [2/15], Batch [80/262], Loss: -0.8740460872650146
+DEBUG:root:Epoch [2/15], Batch [90/262], Loss: -0.9236052632331848
+DEBUG:root:Epoch [2/15], Batch [100/262], Loss: -0.9196248054504395
+DEBUG:root:Epoch [2/15], Batch [110/262], Loss: -0.9393304586410522
+DEBUG:root:Epoch [2/15], Batch [120/262], Loss: -0.9541503190994263
+DEBUG:root:Epoch [2/15], Batch [130/262], Loss: -0.9607751369476318
+DEBUG:root:Epoch [2/15], Batch [140/262], Loss: -0.9088152050971985
+DEBUG:root:Epoch [2/15], Batch [150/262], Loss: -0.9268320202827454
+DEBUG:root:Epoch [2/15], Batch [160/262], Loss: -0.9048988819122314
+DEBUG:root:Epoch [2/15], Batch [170/262], Loss: -0.9274940490722656
+DEBUG:root:Epoch [2/15], Batch [180/262], Loss: -0.9039942622184753
+DEBUG:root:Epoch [2/15], Batch [190/262], Loss: -0.8812810778617859
+DEBUG:root:Epoch [2/15], Batch [200/262], Loss: -0.8952639102935791
+DEBUG:root:Epoch [2/15], Batch [210/262], Loss: -0.8603110313415527
+DEBUG:root:Epoch [2/15], Batch [220/262], Loss: -0.8991777300834656
+DEBUG:root:Epoch [2/15], Batch [230/262], Loss: -0.8962969779968262
+DEBUG:root:Epoch [2/15], Batch [240/262], Loss: -0.9279508590698242
+DEBUG:root:Epoch [2/15], Batch [250/262], Loss: -0.8484810590744019
+DEBUG:root:Epoch [2/15], Batch [260/262], Loss: -0.9082615971565247
+DEBUG:root:epoch: 02, loss: -0.90586
+DEBUG:root:Epoch [3/15], Batch [0/262], Loss: -0.935417890548706
+DEBUG:root:Epoch [3/15], Batch [10/262], Loss: -0.8756440281867981
+DEBUG:root:Epoch [3/15], Batch [20/262], Loss: -0.9002405405044556
+DEBUG:root:Epoch [3/15], Batch [30/262], Loss: -0.8576756119728088
+DEBUG:root:Epoch [3/15], Batch [40/262], Loss: -0.8724656105041504
+DEBUG:root:Epoch [3/15], Batch [50/262], Loss: -0.8609473705291748
+DEBUG:root:Epoch [3/15], Batch [60/262], Loss: -0.8770706057548523
+DEBUG:root:Epoch [3/15], Batch [70/262], Loss: -0.9268380403518677
+DEBUG:root:Epoch [3/15], Batch [80/262], Loss: -0.9582041501998901
+DEBUG:root:Epoch [3/15], Batch [90/262], Loss: -0.9135605096817017
+DEBUG:root:Epoch [3/15], Batch [100/262], Loss: -0.9445726871490479
+DEBUG:root:Epoch [3/15], Batch [110/262], Loss: -0.9387776851654053
+DEBUG:root:Epoch [3/15], Batch [120/262], Loss: -0.9387175440788269
+DEBUG:root:Epoch [3/15], Batch [130/262], Loss: -0.8923547267913818
+DEBUG:root:Epoch [3/15], Batch [140/262], Loss: -0.8764773011207581
+DEBUG:root:Epoch [3/15], Batch [150/262], Loss: -0.8950769901275635
+DEBUG:root:Epoch [3/15], Batch [160/262], Loss: -0.8827802538871765
+DEBUG:root:Epoch [3/15], Batch [170/262], Loss: -0.9018497467041016
+DEBUG:root:Epoch [3/15], Batch [180/262], Loss: -0.8683853149414062
+DEBUG:root:Epoch [3/15], Batch [190/262], Loss: -0.9446623921394348
+DEBUG:root:Epoch [3/15], Batch [200/262], Loss: -0.9368960857391357
+DEBUG:root:Epoch [3/15], Batch [210/262], Loss: -0.903087854385376
+DEBUG:root:Epoch [3/15], Batch [220/262], Loss: -0.9467397928237915
+DEBUG:root:Epoch [3/15], Batch [230/262], Loss: -0.9725746512413025
+DEBUG:root:Epoch [3/15], Batch [240/262], Loss: -0.9487005472183228
+DEBUG:root:Epoch [3/15], Batch [250/262], Loss: -0.9281225204467773
+DEBUG:root:Epoch [3/15], Batch [260/262], Loss: -0.9421685934066772
+DEBUG:root:epoch: 03, loss: -0.90726
+DEBUG:root:Epoch [4/15], Batch [0/262], Loss: -0.9322100877761841
+DEBUG:root:Epoch [4/15], Batch [10/262], Loss: -0.966846227645874
+DEBUG:root:Epoch [4/15], Batch [20/262], Loss: -0.9396569728851318
+DEBUG:root:Epoch [4/15], Batch [30/262], Loss: -0.9204373359680176
+DEBUG:root:Epoch [4/15], Batch [40/262], Loss: -0.9353784322738647
+DEBUG:root:Epoch [4/15], Batch [50/262], Loss: -0.9300955533981323
+DEBUG:root:Epoch [4/15], Batch [60/262], Loss: -0.9354956150054932
+DEBUG:root:Epoch [4/15], Batch [70/262], Loss: -0.9392712116241455
+DEBUG:root:Epoch [4/15], Batch [80/262], Loss: -0.9567553997039795
+DEBUG:root:Epoch [4/15], Batch [90/262], Loss: -0.8863892555236816
+DEBUG:root:Epoch [4/15], Batch [100/262], Loss: -0.9142225980758667
+DEBUG:root:Epoch [4/15], Batch [110/262], Loss: -0.9182883501052856
+DEBUG:root:Epoch [4/15], Batch [120/262], Loss: -0.916788637638092
+DEBUG:root:Epoch [4/15], Batch [130/262], Loss: -0.8723645210266113
+DEBUG:root:Epoch [4/15], Batch [140/262], Loss: -0.8515595197677612
+DEBUG:root:Epoch [4/15], Batch [150/262], Loss: -0.8349000215530396
+DEBUG:root:Epoch [4/15], Batch [160/262], Loss: -0.7899487018585205
+DEBUG:root:Epoch [4/15], Batch [170/262], Loss: -0.8660343885421753
+DEBUG:root:Epoch [4/15], Batch [180/262], Loss: -0.861841082572937
+DEBUG:root:Epoch [4/15], Batch [190/262], Loss: -0.7944387793540955
+DEBUG:root:Epoch [4/15], Batch [200/262], Loss: -0.8448660969734192
+DEBUG:root:Epoch [4/15], Batch [210/262], Loss: -0.9135953187942505
+DEBUG:root:Epoch [4/15], Batch [220/262], Loss: -0.8956464529037476
+DEBUG:root:Epoch [4/15], Batch [230/262], Loss: -0.9267706871032715
+DEBUG:root:Epoch [4/15], Batch [240/262], Loss: -0.9010725021362305
+DEBUG:root:Epoch [4/15], Batch [250/262], Loss: -0.9058315753936768
+DEBUG:root:Epoch [4/15], Batch [260/262], Loss: -0.8879942297935486
+DEBUG:root:epoch: 04, loss: -0.90316
+DEBUG:root:Epoch [5/15], Batch [0/262], Loss: -0.8932410478591919
+DEBUG:root:Epoch [5/15], Batch [10/262], Loss: -0.8547062873840332
+DEBUG:root:Epoch [5/15], Batch [20/262], Loss: -0.8770385980606079
+DEBUG:root:Epoch [5/15], Batch [30/262], Loss: -0.8747376799583435
+DEBUG:root:Epoch [5/15], Batch [40/262], Loss: -0.8077535629272461
+DEBUG:root:Epoch [5/15], Batch [50/262], Loss: -0.9005932211875916
+DEBUG:root:Epoch [5/15], Batch [60/262], Loss: -0.9436339735984802
+DEBUG:root:Epoch [5/15], Batch [70/262], Loss: -0.9451247453689575
+DEBUG:root:Epoch [5/15], Batch [80/262], Loss: -0.970361053943634
+DEBUG:root:Epoch [5/15], Batch [90/262], Loss: -0.9510090947151184
+DEBUG:root:Epoch [5/15], Batch [100/262], Loss: -0.9405027627944946
+DEBUG:root:Epoch [5/15], Batch [110/262], Loss: -0.9276009798049927
+DEBUG:root:Epoch [5/15], Batch [120/262], Loss: -0.8487666249275208
+DEBUG:root:Epoch [5/15], Batch [130/262], Loss: -0.9012742042541504
+DEBUG:root:Epoch [5/15], Batch [140/262], Loss: -0.8994619250297546
+DEBUG:root:Epoch [5/15], Batch [150/262], Loss: -0.9219216704368591
+DEBUG:root:Epoch [5/15], Batch [160/262], Loss: -0.8868290185928345
+DEBUG:root:Epoch [5/15], Batch [170/262], Loss: -0.8907987475395203
+DEBUG:root:Epoch [5/15], Batch [180/262], Loss: -0.8770518898963928
+DEBUG:root:Epoch [5/15], Batch [190/262], Loss: -0.8847421407699585
+DEBUG:root:Epoch [5/15], Batch [200/262], Loss: -0.8696714043617249
+DEBUG:root:Epoch [5/15], Batch [210/262], Loss: -0.8827177286148071
+DEBUG:root:Epoch [5/15], Batch [220/262], Loss: -0.8723365664482117
+DEBUG:root:Epoch [5/15], Batch [230/262], Loss: -0.8566451668739319
+DEBUG:root:Epoch [5/15], Batch [240/262], Loss: -0.7908992171287537
+DEBUG:root:Epoch [5/15], Batch [250/262], Loss: -0.8390892744064331
+DEBUG:root:Epoch [5/15], Batch [260/262], Loss: -0.8712724447250366
+DEBUG:root:epoch: 05, loss: -0.88473
+DEBUG:root:Epoch [6/15], Batch [0/262], Loss: -0.85651034116745
+DEBUG:root:Epoch [6/15], Batch [10/262], Loss: -0.8667092323303223
+DEBUG:root:Epoch [6/15], Batch [20/262], Loss: -0.8876649141311646
+DEBUG:root:Epoch [6/15], Batch [30/262], Loss: -0.8730350732803345
+DEBUG:root:Epoch [6/15], Batch [40/262], Loss: -0.8825271725654602
+DEBUG:root:Epoch [6/15], Batch [50/262], Loss: -0.9115248918533325
+DEBUG:root:Epoch [6/15], Batch [60/262], Loss: -0.9048333168029785
+DEBUG:root:Epoch [6/15], Batch [70/262], Loss: -0.8709925413131714
+DEBUG:root:Epoch [6/15], Batch [80/262], Loss: -0.8722372055053711
+DEBUG:root:Epoch [6/15], Batch [90/262], Loss: -0.886898398399353
+DEBUG:root:Epoch [6/15], Batch [100/262], Loss: -0.854764461517334
+DEBUG:root:Epoch [6/15], Batch [110/262], Loss: -0.814306378364563
+DEBUG:root:Epoch [6/15], Batch [120/262], Loss: -0.8687101602554321
+DEBUG:root:Epoch [6/15], Batch [130/262], Loss: -0.8570148944854736
+DEBUG:root:Epoch [6/15], Batch [140/262], Loss: -0.834052562713623
+DEBUG:root:Epoch [6/15], Batch [150/262], Loss: -0.8678511381149292
+DEBUG:root:Epoch [6/15], Batch [160/262], Loss: -0.8767738342285156
+DEBUG:root:Epoch [6/15], Batch [170/262], Loss: -0.8482671976089478
+DEBUG:root:Epoch [6/15], Batch [180/262], Loss: -0.8594461679458618
+DEBUG:root:Epoch [6/15], Batch [190/262], Loss: -0.8528050184249878
+DEBUG:root:Epoch [6/15], Batch [200/262], Loss: -0.8499143123626709
+DEBUG:root:Epoch [6/15], Batch [210/262], Loss: -0.8710453510284424
+DEBUG:root:Epoch [6/15], Batch [220/262], Loss: -0.8945536017417908
+DEBUG:root:Epoch [6/15], Batch [230/262], Loss: -0.8912225961685181
+DEBUG:root:Epoch [6/15], Batch [240/262], Loss: -0.8788502216339111
+DEBUG:root:Epoch [6/15], Batch [250/262], Loss: -0.8639969229698181
+DEBUG:root:Epoch [6/15], Batch [260/262], Loss: -0.842666506767273
+DEBUG:root:epoch: 06, loss: -0.86869
+DEBUG:root:Epoch [7/15], Batch [0/262], Loss: -0.8671432733535767
+DEBUG:root:Epoch [7/15], Batch [10/262], Loss: -0.8612133264541626
+DEBUG:root:Epoch [7/15], Batch [20/262], Loss: -0.8670179843902588
+DEBUG:root:Epoch [7/15], Batch [30/262], Loss: -0.9166752099990845
+DEBUG:root:Epoch [7/15], Batch [40/262], Loss: -0.940898060798645
+DEBUG:root:Epoch [7/15], Batch [50/262], Loss: -0.8724324107170105
+DEBUG:root:Epoch [7/15], Batch [60/262], Loss: -0.8969664573669434
+DEBUG:root:Epoch [7/15], Batch [70/262], Loss: -0.8698365688323975
+DEBUG:root:Epoch [7/15], Batch [80/262], Loss: -0.9093319773674011
+DEBUG:root:Epoch [7/15], Batch [90/262], Loss: -0.9096164703369141
+DEBUG:root:Epoch [7/15], Batch [100/262], Loss: -0.8501479625701904
+DEBUG:root:Epoch [7/15], Batch [110/262], Loss: -0.8897761106491089
+DEBUG:root:Epoch [7/15], Batch [120/262], Loss: -0.8929342031478882
+DEBUG:root:Epoch [7/15], Batch [130/262], Loss: -0.9360317587852478
+DEBUG:root:Epoch [7/15], Batch [140/262], Loss: -0.8746715188026428
+DEBUG:root:Epoch [7/15], Batch [150/262], Loss: -0.8793807029724121
+DEBUG:root:Epoch [7/15], Batch [160/262], Loss: -0.8723376989364624
+DEBUG:root:Epoch [7/15], Batch [170/262], Loss: -0.9154821038246155
+DEBUG:root:Epoch [7/15], Batch [180/262], Loss: -0.939017117023468
+DEBUG:root:Epoch [7/15], Batch [190/262], Loss: -0.9316262006759644
+DEBUG:root:Epoch [7/15], Batch [200/262], Loss: -0.8895125389099121
+DEBUG:root:Epoch [7/15], Batch [210/262], Loss: -0.878710925579071
+DEBUG:root:Epoch [7/15], Batch [220/262], Loss: -0.9189721941947937
+DEBUG:root:Epoch [7/15], Batch [230/262], Loss: -0.9008452892303467
+DEBUG:root:Epoch [7/15], Batch [240/262], Loss: -0.8951880931854248
+DEBUG:root:Epoch [7/15], Batch [250/262], Loss: -0.9125794172286987
+DEBUG:root:Epoch [7/15], Batch [260/262], Loss: -0.9191772937774658
+DEBUG:root:epoch: 07, loss: -0.88999
+DEBUG:root:Epoch [8/15], Batch [0/262], Loss: -0.8672240376472473
+DEBUG:root:Epoch [8/15], Batch [10/262], Loss: -0.9167460203170776
+DEBUG:root:Epoch [8/15], Batch [20/262], Loss: -0.8952540159225464
+DEBUG:root:Epoch [8/15], Batch [30/262], Loss: -0.9113531112670898
+DEBUG:root:Epoch [8/15], Batch [40/262], Loss: -0.9117707014083862
+DEBUG:root:Epoch [8/15], Batch [50/262], Loss: -0.8857874870300293
+DEBUG:root:Epoch [8/15], Batch [60/262], Loss: -0.8719285726547241
+DEBUG:root:Epoch [8/15], Batch [70/262], Loss: -0.8943941593170166
+DEBUG:root:Epoch [8/15], Batch [80/262], Loss: -0.8951507806777954
+DEBUG:root:Epoch [8/15], Batch [90/262], Loss: -0.8532511591911316
+DEBUG:root:Epoch [8/15], Batch [100/262], Loss: -0.8830291628837585
+DEBUG:root:Epoch [8/15], Batch [110/262], Loss: -0.8923732042312622
+DEBUG:root:Epoch [8/15], Batch [120/262], Loss: -0.859662652015686
+DEBUG:root:Epoch [8/15], Batch [130/262], Loss: -0.8909146785736084
+DEBUG:root:Epoch [8/15], Batch [140/262], Loss: -0.8880562782287598
+DEBUG:root:Epoch [8/15], Batch [150/262], Loss: -0.8796154260635376
+DEBUG:root:Epoch [8/15], Batch [160/262], Loss: -0.841240406036377
+DEBUG:root:Epoch [8/15], Batch [170/262], Loss: -0.8799141645431519
+DEBUG:root:Epoch [8/15], Batch [180/262], Loss: -0.8274779915809631
+DEBUG:root:Epoch [8/15], Batch [190/262], Loss: -0.8308488726615906
+DEBUG:root:Epoch [8/15], Batch [200/262], Loss: -0.837811291217804
+DEBUG:root:Epoch [8/15], Batch [210/262], Loss: -0.8637792468070984
+DEBUG:root:Epoch [8/15], Batch [220/262], Loss: -0.826053261756897
+DEBUG:root:Epoch [8/15], Batch [230/262], Loss: -0.8605102300643921
+DEBUG:root:Epoch [8/15], Batch [240/262], Loss: -0.8686752915382385
+DEBUG:root:Epoch [8/15], Batch [250/262], Loss: -0.8517478704452515
+DEBUG:root:Epoch [8/15], Batch [260/262], Loss: -0.8605027198791504
+DEBUG:root:epoch: 08, loss: -0.87657
+DEBUG:root:Epoch [9/15], Batch [0/262], Loss: -0.8668256998062134
+DEBUG:root:Epoch [9/15], Batch [10/262], Loss: -0.8274763822555542
+DEBUG:root:Epoch [9/15], Batch [20/262], Loss: -0.9012361764907837
+DEBUG:root:Epoch [9/15], Batch [30/262], Loss: -0.8794089555740356
+DEBUG:root:Epoch [9/15], Batch [40/262], Loss: -0.892451822757721
+DEBUG:root:Epoch [9/15], Batch [50/262], Loss: -0.9083965420722961
+DEBUG:root:Epoch [9/15], Batch [60/262], Loss: -0.8679020404815674
+DEBUG:root:Epoch [9/15], Batch [70/262], Loss: -0.8873051404953003
+DEBUG:root:Epoch [9/15], Batch [80/262], Loss: -0.9095052480697632
+DEBUG:root:Epoch [9/15], Batch [90/262], Loss: -0.910520076751709
+DEBUG:root:Epoch [9/15], Batch [100/262], Loss: -0.8979140520095825
+DEBUG:root:Epoch [9/15], Batch [110/262], Loss: -0.9350148439407349
+DEBUG:root:Epoch [9/15], Batch [120/262], Loss: -0.9090338349342346
+DEBUG:root:Epoch [9/15], Batch [130/262], Loss: -0.8989162445068359
+DEBUG:root:Epoch [9/15], Batch [140/262], Loss: -0.920423686504364
+DEBUG:root:Epoch [9/15], Batch [150/262], Loss: -0.9160398244857788
+DEBUG:root:Epoch [9/15], Batch [160/262], Loss: -0.8846688270568848
+DEBUG:root:Epoch [9/15], Batch [170/262], Loss: -0.9006801843643188
+DEBUG:root:Epoch [9/15], Batch [180/262], Loss: -0.9277434349060059
+DEBUG:root:Epoch [9/15], Batch [190/262], Loss: -0.8862498998641968
+DEBUG:root:Epoch [9/15], Batch [200/262], Loss: -0.8940311670303345
+DEBUG:root:Epoch [9/15], Batch [210/262], Loss: -0.9090430736541748
+DEBUG:root:Epoch [9/15], Batch [220/262], Loss: -0.8787965774536133
+DEBUG:root:Epoch [9/15], Batch [230/262], Loss: -0.8802797794342041
+DEBUG:root:Epoch [9/15], Batch [240/262], Loss: -0.8964332938194275
+DEBUG:root:Epoch [9/15], Batch [250/262], Loss: -0.8936537504196167
+DEBUG:root:Epoch [9/15], Batch [260/262], Loss: -0.9096252918243408
+DEBUG:root:epoch: 09, loss: -0.89964
+DEBUG:root:Epoch [10/15], Batch [0/262], Loss: -0.9192842841148376
+DEBUG:root:Epoch [10/15], Batch [10/262], Loss: -0.9131863117218018
+DEBUG:root:Epoch [10/15], Batch [20/262], Loss: -0.919793426990509
+DEBUG:root:Epoch [10/15], Batch [30/262], Loss: -0.9144593477249146
+DEBUG:root:Epoch [10/15], Batch [40/262], Loss: -0.8669595718383789
+DEBUG:root:Epoch [10/15], Batch [50/262], Loss: -0.8897892236709595
+DEBUG:root:Epoch [10/15], Batch [60/262], Loss: -0.8974781036376953
+DEBUG:root:Epoch [10/15], Batch [70/262], Loss: -0.9306604862213135
+DEBUG:root:Epoch [10/15], Batch [80/262], Loss: -0.8929098844528198
+DEBUG:root:Epoch [10/15], Batch [90/262], Loss: -0.8766424059867859
+DEBUG:root:Epoch [10/15], Batch [100/262], Loss: -0.8799233436584473
+DEBUG:root:Epoch [10/15], Batch [110/262], Loss: -0.9010018110275269
+DEBUG:root:Epoch [10/15], Batch [120/262], Loss: -0.8982744216918945
+DEBUG:root:Epoch [10/15], Batch [130/262], Loss: -0.8343240022659302
+DEBUG:root:Epoch [10/15], Batch [140/262], Loss: -0.8935383558273315
+DEBUG:root:Epoch [10/15], Batch [150/262], Loss: -0.928250789642334
+DEBUG:root:Epoch [10/15], Batch [160/262], Loss: -0.8942161798477173
+DEBUG:root:Epoch [10/15], Batch [170/262], Loss: -0.8884931802749634
+DEBUG:root:Epoch [10/15], Batch [180/262], Loss: -0.8908748626708984
+DEBUG:root:Epoch [10/15], Batch [190/262], Loss: -0.8716732859611511
+DEBUG:root:Epoch [10/15], Batch [200/262], Loss: -0.8991144299507141
+DEBUG:root:Epoch [10/15], Batch [210/262], Loss: -0.9286291599273682
+DEBUG:root:Epoch [10/15], Batch [220/262], Loss: -0.9039013385772705
+DEBUG:root:Epoch [10/15], Batch [230/262], Loss: -0.9221916198730469
+DEBUG:root:Epoch [10/15], Batch [240/262], Loss: -0.9000982046127319
+DEBUG:root:Epoch [10/15], Batch [250/262], Loss: -0.911078929901123
+DEBUG:root:Epoch [10/15], Batch [260/262], Loss: -0.8919508457183838
+DEBUG:root:epoch: 10, loss: -0.89759
+DEBUG:root:Epoch [11/15], Batch [0/262], Loss: -0.8946685194969177
+DEBUG:root:Epoch [11/15], Batch [10/262], Loss: -0.8925271034240723
+DEBUG:root:Epoch [11/15], Batch [20/262], Loss: -0.9121159315109253
+DEBUG:root:Epoch [11/15], Batch [30/262], Loss: -0.9203710556030273
+DEBUG:root:Epoch [11/15], Batch [40/262], Loss: -0.8816977739334106
+DEBUG:root:Epoch [11/15], Batch [50/262], Loss: -0.9151214361190796
+DEBUG:root:Epoch [11/15], Batch [60/262], Loss: -0.9211025834083557
+DEBUG:root:Epoch [11/15], Batch [70/262], Loss: -0.9025561809539795
+DEBUG:root:Epoch [11/15], Batch [80/262], Loss: -0.8994593024253845
+DEBUG:root:Epoch [11/15], Batch [90/262], Loss: -0.8808329701423645
+DEBUG:root:Epoch [11/15], Batch [100/262], Loss: -0.8690943717956543
+DEBUG:root:Epoch [11/15], Batch [110/262], Loss: -0.9477141499519348
+DEBUG:root:Epoch [11/15], Batch [120/262], Loss: -0.9437377452850342
+DEBUG:root:Epoch [11/15], Batch [130/262], Loss: -0.9017067551612854
+DEBUG:root:Epoch [11/15], Batch [140/262], Loss: -0.9104572534561157
+DEBUG:root:Epoch [11/15], Batch [150/262], Loss: -0.8860820531845093
+DEBUG:root:Epoch [11/15], Batch [160/262], Loss: -0.9181786775588989
+DEBUG:root:Epoch [11/15], Batch [170/262], Loss: -0.9248635768890381
+DEBUG:root:Epoch [11/15], Batch [180/262], Loss: -0.8796157240867615
+DEBUG:root:Epoch [11/15], Batch [190/262], Loss: -0.8884589672088623
+DEBUG:root:Epoch [11/15], Batch [200/262], Loss: -0.9069703817367554
+DEBUG:root:Epoch [11/15], Batch [210/262], Loss: -0.9374319314956665
+DEBUG:root:Epoch [11/15], Batch [220/262], Loss: -0.8854702711105347
+DEBUG:root:Epoch [11/15], Batch [230/262], Loss: -0.850509762763977
+DEBUG:root:Epoch [11/15], Batch [240/262], Loss: -0.8932689428329468
+DEBUG:root:Epoch [11/15], Batch [250/262], Loss: -0.8825732469558716
+DEBUG:root:Epoch [11/15], Batch [260/262], Loss: -0.9197131991386414
+DEBUG:root:epoch: 11, loss: -0.90736
+DEBUG:root:Epoch [12/15], Batch [0/262], Loss: -0.913345217704773
+DEBUG:root:Epoch [12/15], Batch [10/262], Loss: -0.9452654719352722
+DEBUG:root:Epoch [12/15], Batch [20/262], Loss: -0.9218430519104004
+DEBUG:root:Epoch [12/15], Batch [30/262], Loss: -0.8944327235221863
+DEBUG:root:Epoch [12/15], Batch [40/262], Loss: -0.9226734638214111
+DEBUG:root:Epoch [12/15], Batch [50/262], Loss: -0.9308608174324036
+DEBUG:root:Epoch [12/15], Batch [60/262], Loss: -0.9320158362388611
+DEBUG:root:Epoch [12/15], Batch [70/262], Loss: -0.9359568357467651
+DEBUG:root:Epoch [12/15], Batch [80/262], Loss: -0.8983297944068909
+DEBUG:root:Epoch [12/15], Batch [90/262], Loss: -0.8925729990005493
+DEBUG:root:Epoch [12/15], Batch [100/262], Loss: -0.8820421695709229
+DEBUG:root:Epoch [12/15], Batch [110/262], Loss: -0.9449514150619507
+DEBUG:root:Epoch [12/15], Batch [120/262], Loss: -0.9185593724250793
+DEBUG:root:Epoch [12/15], Batch [130/262], Loss: -0.9284317493438721
+DEBUG:root:Epoch [12/15], Batch [140/262], Loss: -0.9310646653175354
+DEBUG:root:Epoch [12/15], Batch [150/262], Loss: -0.9194934368133545
+DEBUG:root:Epoch [12/15], Batch [160/262], Loss: -0.9100680351257324
+DEBUG:root:Epoch [12/15], Batch [170/262], Loss: -0.9059703350067139
+DEBUG:root:Epoch [12/15], Batch [180/262], Loss: -0.9380737543106079
+DEBUG:root:Epoch [12/15], Batch [190/262], Loss: -0.9124915599822998
+DEBUG:root:Epoch [12/15], Batch [200/262], Loss: -0.9282205700874329
+DEBUG:root:Epoch [12/15], Batch [210/262], Loss: -0.9300023317337036
+DEBUG:root:Epoch [12/15], Batch [220/262], Loss: -0.9067975878715515
+DEBUG:root:Epoch [12/15], Batch [230/262], Loss: -0.9439519643783569
+DEBUG:root:Epoch [12/15], Batch [240/262], Loss: -0.9341609477996826
+DEBUG:root:Epoch [12/15], Batch [250/262], Loss: -0.9467618465423584
+DEBUG:root:Epoch [12/15], Batch [260/262], Loss: -0.9224107265472412
+DEBUG:root:epoch: 12, loss: -0.91863
+DEBUG:root:Epoch [13/15], Batch [0/262], Loss: -0.9388359189033508
+DEBUG:root:Epoch [13/15], Batch [10/262], Loss: -0.9199209809303284
+DEBUG:root:Epoch [13/15], Batch [20/262], Loss: -0.9362810850143433
+DEBUG:root:Epoch [13/15], Batch [30/262], Loss: -0.9432387351989746
+DEBUG:root:Epoch [13/15], Batch [40/262], Loss: -0.9323537349700928
+DEBUG:root:Epoch [13/15], Batch [50/262], Loss: -0.9467876553535461
+DEBUG:root:Epoch [13/15], Batch [60/262], Loss: -0.9225103855133057
+DEBUG:root:Epoch [13/15], Batch [70/262], Loss: -0.9335962533950806
+DEBUG:root:Epoch [13/15], Batch [80/262], Loss: -0.9572817087173462
+DEBUG:root:Epoch [13/15], Batch [90/262], Loss: -0.9238048195838928
+DEBUG:root:Epoch [13/15], Batch [100/262], Loss: -0.9482874274253845
+DEBUG:root:Epoch [13/15], Batch [110/262], Loss: -0.9052190184593201
+DEBUG:root:Epoch [13/15], Batch [120/262], Loss: -0.9243518710136414
+DEBUG:root:Epoch [13/15], Batch [130/262], Loss: -0.9412461519241333
+DEBUG:root:Epoch [13/15], Batch [140/262], Loss: -0.9341505765914917
+DEBUG:root:Epoch [13/15], Batch [150/262], Loss: -0.9130853414535522
+DEBUG:root:Epoch [13/15], Batch [160/262], Loss: -0.93440842628479
+DEBUG:root:Epoch [13/15], Batch [170/262], Loss: -0.924350380897522
+DEBUG:root:Epoch [13/15], Batch [180/262], Loss: -0.9181844592094421
+DEBUG:root:Epoch [13/15], Batch [190/262], Loss: -0.9364505410194397
+DEBUG:root:Epoch [13/15], Batch [200/262], Loss: -0.9311285018920898
+DEBUG:root:Epoch [13/15], Batch [210/262], Loss: -0.907109797000885
+DEBUG:root:Epoch [13/15], Batch [220/262], Loss: -0.9089846611022949
+DEBUG:root:Epoch [13/15], Batch [230/262], Loss: -0.9293996691703796
+DEBUG:root:Epoch [13/15], Batch [240/262], Loss: -0.9180728793144226
+DEBUG:root:Epoch [13/15], Batch [250/262], Loss: -0.9179717302322388
+DEBUG:root:Epoch [13/15], Batch [260/262], Loss: -0.9452083110809326
+DEBUG:root:epoch: 13, loss: -0.92474
+DEBUG:root:Epoch [14/15], Batch [0/262], Loss: -0.9614864587783813
+DEBUG:root:Epoch [14/15], Batch [10/262], Loss: -0.9317124485969543
+DEBUG:root:Epoch [14/15], Batch [20/262], Loss: -0.937939465045929
+DEBUG:root:Epoch [14/15], Batch [30/262], Loss: -0.9265412092208862
+DEBUG:root:Epoch [14/15], Batch [40/262], Loss: -0.9115193486213684
+DEBUG:root:Epoch [14/15], Batch [50/262], Loss: -0.9312341213226318
+DEBUG:root:Epoch [14/15], Batch [60/262], Loss: -0.8699595928192139
+DEBUG:root:Epoch [14/15], Batch [70/262], Loss: -0.9083489775657654
+DEBUG:root:Epoch [14/15], Batch [80/262], Loss: -0.9242236018180847
+DEBUG:root:Epoch [14/15], Batch [90/262], Loss: -0.9485918283462524
+DEBUG:root:Epoch [14/15], Batch [100/262], Loss: -0.9177462458610535
+DEBUG:root:Epoch [14/15], Batch [110/262], Loss: -0.937576174736023
+DEBUG:root:Epoch [14/15], Batch [120/262], Loss: -0.9051955938339233
+DEBUG:root:Epoch [14/15], Batch [130/262], Loss: -0.9412919282913208
+DEBUG:root:Epoch [14/15], Batch [140/262], Loss: -0.9294599294662476
+DEBUG:root:Epoch [14/15], Batch [150/262], Loss: -0.8985213041305542
+DEBUG:root:Epoch [14/15], Batch [160/262], Loss: -0.9528722763061523
+DEBUG:root:Epoch [14/15], Batch [170/262], Loss: -0.9247878193855286
+DEBUG:root:Epoch [14/15], Batch [180/262], Loss: -0.912681519985199
+DEBUG:root:Epoch [14/15], Batch [190/262], Loss: -0.9481528997421265
+DEBUG:root:Epoch [14/15], Batch [200/262], Loss: -0.9402070045471191
+DEBUG:root:Epoch [14/15], Batch [210/262], Loss: -0.9272273778915405
+DEBUG:root:Epoch [14/15], Batch [220/262], Loss: -0.9436066150665283
+DEBUG:root:Epoch [14/15], Batch [230/262], Loss: -0.9497928619384766
+DEBUG:root:Epoch [14/15], Batch [240/262], Loss: -0.923240065574646
+DEBUG:root:Epoch [14/15], Batch [250/262], Loss: -0.9503136277198792
+DEBUG:root:Epoch [14/15], Batch [260/262], Loss: -0.9124882221221924
+DEBUG:root:epoch: 14, loss: -0.92524
+DEBUG:root:Epoch [0/20], Batch [0/262], Loss: 1.125539779663086
+DEBUG:root:Epoch [0/20], Batch [100/262], Loss: 1.116906762123108
+DEBUG:root:Epoch [0/20], Batch [200/262], Loss: 1.0991965532302856
+DEBUG:root:====== Eval started ======
+DEBUG:root:====== Model saved ======
+DEBUG:root:Epoch : 1 - loss : 1.1066 - val_loss : 1.1390 - val_acc: 0.3306 
+
+DEBUG:root:Epoch [1/20], Batch [0/262], Loss: 1.1148418188095093
+DEBUG:root:Epoch [1/20], Batch [100/262], Loss: 1.102590799331665
+DEBUG:root:Epoch [1/20], Batch [200/262], Loss: 0.8989030718803406
+DEBUG:root:====== Eval started ======
+DEBUG:root:====== Model saved ======
+DEBUG:root:Epoch : 2 - loss : 1.0372 - val_loss : 0.8839 - val_acc: 0.5052 
+
+DEBUG:root:Epoch [2/20], Batch [0/262], Loss: 0.8964938521385193
+DEBUG:root:Epoch [2/20], Batch [100/262], Loss: 0.8314087986946106
+DEBUG:root:Epoch [2/20], Batch [200/262], Loss: 0.8899792432785034
+DEBUG:root:====== Eval started ======
+DEBUG:root:====== Model saved ======
+DEBUG:root:Epoch : 3 - loss : 0.8356 - val_loss : 0.8195 - val_acc: 0.5461 
+
+DEBUG:root:Epoch [3/20], Batch [0/262], Loss: 0.7936061024665833
+DEBUG:root:Epoch [3/20], Batch [100/262], Loss: 0.7925614714622498
+DEBUG:root:Epoch [3/20], Batch [200/262], Loss: 0.7409981489181519
+DEBUG:root:====== Eval started ======
+DEBUG:root:Epoch : 4 - loss : 0.7784 - val_loss : 1.7088 - val_acc: 0.3695 
+
+DEBUG:root:Epoch [4/20], Batch [0/262], Loss: 0.830180287361145
+DEBUG:root:Epoch [4/20], Batch [100/262], Loss: 0.7715758085250854
+DEBUG:root:Epoch [4/20], Batch [200/262], Loss: 0.7167435884475708
+DEBUG:root:====== Eval started ======
+DEBUG:root:====== Model saved ======
+DEBUG:root:Epoch : 5 - loss : 0.7680 - val_loss : 0.7943 - val_acc: 0.5553 
+
+DEBUG:root:Epoch [5/20], Batch [0/262], Loss: 0.7436125874519348
+DEBUG:root:Epoch [5/20], Batch [100/262], Loss: 0.6739528775215149
+DEBUG:root:Epoch [5/20], Batch [200/262], Loss: 0.6995495557785034
+DEBUG:root:====== Eval started ======
+DEBUG:root:Epoch : 6 - loss : 0.7329 - val_loss : 1.4056 - val_acc: 0.4636 
+
+DEBUG:root:Epoch [6/20], Batch [0/262], Loss: 0.8106107711791992
+DEBUG:root:Epoch [6/20], Batch [100/262], Loss: 0.6917586326599121
+DEBUG:root:Epoch [6/20], Batch [200/262], Loss: 0.6956510543823242
+DEBUG:root:====== Eval started ======
+DEBUG:root:====== Model saved ======
+DEBUG:root:Epoch : 7 - loss : 0.7270 - val_loss : 0.8723 - val_acc: 0.5666 
+
+DEBUG:root:Epoch [7/20], Batch [0/262], Loss: 0.7213948369026184
+DEBUG:root:Epoch [7/20], Batch [100/262], Loss: 0.7141866087913513
+DEBUG:root:Epoch [7/20], Batch [200/262], Loss: 0.7078477144241333
+DEBUG:root:====== Eval started ======
+DEBUG:root:Epoch : 8 - loss : 0.7224 - val_loss : 0.9956 - val_acc: 0.5392 
+
+DEBUG:root:Epoch [8/20], Batch [0/262], Loss: 0.6997146606445312
+DEBUG:root:Epoch [8/20], Batch [100/262], Loss: 0.7809436917304993
+DEBUG:root:Epoch [8/20], Batch [200/262], Loss: 0.7293373346328735
+DEBUG:root:====== Eval started ======
+DEBUG:root:====== Model saved ======
+DEBUG:root:Epoch : 9 - loss : 0.7109 - val_loss : 0.7623 - val_acc: 0.5837 
+
+DEBUG:root:Epoch [9/20], Batch [0/262], Loss: 0.7468755841255188
+DEBUG:root:Epoch [9/20], Batch [100/262], Loss: 0.7129666805267334
+DEBUG:root:Epoch [9/20], Batch [200/262], Loss: 0.6806690096855164
+DEBUG:root:====== Eval started ======
+DEBUG:root:Epoch : 10 - loss : 0.6796 - val_loss : 2.2335 - val_acc: 0.5097 
+
+DEBUG:root:Epoch [10/20], Batch [0/262], Loss: 0.7483832836151123
+DEBUG:root:Epoch [10/20], Batch [100/262], Loss: 0.656933605670929
+DEBUG:root:Epoch [10/20], Batch [200/262], Loss: 0.8233468532562256
+DEBUG:root:====== Eval started ======
+DEBUG:root:Epoch : 11 - loss : 0.6685 - val_loss : 2.4028 - val_acc: 0.5478 
+
+DEBUG:root:Epoch [11/20], Batch [0/262], Loss: 0.629347026348114
+DEBUG:root:Epoch [11/20], Batch [100/262], Loss: 0.6774179339408875
+DEBUG:root:Epoch [11/20], Batch [200/262], Loss: 0.667964518070221
+DEBUG:root:====== Eval started ======
+DEBUG:root:Epoch : 12 - loss : 0.6737 - val_loss : 1.1623 - val_acc: 0.5580 
+
+DEBUG:root:Epoch [12/20], Batch [0/262], Loss: 0.6782885789871216
+DEBUG:root:Epoch [12/20], Batch [100/262], Loss: 0.6098079681396484
+DEBUG:root:Epoch [12/20], Batch [200/262], Loss: 0.6087487936019897
+DEBUG:root:====== Eval started ======
+DEBUG:root:Epoch : 13 - loss : 0.6482 - val_loss : 1.8723 - val_acc: 0.5444 
+
+DEBUG:root:Epoch [13/20], Batch [0/262], Loss: 0.6059713363647461
+DEBUG:root:Epoch [13/20], Batch [100/262], Loss: 0.5728448629379272
+DEBUG:root:Epoch [13/20], Batch [200/262], Loss: 0.6813207268714905
+DEBUG:root:====== Eval started ======
+DEBUG:root:Epoch : 14 - loss : 0.6298 - val_loss : 0.9629 - val_acc: 0.5157 
+
+DEBUG:root:Epoch [14/20], Batch [0/262], Loss: 0.6715108752250671
+DEBUG:root:Epoch [14/20], Batch [100/262], Loss: 0.6131709814071655
+DEBUG:root:Epoch [14/20], Batch [200/262], Loss: 0.5737862586975098
+DEBUG:root:====== Eval started ======
+DEBUG:root:Epoch : 15 - loss : 0.6322 - val_loss : 3.3489 - val_acc: 0.5487 
+
+DEBUG:root:Epoch [15/20], Batch [0/262], Loss: 0.6379892230033875
+DEBUG:root:Epoch [15/20], Batch [100/262], Loss: 0.6670451164245605
+DEBUG:root:Epoch [15/20], Batch [200/262], Loss: 0.6773388385772705
+DEBUG:root:====== Eval started ======
+DEBUG:root:Epoch : 16 - loss : 0.6231 - val_loss : 0.8071 - val_acc: 0.5790 
+
+DEBUG:root:Epoch [16/20], Batch [0/262], Loss: 0.7806425094604492
+DEBUG:root:Epoch [16/20], Batch [100/262], Loss: 0.6531228423118591
+DEBUG:root:Epoch [16/20], Batch [200/262], Loss: 0.596826434135437
+DEBUG:root:====== Eval started ======
+DEBUG:root:Epoch : 17 - loss : 0.6567 - val_loss : 2.2232 - val_acc: 0.5209 
+
+DEBUG:root:Epoch [17/20], Batch [0/262], Loss: 0.5977168083190918
+DEBUG:root:Epoch [17/20], Batch [100/262], Loss: 0.5598874092102051
+DEBUG:root:Epoch [17/20], Batch [200/262], Loss: 0.5649362206459045
+DEBUG:root:====== Eval started ======
+DEBUG:root:====== Model saved ======
+DEBUG:root:Epoch : 18 - loss : 0.5999 - val_loss : 0.6884 - val_acc: 0.6526 
+
+DEBUG:root:Epoch [18/20], Batch [0/262], Loss: 0.6656889915466309
+DEBUG:root:Epoch [18/20], Batch [100/262], Loss: 0.5867487192153931
+DEBUG:root:Epoch [18/20], Batch [200/262], Loss: 0.49557948112487793
+DEBUG:root:====== Eval started ======
+DEBUG:root:Epoch : 19 - loss : 0.5678 - val_loss : 1.3321 - val_acc: 0.5631 
+
+DEBUG:root:Epoch [19/20], Batch [0/262], Loss: 0.5671147108078003
+DEBUG:root:Epoch [19/20], Batch [100/262], Loss: 0.45950931310653687
+DEBUG:root:Epoch [19/20], Batch [200/262], Loss: 0.5027176737785339
+DEBUG:root:====== Eval started ======
+DEBUG:root:Epoch : 20 - loss : 0.5013 - val_loss : 1.7515 - val_acc: 0.5516 
+
+DEBUG:matplotlib.colorbar:locator: <matplotlib.ticker.AutoLocator object at 0x7fb69c51d8b0>
