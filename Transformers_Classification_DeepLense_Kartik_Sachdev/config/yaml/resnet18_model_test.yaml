@@ -1,0 +1,32 @@
+network_type: Resnet
+image_size: 224
+channels: 1
+batch_size: 128
+
+optimizer_config:
+  name: Adam
+  lr: 0.001
+  weight_decay: 0.01
+  momentum: 0.9
+  betas: (0.9 0.999)
+  warmup_epoch: 3
+
+ssl:
+  learning_method: contrastive_embedding
+  margin: 1.0
+  temperature: 0.5
+
+backbone:
+  resnet_name: resnet18
+
+pretrained:
+  head_size: [1]
+  layer_types: [Identity]
+  saved_model_path: output/pretrained_contrastive_embedding.pth
+  num_epochs: 10
+
+finetuned:
+  head_size: [256, 256]
+  activation:
+  num_epochs: 10
+  saved_model_path: output/finetuned_contrastive_embedding.pth

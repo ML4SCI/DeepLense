@@ -6,6 +6,9 @@ from tqdm import tqdm
 from typing import *
 import wandb
 import torch.nn as nn
+from torch.nn.functional import normalize
+from utils.scheduler import cosine_schedule
+from utils.util import update_momentum
 
 
 def train(
@@ -25,36 +28,36 @@ def train(
 ):
     """Supervised learning for image classification. Uses `wandb` for logging
 
-    Args:
-        epochs (int): # of epochs
-        model (nn.Module): model for training
-        device (Union[int, str]): number or name of device
-        train_loader (Any): pytorch loader for trainset
-        valid_loader (Any): pytorch loader for testset
-        criterion (nn.Module): loss critirea
-        optimizer (nn.Module): optimizer for model training
-        use_lr_schedule (nn.Module): whether to use learning rate scheduler
-        scheduler_step (nn.Module): type of learning rate scheduler
-        path (str): path to save models
-        config (dict): model hyperparameters as dict 
-        dataset_name (str): type of dataset
-        log_freq (int, optional): logging frequency. Defaults to 100.
-   
-   Example:
-   >>>     train(
-   >>>     epochs=25, 
-   >>>     model=model,
-   >>>     device=0,
-   >>>     train_loader=train_loader,
-   >>>     valid_loader=test_loader,
-   >>>     criterion=criterion,
-   >>>     optimizer=optimizer,
-   >>>     use_lr_schedule=train_config["lr_schedule_config"]["use_lr_schedule"],
-   >>>     scheduler_step=cosine_scheduler,
-   >>>     path=PATH,
-   >>>     log_freq=20,
-   >>>     config=train_config,
-   >>>     dataset_name=dataset_name)
+     Args:
+         epochs (int): # of epochs
+         model (nn.Module): model for training
+         device (Union[int, str]): number or name of device
+         train_loader (Any): pytorch loader for trainset
+         valid_loader (Any): pytorch loader for testset
+         criterion (nn.Module): loss critirea
+         optimizer (nn.Module): optimizer for model training
+         use_lr_schedule (nn.Module): whether to use learning rate scheduler
+         scheduler_step (nn.Module): type of learning rate scheduler
+         path (str): path to save models
+         config (dict): model hyperparameters as dict
+         dataset_name (str): type of dataset
+         log_freq (int, optional): logging frequency. Defaults to 100.
+
+    Example:
+    >>>     train(
+    >>>     epochs=25,
+    >>>     model=model,
+    >>>     device=0,
+    >>>     train_loader=train_loader,
+    >>>     valid_loader=test_loader,
+    >>>     criterion=criterion,
+    >>>     optimizer=optimizer,
+    >>>     use_lr_schedule=train_config["lr_schedule_config"]["use_lr_schedule"],
+    >>>     scheduler_step=cosine_scheduler,
+    >>>     path=PATH,
+    >>>     log_freq=20,
+    >>>     config=train_config,
+    >>>     dataset_name=dataset_name)
     """
     wandb.init(config=config, group=dataset_name, job_type="train")  # ,mode="disabled"
     wandb.watch(model, criterion, log="all", log_freq=log_freq)
@@ -141,3 +144,238 @@ def train(
             wandb.run.summary["best_step"] = steps
             wandb.save(path)
             torch.save(best_model.state_dict(), path)
+
+
+def train_contrastive_with_labels(
+    epochs: int,
+    model: nn.Module,
+    device: Union[int, str],
+    train_loader: Any,
+    criterion: nn.Module,
+    optimizer: nn.Module,
+    saved_model_path: str,
+):
+    best_loss = float("inf")
+
+    for epoch in range(epochs):
+        epoch_loss = 0.0
+        for batch_idx, (img1, img2, label) in enumerate(train_loader):
+            img1, img2, label = img1.to(device), img2.to(device), label.to(device)
+
+            optimizer.zero_grad()
+            output1 = model(img1)
+            output2 = model(img2)
+            loss = criterion(output1, output2, label)
+            epoch_loss += loss
+            loss.backward()
+            optimizer.step()
+
+            if batch_idx % 10 == 0:
+                print(
+                    f"Epoch [{epoch}/{epochs}], Batch [{batch_idx}/{len(train_loader)}], Loss: {loss.item()}"
+                )
+
+        epoch_loss = epoch_loss / len(train_loader)
+
+        if epoch_loss < best_loss:
+            best_loss = epoch_loss
+            best_model = copy.deepcopy(model)
+            torch.save(best_model.state_dict(), saved_model_path)
+
+
+def train_contrastive_pair(
+    epochs: int,
+    model: nn.Module,
+    device: Union[int, str],
+    train_loader: Any,
+    criterion: nn.Module,
+    optimizer: nn.Module,
+    saved_model_path: str,
+    batch_size: int,
+):
+    best_loss = float("inf")
+
+    # Training loop
+    for epoch in range(epochs):
+        epoch_loss = 0.0
+        for batch_idx, (img1, img2, label) in enumerate(train_loader):
+            if img1.shape[0] != batch_size:
+                continue
+
+            optimizer.zero_grad()
+
+            img1, img2, label = (
+                img1.to(device).float(),
+                img2.to(device).float(),
+                label.to(device),
+            )
+
+            output1 = model(img1)
+            output2 = model(img2)
+
+            loss = criterion(output1, output2)
+            loss.backward()
+            optimizer.step()
+
+            if batch_idx % 10 == 0:
+                print(
+                    f"Epoch [{epoch}/{epochs}], Batch [{batch_idx}/{len(train_loader)}], Loss: {loss.item()}"
+                )
+
+        epoch_loss = epoch_loss / len(train_loader)
+
+        if epoch_loss < best_loss:
+            best_loss = epoch_loss
+            best_model = copy.deepcopy(model)
+            torch.save(best_model.state_dict(), saved_model_path)
+
+
+def train_contrastive(
+    epochs: int,
+    model: nn.Module,
+    device: Union[int, str],
+    train_loader: Any,
+    criterion: nn.Module,
+    optimizer: nn.Module,
+    saved_model_path: str,
+):
+    best_loss = float("inf")
+
+    # Training loop
+    for epoch in range(epochs):
+        epoch_loss = 0.0
+        for batch_idx, (img1, _, _) in enumerate(train_loader):
+            img1 = img1.to(device)
+
+            optimizer.zero_grad()
+            embeddings = model(img1)
+
+            # embeddings = model(img1)
+            embeddings = normalize(embeddings, dim=1)
+
+            loss = criterion(embeddings)
+            loss.backward()
+            optimizer.step()
+
+            if batch_idx % 10 == 0:
+                print(
+                    f"Epoch [{epoch}/{epochs}], Batch [{batch_idx}/{len(train_loader)}], Loss: {loss.item()}"
+                )
+
+        epoch_loss = epoch_loss / len(train_loader)
+
+        if epoch_loss < best_loss:
+            best_loss = epoch_loss
+            best_model = copy.deepcopy(model)
+            torch.save(best_model.state_dict(), saved_model_path)
+
+
+def train_simplistic(
+    epochs: int,
+    model: nn.Module,
+    device: Union[int, str],
+    train_loader: Any,
+    criterion: nn.Module,
+    optimizer: nn.Module,
+    saved_model_path: str,
+    valid_loader: Any,
+):
+    best_loss = float("inf")
+    all_val_loss = []
+    all_val_accuracy = []
+
+    # Training loop
+    for epoch in range(epochs):
+        epoch_loss = 0.0
+
+        for batch_idx, (img1, _, label) in enumerate(train_loader):
+            img1 = img1.to(device)
+            label = label.to(device)
+            optimizer.zero_grad()
+            output = model(img1)
+
+            loss = criterion(output, label)
+            loss.backward()
+            optimizer.step()
+            epoch_loss += loss
+
+            if batch_idx % 10 == 0:
+                print(
+                    f"Epoch [{epoch}/{epochs}], Batch [{batch_idx}/{len(train_loader)}], Loss: {loss.item()}"
+                )
+
+        epoch_loss = epoch_loss / len(train_loader)
+
+        if epoch_loss < best_loss:
+            best_loss = epoch_loss
+            best_model = copy.deepcopy(model)
+            torch.save(best_model.state_dict(), saved_model_path)
+            print("====== Model saved ======")
+
+        with torch.no_grad():
+            print("====== Eval started ======")
+            model.eval()
+            epoch_val_accuracy = 0
+            epoch_val_loss = 0
+            for _, (data, _, label) in enumerate(valid_loader):
+                data = data.to(device)
+                label = label.to(device)
+
+                val_output = model(data)
+                val_loss = criterion(val_output, label)
+
+                acc = (val_output.argmax(dim=1) == label).float().mean()
+                epoch_val_accuracy += acc
+                epoch_val_loss += val_loss
+
+            epoch_val_accuracy = epoch_val_accuracy / len(valid_loader)
+            epoch_val_loss = epoch_val_loss / len(valid_loader)
+            all_val_loss.append(epoch_val_loss)
+
+        all_val_accuracy.append(epoch_val_accuracy.item() * 100)
+
+        print(
+            f"Epoch : {epoch+1} - loss : {epoch_loss:.4f} - val_loss : {epoch_val_loss:.4f} - val_acc: {epoch_val_accuracy:.4f} \n"
+        )
+
+
+def train_byol(
+    epochs: int,
+    model: nn.Module,
+    device: Union[int, str],
+    train_loader: Any,
+    criterion: nn.Module,
+    optimizer: nn.Module,
+    saved_model_path: str,
+    valid_loader: Any,
+):
+    best_loss = float("inf")
+    print("Starting Training")
+    for epoch in range(epochs):
+        total_loss = 0
+        momentum_val = cosine_schedule(epoch, epochs, 0.996, 1)
+        for batch_idx, (img1, img2, label) in enumerate(train_loader):
+            x0, x1 = img1, img2
+            x0 = x0.to(device)
+            x1 = x1.to(device)
+
+            out0, out1 = model(x0, x1)
+            loss = criterion(out0, out1)
+
+            total_loss += loss.detach()
+            loss.backward()
+            optimizer.step()
+            optimizer.zero_grad()
+
+            if batch_idx % 10 == 0:
+                print(
+                    f"Epoch [{epoch}/{epochs}], Batch [{batch_idx}/{len(train_loader)}], Loss: {loss.item()}"
+                )
+
+        if total_loss < best_loss:
+            best_loss = total_loss
+            best_model = copy.deepcopy(model)
+            torch.save(best_model.state_dict(), saved_model_path)
+
+        avg_loss = total_loss / len(train_loader)
+        print(f">>>>> Epoch: {epoch:>02}, Epoch Loss: {avg_loss:.5f}")
