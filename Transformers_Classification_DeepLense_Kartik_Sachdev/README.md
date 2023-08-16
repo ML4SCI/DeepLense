@@ -1,10 +1,10 @@
-# __DeepLense Classification__
+# __DeepLense Classification : Self-Supervised & Supervised Learning__
   
- PyTorch-based library for performing image classification of the simulated strong lensing images to predict substructures of dark matter halos. The project involves implementation and benchmarking of various versions of Vision Transformers to achieve a robust architecture with high metrics for classification namely Validation Accuracy, ROC and AUC scores.
+ PyTorch-based library for performing Self-Supervised & Supervised Learning for image classification of the simulated strong lensing images to predict substructures of dark matter halos. The project involves implementation and benchmarking of various versions of Vision Transformers to achieve a robust architecture with high metrics for classification namely Validation Accuracy, ROC and AUC scores.
 
-It is one of __Google Summer of Code (GSoC) 2022__ project in association with [__Machine Learning for Science (ML4Sci)__](https://ml4sci.org/). More information about the project can be found [here](https://summerofcode.withgoogle.com/programs/2022/projects/L557jFPL) <br>
+It is __Google Summer of Code (GSoC) 2023 & 2022__ project in association with [__Machine Learning for Science (ML4Sci)__](https://ml4sci.org/). More information about the project can be found [here](https://summerofcode.withgoogle.com/programs/2022/projects/L557jFPL) <br>
 
-A brief summary of the project along with technical background, and key takeaways can be found in the [Medium Blog Post](https://medium.com/@sachdev.kartik25/benchmarking-vision-transformers-for-classification-of-dark-matter-substructure-gsoc-2022-with-6ec7711cc32d)
+A brief summary of the 2022 project along with technical background, and key takeaways can be found in the [Medium Blog Post](https://medium.com/@sachdev.kartik25/benchmarking-vision-transformers-for-classification-of-dark-matter-substructure-gsoc-2022-with-6ec7711cc32d)
 <br>
 
 # __Datasets__
@@ -92,30 +92,14 @@ python3 main.py \
 
 ### __Self-Supervised Learning__
 
-```bash
+Refer the following .ipynb files for the respective method:
 
-python3 main_ssl.py \
---dataset_name Model_II \
---train_config_path /home/kartik/git/DeepLense/Transformers_Classification_DeepLense_Kartik_Sachdev/config/yaml/resnet18_model_test.yaml
-```
+| Method | ipynb file |
+| :---  | :--- | 
+| SimSiam | [Simsam.ipynb](/Transformers_Classification_DeepLense_Kartik_Sachdev/SimSiam.ipynb) |
+| DINO | [DINO.ipynb](/Transformers_Classification_DeepLense_Kartik_Sachdev/DINO.ipynb) |
+| BYOL | [BYOL.ipynb](/Transformers_Classification_DeepLense_Kartik_Sachdev/BYOL.ipynb) |
 
-Losses <br>
-[]  BYOL <br>
-[]  SImsiam <br>
-[] 
-
-Process <br>
-[ ] Correct nn.Module <br>
-  - Value to the project : clean code
-  - Is it completely wrong : No 
-  - Impact factor : Min
-  - Time to complete: Min
-
-[ ] Loss function <br>
-  - Value to the project : does the main thing
-  - Is it completely wrong : Yes
-  - Impact factor : Max
-  - Time to complete: Max
 
 <br>
 
@@ -160,6 +144,27 @@ sbatch < jobscript.sh
 <br>
 
 # __Results__
+
+## __Self-Supervised Learning__
+
+### __[SimSiam](https://arxiv.org/abs/2011.10566)__
+
+  | Dataset | Backbone  |  AUC (axion) | AUC (cdm) | AUC (no_sub) 
+  | :---:  | :---: | :---: |  :---: | :---: |
+  | Model II   | ResNet34 |  0.9042  | 0.7718 | 0.6839 |
+  | Model II  | ResNet50 |  0.9927  | 0.9973 | 0.9946 |
+
+### __[DINO](https://arxiv.org/abs/2104.14294)__
+
+  | Dataset | Backbone  |  AUC (axion) | AUC (cdm) | AUC (no_sub) 
+  | :---:  | :---: | :---: |  :---: | :---: |
+  | Model II   | CvT |  0.9938  | 0.4250 | 0.5616 |
+  | Model III  | CvT |  0.8544  | 0.9661 | 0.8991 |
+
+------------------------
+<br>
+
+## __Supervised Learning__
 
 10 different versions of Vision Transformers have been tested. Results are as follows:
 
