@@ -36,11 +36,11 @@ Use the train.py script to train a particular model (using timm model name). The
 ```bash
 python3 train.py \
 --dataset Model_I \
---model_source timm \
---model_name efficientformer_l3 \
---pretrained 1 \
---tune 1 \
---device cuda \
+--model_name coatnet_nano_rw_224 \
+--pretrained \
+--tune \
+--no-complex \
+--device best \
 --project ml4sci_deeplense_final
 ```
 | Arguments | Description |
