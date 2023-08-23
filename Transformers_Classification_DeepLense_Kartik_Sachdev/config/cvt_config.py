@@ -9,8 +9,17 @@ CvT_CONFIG = {
     "num_epochs": 15,
     "optimizer_config": {
         "name": "AdamW",
-        "weight_decay": 0.01,
+        "weight_decay": 1e-4, #0.01
         "lr": 0.001,
+        "momentum": 0.9,
+        "betas": (0.9, 0.999),
+        "warmup_epoch": 3,
+    },
+    "out_features": 128, 
+    "optimizer_finetune_config": {
+        "name": "AdamW",
+        "weight_decay": 0.01, #0.01
+        "lr": 3e-4,
         "momentum": 0.9,
         "betas": (0.9, 0.999),
         "warmup_epoch": 3,
@@ -26,6 +35,7 @@ CvT_CONFIG = {
         },
     },
     "channels": 1,
+    "#s" : 128,
     "network_config": {
         "s1_emb_dim": 64,  # stage 1 - dimension
         "s1_emb_kernel": 7,  # stage 1 - conv kernel size
