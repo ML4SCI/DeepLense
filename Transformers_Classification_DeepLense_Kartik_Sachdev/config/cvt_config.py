@@ -42,24 +42,24 @@ CvT_CONFIG = {
         "s1_emb_stride": 4,  # stage 1 - conv stride
         "s1_proj_kernel": 3,  # stage 1 - attention ds-conv kernel size
         "s1_kv_proj_stride": 2,  # stage 1 - attention key / value projection stride
-        "s1_heads": 2,  # stage 1 - heads
-        "s1_depth": 3,  # stage 1 - depth
+        "s1_heads": 4,  # stage 1 - heads
+        "s1_depth": 4,  # stage 1 - depth
         "s1_mlp_mult": 4,  # stage 1 - feedforward expansion factor
         "s2_emb_dim": 128,  # stage 2 - (same as above)
         "s2_emb_kernel": 3,
         "s2_emb_stride": 2,
         "s2_proj_kernel": 3,
         "s2_kv_proj_stride": 2,
-        "s2_heads": 4,
-        "s2_depth": 5,
+        "s2_heads": 6,
+        "s2_depth": 6,
         "s2_mlp_mult": 4,
         "s3_emb_dim" : 384,       # stage 3 - (same as above)
         "s3_emb_kernel" : 3,
         "s3_emb_stride" : 2,
         "s3_proj_kernel" : 3,
         "s3_kv_proj_stride" : 2,
-        "s3_heads" : 5,
-        "s3_depth" : 6,
+        "s3_heads" : 7,
+        "s3_depth" : 7,
         "s3_mlp_mult" : 4,
         "stages": ["s1", "s2", "s3"],
         "mlp_last": 256,
