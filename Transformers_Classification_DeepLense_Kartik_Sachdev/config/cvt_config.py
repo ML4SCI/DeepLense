@@ -19,7 +19,7 @@ CvT_CONFIG = {
     "optimizer_finetune_config": {
         "name": "AdamW",
         "weight_decay": 0.01, #0.01
-        "lr": 3e-4,
+        "lr": 0.001,
         "momentum": 0.9,
         "betas": (0.9, 0.999),
         "warmup_epoch": 3,

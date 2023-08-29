@@ -200,7 +200,7 @@ def main(args):
         scheduler=cosine_scheduler,
         path=model_path_pretrained,
         log_freq=100,
-        ci=False
+        ci=False,
     )
 
     # load model
@@ -223,7 +223,7 @@ def main(args):
     warmup_epochs = optimizer_finetune_config["warmup_epoch"]
 
     # optimizer
-    optimizer_finetune = optim.AdamW(model.parameters(), lr=lr)
+    optimizer_finetune = optim.AdamW(model.parameters(), lr=lr, weight_decay=weight_decay)
 
     num_train_steps = math.ceil(len(train_loader))
     num_warmup_steps = num_train_steps * warmup_epochs
@@ -248,7 +248,8 @@ def main(args):
         optimizer_finetune,
         finetuned_model_path,
         valid_loader=val_loader,
-        ci=False
+        scheduler=cosine_scheduler,
+        ci=False,
     )
 
     # Infer on test data

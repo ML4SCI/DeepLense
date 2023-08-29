@@ -12,7 +12,9 @@ def finetune(
     optimizer: nn.Module,
     saved_model_path: str,
     valid_loader: Any,
-    ci=False
+    scheduler=None,
+    ci=False,
+    
 ):
     best_loss = float("inf")
     best_accuracy = float("-inf")
@@ -33,7 +35,8 @@ def finetune(
             loss = criterion(output, label)
             loss.backward()
             optimizer.step()
-            # cosine_scheduler.step()
+            if scheduler is not None:
+                scheduler.step()    
             epoch_loss += loss
             if ci:
                 break
