@@ -262,7 +262,7 @@ def visualize_samples_ssl(
 
             batch = dataset[sample_idx]
             if regression:
-                outer_subplot.set_title(str(f"{batch[-1]}"))
+                outer_subplot.set_title(str(f"{batch[-1]:.4f}"))
             else:
                 outer_subplot.set_title(f"{labels_map[batch[-1]]}")
             img = batch[:-1]

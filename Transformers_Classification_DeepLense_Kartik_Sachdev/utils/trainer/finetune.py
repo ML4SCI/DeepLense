@@ -137,9 +137,7 @@ def finetune_regression(
             logging.debug("====== Eval started ======")
             model.eval()
             epoch_val_loss = 0
-            for batch_idx, batch in enumerate(
-                valid_loader
-            ):  # for batch_idx, batch in enumerate(train_loader):
+            for batch_idx, batch in enumerate(valid_loader):
                 data = batch[0].to(device)
                 label = batch[-1].to(device)
 
@@ -159,5 +157,5 @@ def finetune_regression(
             all_val_loss.append(epoch_val_loss)
 
         logging.debug(
-            f"Epoch : {epoch+1} - loss : {epoch_loss:.4f} - val_loss : {epoch_val_loss:.4f} \n"
+            f"Epoch : {epoch+1} - loss : {epoch_loss} - val_loss : {epoch_val_loss} \n"
         )
