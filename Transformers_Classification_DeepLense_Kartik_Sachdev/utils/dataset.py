@@ -222,6 +222,7 @@ def visualize_samples_ssl(
     cols_rows=5,
     num_rows_inner=1,
     num_cols_inner=2,
+    regression=False,
 ) -> None:
     """Visualize samples from dataset
 
@@ -260,7 +261,10 @@ def visualize_samples_ssl(
             # img = [img1, img2]
 
             batch = dataset[sample_idx]
-            outer_subplot.set_title(f"{labels_map[batch[-1]]}")
+            if regression:
+                outer_subplot.set_title(str(f"{batch[-1]}"))
+            else:
+                outer_subplot.set_title(f"{labels_map[batch[-1]]}")
             img = batch[:-1]
 
             # Generate the inner subplots within the current outer subplot
@@ -488,6 +492,7 @@ class DeepLenseDatasetSSL(Dataset):
         transforms=None,
         download="False",
         channels=1,
+        classes=None,
     ):
         assert mode in ["train", "test", "val"]
 
@@ -525,7 +530,8 @@ class DeepLenseDatasetSSL(Dataset):
         self.root_dir = foldername
 
         self.transforms = transforms
-        classes = os.listdir(self.root_dir)
+        if classes is None:
+            classes = os.listdir(self.root_dir)
         classes.sort()
         self.class_to_idx = {cls_name: i for i, cls_name in enumerate(classes)}
         self.imagefilename = []
@@ -574,6 +580,38 @@ class DeepLenseDatasetSSL(Dataset):
                 image_t = t(image_pil)
                 image_t = image_t.float().clone().detach()
                 self.ret.append(image)
+
+
+class DeepLenseDatasetSSLRegression(DeepLenseDatasetSSL):
+    def __init__(
+        self,
+        destination_dir: str,
+        mode: str,
+        dataset_name: str,
+        transforms=None,
+        download="False",
+        channels=1,
+        classes=None,
+    ):
+        super().__init__(
+            destination_dir, mode, dataset_name, transforms, download, channels, classes
+        )
+
+    def __getitem__(self, index):
+        image, label = self.imagefilename[index], self.labels[index]
+
+        # this assumes that classes have mass in second dim
+        data = np.load(image, allow_pickle=True)
+        image = data[0]
+        mass = np.float32(data[1])
+        image = (image - np.min(image)) / (np.max(image) - np.min(image))
+        image = np.expand_dims(image, axis=2)
+
+        self.ret = []
+        self.get_transformed_images_album(image)
+        self.ret.append(mass)
+
+        return self.ret
 
 
 class DefaultDatasetSetupSSL:
