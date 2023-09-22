@@ -109,9 +109,7 @@ def finetune_regression(
         epoch_loss = 0.0
         model.train()
 
-        for batch_idx, batch in enumerate(
-            train_loader
-        ):  # for batch_idx, batch in enumerate(train_loader):
+        for batch_idx, batch in enumerate(train_loader):
             img1 = batch[0].to(device)
             label = batch[-1].to(device)
             optimizer.zero_grad()
