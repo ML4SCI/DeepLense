@@ -1,8 +1,10 @@
 
-# Lensiformer: a Relativistic Physics-Informed Vision Transformer (PIViT) Architecture for Dark Matter Morphology.
+# Lensiformer: a Relativistic Physics-Informed Vision Transformer Architecture for Dark Matter Morphology.
 
 
 ![Google_Summer_of_Code_logo_(2021) svg](https://github.com/SVJLucas/Physics-Informed-Features-For-Dark-Matter-Morphology/assets/60625769/ac669c97-02ef-48cb-877c-1d794a506476)
+
+The Lensiformer architecture, developed as part of the international **Google Summer of Code** program in collaboration with **Machine Learning for Science (ML4SCI)**, serves as a transformer specifically designed for studies in relativistic gravitational lensing.
 
 # Problem Description
 
@@ -42,17 +44,20 @@ Lensiformer aims to bridge this gap by offering a novel approach to the study of
 
 
 
-
-
-![Model (2)](https://github.com/SVJLucas/DeepLense/assets/60625769/ac4fe7a3-29f1-413a-aa34-c2d8d170939e)
-
-
-
+![Vit-ViTSD-Lensiformer](https://github.com/SVJLucas/DeepLense/assets/60625769/4cfff8d6-cf56-4e7e-a3b3-6833b4bedf88)
 
 The Lensiformer architecture brings together the best of both worlds: the physics-informed rigor of gravitational lensing and the machine learning prowess of [Vision Transformers designed for small datasets](https://arxiv.org/abs/2112.13492). This is achieved through a two-pronged approach consisting of a specialized encoder and decoder.
 
 ## Relativistic Physics-Informed Encoder
+
+
 The encoder is rooted in the principles of relativistic physics. It employs the **relativistic lens equation in conjunction with a Singular Isothermal Spherical (SIS) model as an ansatz**. This approach is used to approximate the gravitational potential exerted by the galaxy acting as the lens, as well as by the dark matter. Subsequently, this information is used to **reconstruct the source galaxy that is being lensed**.
+
+
+<div align="center">
+  <img src="https://github.com/SVJLucas/DeepLense/assets/60625769/02a4dad4-f6f4-40a2-85ce-0eaffe12c718" alt="Encoder" width="350"/>
+</div>
+
 
 The equation for gravitational lensing, in its dimensionless form, can be given by the following relation:
 
@@ -62,7 +67,7 @@ $$
 \end{align}
 $$
 
-In this equation, $\vec{\mathcal{S}}=(x_s,y_s)$ represents the dimensionless source vector position in the source plane, which corresponds to the position of the source galaxy. On the other hand, $\vec{\mathcal{I}}=(x_i,y_i)$ represents the dimensionless image vector position in the image plane, which corresponds to the image we observe. Finally, $\vec{\nabla} \Psi (\vec{\mathcal{I}}) = \bigg(\Psi_x(x_i,y_i),\Psi_y(x_i,y_i)\bigg)$ represents the gradient of the dimensionless gravitational potential produced by the lens, which in our case, includes both the lensing galaxy and the possible dark matter.
+In this equation, $\vec{\mathcal{S}}=(x_s,y_s)$ represents the dimensionless source vector position in the source plane, which corresponds to the position of the source galaxy. On the other hand, $\vec{\mathcal{I}}=(x_i,y_i)$ represents the dimensionless image vector position in the image plane, which corresponds to the image we observe. Finally, $\vec{\nabla} \Psi (\vec{\mathcal{I}}) = \big(\Psi_x(x_i,y_i),\Psi_y(x_i,y_i)\big)$ represents the gradient of the dimensionless gravitational potential produced by the lens, which in our case, includes both the lensing galaxy and the possible dark matter.
 
 Observe that this equation involves three unknowns: the source position $\vec{\mathcal{S}}$, the image position $\vec{\mathcal{I}}$, and the gravitational potential of the system $\Psi(x_i,y_i)$. Yet, we only have knowledge of the produced image $\vec{\mathcal{I}}$.
 
@@ -100,22 +105,28 @@ $$
 \end{align}
 $$
 
-By imposing a potential profile, we can now estimate the source position. We must then estimate the value of the constant $k$. An example for a value of $k=1$ :
+By imposing a potential profile, we can now estimate the source position. Instead of using a single correction term $k$ for the entire image, we found that better convergence was achieved when the value of $k$ was localized, leading to a non-uniform distribution. This approach helps capture the localized gravitational distortions of dark matter that we had initially neglected.
 
-![download](https://github.com/SVJLucas/DeepLense/assets/60625769/b37f19e5-c226-4812-86cd-4131d8838488)
-
-Following this process, we are able to obtain a reconstructed image $\hat{I}_{\hat{\mathcal{S}}}(x_s,y_s)$ of the source.
+To predict the values of $k$, we use the image of the lensed source galaxy and employ the architecture of a ViTSD (Vision Transformer for Small Datasets). We predict a corresponding $k_{ij}$ value for each pixel $(i, j)$, as follow:
 
 
-![k model](https://github.com/SVJLucas/DeepLense/assets/60625769/2f69c530-27a6-48f3-af7a-e5ec186bbfae)
+
+![k model](https://github.com/SVJLucas/DeepLense/assets/60625769/8742970e-b50e-4132-b6df-596dc0a3a3ba)
 
 
-This approximated profile, often referred to as the image profile, is fed into the encoder as the "value." This approach allows Lensiformer to better simulate the complexities of dark matter distribution in the universe, taking into account the intricate relationships prescribed by general relativity.
+During experiments, we observed that calibrating the values of $k_{ij}$ to fall within a range of 20% more or less than the values predicted by the Singular Isothermal Sphere (SIS) model facilitated faster convergence. Consequently, we opted for a saturation layer to ensure that the correction values remained within this specified range.
 
-Visual Transformers for Small Datasets as Decoder
+With the obtained values $k_{ij}$, we can estimate the potential $\Psi(x_i, y_i)$. Alongside the image, this allows us to solve the gravitational lens equation and generate an estimated image of the source galaxy. This image will then undergo **Shift Patch Tokenization (SPT)** and serve as the input for the decoder.
+
+
+
+
+
+
+## Visual Transformers for Small Datasets as Decoder
 For the decoder part of the architecture, Lensiformer leverages advances from the paper "Vision Transformer for Small-Size Datasets" by Seung Hoon Lee, Seunghyun Lee, and Byung Cheol Song from Inha University. This paper outlines techniques like Shifted Patch Tokenization (SPT) and Locality Self-Attention (LSA) that effectively counter the Vision Transformer's inherent limitations on small datasets. When applied to Lensiformer, these techniques enable the architecture to learn effectively even from smaller astrophysical datasets.
 
-Integration of Encoder and Decoder
+## Integration of Encoder and Decoder
 In Lensiformer, the original lensed image is used as the "query" and "key" for the transformer architecture. This allows the decoder to generate a more accurate and physics-consistent representation of the lensing phenomena. The application of Shifted Patch Tokenization and Locality Self-Attention not only improves the model's performance but also makes it more adaptable to various types of data.
 
 
