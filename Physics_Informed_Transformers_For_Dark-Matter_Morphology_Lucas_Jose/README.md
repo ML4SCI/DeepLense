@@ -34,7 +34,8 @@ To create the **Real-Galaxy-Tiny Dataset**, we can do:
 
 The Real Galaxy Dataset Pipeline process is as follow:
 
-![Real Galaxy Dataset Pipeline](https://github.com/SVJLucas/DeepLense/assets/60625769/c10f1a27-ab56-4b35-bf84-490798bc6d8f)
+
+![Real Galaxy Dataset Pipeline](https://github.com/SVJLucas/DeepLense/assets/60625769/2413a133-2fe5-42d0-bd48-74e071e12183)
 
 
 To construct the dataset, we perform **1,000** training simulations (comprising 50% No-Substructure Dark Matter and 50% Cold Dark Matter) and **1,000** testing simulations (also split evenly between No-Substructure Dark Matter and Cold Dark Matter).
