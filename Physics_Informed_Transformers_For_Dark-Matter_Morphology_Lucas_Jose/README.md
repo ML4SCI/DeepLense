@@ -142,6 +142,21 @@ For the decoder part of the architecture, Lensiformer leverages advances from th
 In Lensiformer, the original lensed image is used as the "query" and "key" for the transformer architecture. This allows the decoder to generate a more accurate and physics-consistent representation of the lensing phenomena. The application of Shifted Patch Tokenization and Locality Self-Attention not only improves the model's performance but also makes it more adaptable to various types of data.
 
 
+# Experiment
+
+To rigorously evaluate the performance of the Lensiformer model, we plan to train a selection of state-of-the-art vision transformer models on the Real-Galaxy-Tiny Dataset. These selected models will be standardized for a fair comparison by ensuring they have the same number of parameters and transformer blocks. The chosen models for this comparative analysis are leading architectures in the realm of computer vision, and they originate from diverse research entities. Below is a brief overview of the selected models:
+
+* **ViT (Vision Transformer):** Conceived by **Google**, the Vision Transformer (ViT) model employs a pure Transformer architecture that directly processes sequences of image patches. This approach bypasses the need for traditional Convolutional Neural Networks (CNNs) and has been proven to be especially effective when pre-trained on large datasets.
+
+* **ViTSD (Vision Transformer for Small Datasets):** Developed by **Inha University in South Korea**, the ViTSD model is an enhancement of the original ViT architecture. It incorporates Shifted Patch Tokenization and Locality Self-Attention, features that are particularly beneficial for improving performance on datasets of smaller sizes.
+
+* **CvT (Convolutional Vision Transformer):** Created by **Microsoft**, the CvT model blends the advantages of CNNs and Transformers by introducing convolutional components to the standard Vision Transformer architecture. This hybrid approach yields state-of-the-art performance metrics while requiring fewer computational parameters, thereby improving efficiency.
+
+* **CaiT (Class-Attention in Image Transformers):** Originating from **Facebook AI**, the CaiT model focuses on optimizing deep Transformer architectures specifically for the task of image classification. It not only achieves state-of-the-art performance on the ImageNet benchmark but also does so with fewer Floating Point Operations Per Second (FLOPs) and parameters, making it computationally efficient.
+
+  
+
+
 # Results
 
 
