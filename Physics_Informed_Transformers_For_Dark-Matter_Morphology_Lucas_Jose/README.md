@@ -167,6 +167,59 @@ In Lensiformer, the original lensed image is used as the "query" and "key" for t
 </div>
 
 
+## __Citation__
+
+* [Vision Transformer (ViT)](https://arxiv.org/abs/2010.11929v2)
+
+  ```bibtex
+  @misc{dosovitskiy2021image,
+      title={An Image is Worth 16x16 Words: Transformers for Image Recognition at Scale}, 
+      author={Alexey Dosovitskiy and Lucas Beyer and Alexander Kolesnikov and Dirk Weissenborn and Xiaohua Zhai and Thomas Unterthiner and Mostafa Dehghani and Matthias Minderer and Georg Heigold and Sylvain Gelly and Jakob Uszkoreit and Neil Houlsby},
+      year={2021},
+      eprint={2010.11929},
+      archivePrefix={arXiv},
+      primaryClass={cs.CV}
+  }
+  ```
+
+
+* [Vision Transformer for Small-Size Datasets (ViTSD)](https://arxiv.org/abs/2112.13492)
+
+  ```bibtex
+  @misc{lee2021vision,
+      title={Vision Transformer for Small-Size Datasets}, 
+      author={Seung Hoon Lee and Seunghyun Lee and Byung Cheol Song},
+      year={2021},
+      eprint={2112.13492},
+      archivePrefix={arXiv},
+      primaryClass={cs.CV}
+  }
+  ```
+
+* [Convolutional Transformer (CvT)](https://arxiv.org/abs/2103.15808)
+  ```bibtex
+  @article{wu2021cvt,
+    title={Cvt: Introducing convolutions to vision transformers},
+    author={Wu, Haiping and Xiao, Bin and Codella, Noel and Liu, Mengchen and Dai, Xiyang and Yuan, Lu and Zhang, Lei},
+    journal={arXiv preprint arXiv:2103.15808},
+    year={2021}
+  }
+  ```
+
+* [Class-Attention in Image Transformers (CaiT)](https://arxiv.org/abs/2103.17239)
+  ```bibtex
+  @misc{touvron2021going,
+      title   = {Going deeper with Image Transformers}, 
+      author  = {Hugo Touvron and Matthieu Cord and Alexandre Sablayrolles and Gabriel Synnaeve and Hervé Jégou},
+      year    = {2021},
+      eprint  = {2103.17239},
+      archivePrefix = {arXiv},
+      primaryClass = {cs.CV}
+  }
+  ```
+
+
+
 
 
   
