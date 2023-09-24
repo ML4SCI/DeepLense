@@ -10,9 +10,7 @@ The Lensiformer architecture, developed as part of the international **Google Su
 
 The identification of dark matter through the analysis of dark matter halos using strong gravitational lensing is a promising approach in cosmology. However, due to the limited available data, simulations trained on machine learning models offer a potential solution.
 
-However, even in simulations, in many instances, it becomes complex to differentiate between the potential different gravitational anomalies. In this tutorial, we will gain a better understanding of the physics behind this phenomenon, and from it, obtain better features to train artificial intelligence models.
-
-In Machine Learning for Science, we're dealing with two mainly kinds of simulated Dark Matter:
+However, even in simulations, in many instances, it becomes complex to differentiate between the potential different gravitational anomalies. In Machine Learning for Science, we're dealing with two mainly kinds of simulated Dark Matter:
 
 * **Cold Dark Matter (CDM)**: This model suggests that dark matter consists of slow-moving particles. In the CDM paradigm, smaller clusters of dark matter, known as subhalos, are approximated as "point masses." This simplification facilitates computational modeling by treating these subhalos as singular points in the overall distribution of dark matter.
 
@@ -20,53 +18,26 @@ In Machine Learning for Science, we're dealing with two mainly kinds of simulate
 
 The observable distortions of distant galaxies, known as gravitational lensing, provide an intriguing connection between the types of dark matter and the roles of different galaxies. This phenomenon serves as an illustrative example of how different types of dark matter, despite their elusive nature, can exert gravitational influence and leave noticeable imprints on our observations. Through gravitational lensing, dark matter influences the light path from the source galaxy, causing it to bend around the lensing galaxy. This effect underscores the crucial role of dark matter in determining the large-scale structure of the universe.
 
-# Dataset
 
-In this way, let's simulate 2 cases of Gravitational Lensing:
+# Real-Galaxy-Tiny Dataset: Using a True Galaxy as Source Galaxy.
 
-## Sersic-Tiny Dataset: Approximate the Source Galaxy as the Sersic Profile
-
-The Sersic profile is a mathematical function that describes how the intensity I of the light emitted by a galaxy varies with the distance R from its center. It is widely used in astronomy to characterize the radial brightness profiles of galaxies.
-
-The Sersic profile, for the Source, is given by the formula:
-
-$$
-\begin{align}
-I_S(x_s,y_s) = I_0 \cdot \exp \left( -b_n \cdot \left(\frac{R(x_s,y_s)}{R_{ser}}\right)^{1/n} \right)
-\end{align}
-$$
-
-Here, $I_S$ is the intensity at each point $(x_s, y_s)$ based on the Sersic profile of the Source Galaxy, $n$ is the Sersic index of the Galaxy, $R_{ser}$ is the Sersic radius of the Galaxy, $I_0$ is the central surface brightness, $b_n$ related to the  Sersic index $n$ and it is given by:
-
-$$
-\begin{align}
-b_n \approx 1.999 \cdot n - 0.327
-\end{align}
-$$
-
-Besides, $R$ is the radii from the center of the ellipse given by:
-
-$$
-\begin{align}
-R(x_s,y_s) = \frac{1}{q}\sqrt{\frac{{(\cos(\theta) \cdot (x_s-x_0) + \sin(\theta) \cdot (y_s-y_0))^2}}{q^2} + \big({\sin(\theta) \cdot (x_s-x_0) - \cos(\theta) \cdot (y_s-y_0)}\big)^2}
-\end{align}
-$$
-
-Where  $x_0$ and $y_0$ are the center of the ellipse, $\theta$ is the rotation angle, the axis ratio $q$ (eccentricity).
+Instead of using a Sersic profile, as we previously did in Machine Learning for Science (ML4SCI), we propose a more realistic approach that utilizes actual galaxies as the source. To accomplish this, we will make use of the [Galaxy10 DECals Dataset](https://github.com/henrysky/Galaxy10), an extensive compilation of high-resolution galaxy images.
 
 
-* **First: A Galaxy as Gravitational Lensing and No-Substructure Dark Matter.**
-* **Second: A Galaxy and Cold Dark Matter (CDM) as Gravitational Lensing.**
+To create the **Real-Galaxy-Tiny Dataset**, we can do:
+
+- **1º**  We select a random image of a galaxy from a pre-determined subset of the Galaxy10 DECals Dataset.
+- **2º** We extract the red band of the galaxy, as we aim to work with a two-dimensional image.
+- **3º**  We rescale and randomly rotate the galaxy; thereafter, the image quality and noise levels are adjusted to resemble Hubble telescope captures closely.
+- **4º**  Utilizing the red band of the galaxy, we simulate the relativistic lens equation, taking into account both dark matter patterns and the characteristics of the lensing galaxy.
+- **5º**  The labels for each image are assigned as [1,0] for the No-Substructure Dark Matter type and [0,1] for the Cold Dark Matter type.
+
+The Real Galaxy Dataset Pipeline process is as follow:
+
+![Real Galaxy Dataset Pipeline](https://github.com/SVJLucas/DeepLense/assets/60625769/c10f1a27-ab56-4b35-bf84-490798bc6d8f)
 
 
-## Real-Galaxy-Tiny: Using a True Galaxy as Source
-
-![download](https://github.com/SVJLucas/DeepLense/assets/60625769/b37f19e5-c226-4812-86cd-4131d8838488)
-
-
-
-
-
+To construct the dataset, we perform **1,000** training simulations (comprising 50% No-Substructure Dark Matter and 50% Cold Dark Matter) and **1,000** testing simulations (also split evenly between No-Substructure Dark Matter and Cold Dark Matter).
 
 
 
@@ -135,11 +106,17 @@ Hence:
 
 $$
 \begin{align}
-\boxed{Ψ(x_i,y_i) \approx k \cdot \sqrt{x_i^2+y_i^2}}
+Ψ(x_i,y_i) \approx k \cdot \sqrt{x_i^2+y_i^2}
 \end{align}
 $$
 
-By imposing a potential profile, we can now estimate the source position. Instead of using a single correction term $k$ for the entire image, we found that better convergence was achieved when the value of $k$ was localized, leading to a non-uniform distribution. This approach helps capture the localized gravitational distortions of dark matter that we had initially neglected.
+By imposing a potential profile, we can now estimate the source position. Instead of using a single correction term $k$ for the entire image, we found that better convergence was achieved when the value of $k$ was localized, leading to a non-uniform distribution. This approach helps capture the localized gravitational distortions of dark matter that we had initially neglected. Then:
+
+$$
+\begin{align}
+\boxed{Ψ(x_i,y_i) \approx k(x_i,y_i) \cdot \sqrt{x_i^2+y_i^2}}
+\end{align}
+$$
 
 To predict the values of $k$, we use the image of the lensed source galaxy and employ the architecture of a ViTSD (Vision Transformer for Small Datasets). We predict a corresponding $k_{ij}$ value for each pixel $(i, j)$, as follow:
 
