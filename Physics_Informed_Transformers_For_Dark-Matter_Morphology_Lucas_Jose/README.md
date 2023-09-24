@@ -143,6 +143,9 @@ In Lensiformer, the original lensed image is used as the "query" and "key" for t
 
 # Results
 
+![combined_images_bigger](https://github.com/SVJLucas/DeepLense/assets/60625769/61af96f9-dcdc-46fa-9ed7-16ee7638b54e)
+
+
 ## Training Loss
 <div align="center">
   <img src="https://github.com/SVJLucas/DeepLense/assets/60625769/56cf2e61-7061-43c9-9417-14f6e28448ea" alt="Loss" width="500"/>
