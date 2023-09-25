@@ -41,5 +41,5 @@ The goal here is to explore the properties of dark matter. We want to approximat
 <img src="regression.png">
 
 ## Conclusion and Future Goals
-So far, we can see that the results for self-supervised learning seem superior to their ResNet50 Baseline. 
-Future goals consist of testing models for regression, implementing vision transformers (twin networks) and testing some more self-supervised learning methods.
+So far, we can see that the results for self-supervised learning seem superior to their baseline. 
+Future goals consist of testing models implementing twin networks.
