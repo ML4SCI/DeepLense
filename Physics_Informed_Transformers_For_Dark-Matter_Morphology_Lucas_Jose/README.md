@@ -171,28 +171,55 @@ To provide a more comprehensive understanding of each model's specifications and
 
 # Results
 
+To delineate the strengths of the Lensiformer model in comparison to other state-of-the-art vision transformer architectures, we conducted an extensive evaluation on the Real-Galaxy-Tiny Dataset. Our analysis is predicated on a set of performance metrics that are important for classification tasks in the realm of astrophysics, namely Accuracy, ROC AUC, and F1 Score. Each model was subjected to the same training regimen to ensure an unbiased comparison. The ensuing table elucidates the performance metrics for Lensiformer alongside other leading models in the field.
 
 
-<div align="center">
-  <img src="https://github.com/SVJLucas/DeepLense/assets/60625769/97377c06-ae2a-4de7-a657-c3977e98bab1" alt="results" width="2000"/>
-</div>
+|      Model Name      | Accuracy | ROC AUC | F1 (No Substructure Dark Matter) | F1 (Cold Dark Matter) |
+|:--------------------:|:--------:|:-------:|:-------------------------------:|:---------------------:|
+| Class-Attention in Image Transformers (Facebook AI) | 0.71 | 0.775 | 0.76 | 0.63 |
+| Convolutional Vision Transformer (Microsoft)       | 0.73 | 0.796 | 0.73 | 0.72 |
+| Vision Transformer (Google)                       | 0.78 | 0.841 | 0.78 | 0.77 |
+| Vision Transformer for Small Datasets (Inha University in South Korea) | 0.75 | 0.819 | 0.76 | 0.74 |
+| Lensiformer (Ours)                                | **0.80** | **0.865** | **0.80**| **0.79** |
+
+Table above provides a comprehensive summary of the performance metrics, including F1 scores for each class ('No Substructure Dark Matter' and 'Cold Dark Matter'). 
+
 
 
 ## Training Loss
+
+Upon examining the training loss in the graph bellow, distinct convergence patterns emerge for each model. The Class-Attention in Image Transformers (CaiT) model shows a relatively slow reduction in loss, which is consistent with its lower performance metrics. In contrast, the Convolutional Vision Transformer (CvT) model converges rapidly, with its loss reaching near-zero levels by the 2500th epoch.
+
+The Lensiformer model starts with a loss similar to other models but shows a more gradual and consistent decline. This suggests that the model is learning effectively, albeit at a slower pace, which is corroborated by its higher accuracy and ROC AUC values in the final evaluation.
+
 <div align="center">
   <img src="https://github.com/SVJLucas/DeepLense/assets/60625769/56cf2e61-7061-43c9-9417-14f6e28448ea" alt="Loss" width="500"/>
 </div>
 
+The Vision Transformer (ViT) and Vision Transformer for Small Datasets (ViTSD) both show fast convergence with significant reductions in loss by the 2500th epoch, aligning with their competitive performance metrics.
+
+Overall, the Lensiformer model's slower but consistent loss reduction may be indicative of its ability to generalize better, especially in scenarios with limited data. This is likely a result of its domain-specific knowledge, which becomes increasingly valuable in such contexts.
+
 ## Accuracy
+
+The Lensiformer model outperforms its competitors with an accuracy of 80%. While Vision Transformer (Google) and Convolutional Vision Transformer (Microsoft) exhibit competitive accuracies of 78% and 73% respectively, Lensiformer's superior accuracy indicates its efficacy in correctly identifying the two classes of dark matter morphologies.
+
 <div align="center">
   <img src="https://github.com/SVJLucas/DeepLense/assets/60625769/8c33a0f8-8719-4102-ad8d-a793c9dda475" alt="accuracy" width="500"/>
 </div>
 
+In the graph, it is evident that up to approximately 700 epochs, the Vision Transformer (ViT), Convolutional Vision Transformer (CvT), and Lensiformer models all exhibit competitive performance with closely matched accuracy levels. In contrast, the Class-Attention in Image Transformers (CaiT) model lags behind in this metric. However, beyond the 700-epoch mark, Lensiformer experiences a rapid acceleration in learning. This enhanced rate of learning is attributable to Lensiformer's domain-specific knowledge, which proves to be particularly valuable in scenarios with limited sample sizes.
+
+
 ## ROC-Curve
+
+Furthermore, Lensiformer achieves an ROC AUC score of 0.87, the highest among all models. The ROC AUC score is particularly important in this context as it demonstrates the model's capability to differentiate between the classes across various decision thresholds. This suggests that Lensiformer possesses a robust discriminatory power, which is imperative for applications in astrophysics where false positives can have significant implications.
+
 <div align="center">
   <img src="https://github.com/SVJLucas/DeepLense/assets/60625769/a514ada0-7485-492e-a63c-88759aeb22cd" alt="auc" width="500"/>
 </div>
 
+Besides, The F1 score for both classes ('No Substructure Dark Matter' and 'Cold Dark Matter') is 0.80 and 0.79, respectively. These scores further affirm the model's balanced performance across both classes, which is crucial for ensuring that the model does not exhibit a bias towards a particular class.
 
 ## __Citation__
 
