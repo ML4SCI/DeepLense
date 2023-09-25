@@ -3,7 +3,7 @@
 *Special thanks to (mentors) Anna Parul, Yurii Halychanskyi, and Sergei Gleyzer.*
 <hr> 
 
-Click on this button below to read the detailed blog (Part 1): <br><br> [![medium](https://img.shields.io/badge/medium-000?style=for-the-badge&logo=medium&logoColor=white)](https://yaashwardhan.medium.com/self-supervised-learning-for-strong-gravitational-lensing-part1-5a049e976b51)
+Click on this button below to read the detailed blog: <br><br> [![medium](https://img.shields.io/badge/medium-000?style=for-the-badge&logo=medium&logoColor=white)](https://yaashwardhan.medium.com/self-supervised-learning-for-strong-gravitational-lensing-part1-5a049e976b51)
 
 <img src="header.png">
 
