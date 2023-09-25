@@ -10,13 +10,23 @@ The Lensiformer architecture, developed as part of the international **Google Su
 
 The identification of dark matter through the analysis of dark matter halos using strong gravitational lensing is a promising approach in cosmology. However, due to the limited available data, simulations trained on machine learning models offer a potential solution.
 
-However, even in simulations, in many instances, it becomes complex to differentiate between the potential different gravitational anomalies. In Machine Learning for Science, we're dealing with two mainly kinds of simulated Dark Matter:
+However, even in simulations, in many instances, it becomes complex to differentiate between the potential different gravitational anomalies. In Machine Learning for Science (ML4SCI), we're dealing with two mainly kinds of simulated Dark Matter:
 
 * **Cold Dark Matter (CDM)**: This model suggests that dark matter consists of slow-moving particles. In the CDM paradigm, smaller clusters of dark matter, known as subhalos, are approximated as "point masses." This simplification facilitates computational modeling by treating these subhalos as singular points in the overall distribution of dark matter.
 
 * **No-Substructure Dark Matter**: Unlike the CDM model, the "no-substructure" approach assumes that dark matter is evenly spread out, devoid of any smaller-scale clusters or sub-halos. This stands in stark contrast to the hierarchical structuring and layering of sub-halos within larger halos as predicted by CDM models.
 
-The observable distortions of distant galaxies, known as gravitational lensing, provide an intriguing connection between the types of dark matter and the roles of different galaxies. This phenomenon serves as an illustrative example of how different types of dark matter, despite their elusive nature, can exert gravitational influence and leave noticeable imprints on our observations. Through gravitational lensing, dark matter influences the light path from the source galaxy, causing it to bend around the lensing galaxy. This effect underscores the crucial role of dark matter in determining the large-scale structure of the universe.
+The observable distortions of distant galaxies, known as gravitational lensing, provide an intriguing connection between the types of dark matter and the roles of different galaxies. This phenomenon serves as an illustrative example of how different types of dark matter, despite their elusive nature, can exert gravitational influence and leave noticeable imprints on our observations. **Through gravitational lensing, dark matter influences the light path from the source galaxy, causing it to bend around the lensing galaxy.** This effect underscores the crucial role of dark matter in determining the large-scale structure of the universe.
+
+
+<div align="center">
+  <img src="https://github.com/SVJLucas/DeepLense/assets/60625769/e36e31f7-d48f-4898-922f-d63952b76ae0" alt="Einstein Ring" width="350"/>
+</div>
+
+<div align="center">
+  An Einstein Ring is a phenomenon that occurs when the gravitational field of a massive object bends light from a more distant object.
+</div>
+
 
 
 # Real-Galaxy-Tiny Dataset: Using a True Galaxy as Source Galaxy.
@@ -28,14 +38,13 @@ To create the **Real-Galaxy-Tiny Dataset**, we can do:
 
 - **1º**  We select a random image of a galaxy from a pre-determined subset of the Galaxy10 DECals Dataset.
 - **2º** We extract the red band of the galaxy, as we aim to work with a two-dimensional image.
-- **3º**  We rescale and randomly rotate the galaxy; thereafter, the image quality and noise levels are adjusted to resemble Hubble telescope captures closely.
+- **3º**  We resize and randomly rotate the galaxy image. Subsequently, we adjust the image quality and noise levels to closely emulate the characteristics of captures taken by the Hubble telescope when imaging distant galaxies, which inherently results in a significant reduction in image quality.
 - **4º**  Utilizing the red band of the galaxy, we simulate the relativistic lens equation, taking into account both dark matter patterns and the characteristics of the lensing galaxy.
 - **5º**  The labels for each image are assigned as [1,0] for the No-Substructure Dark Matter type and [0,1] for the Cold Dark Matter type.
 
 The Real Galaxy Dataset Pipeline process is as follow:
 
-
-![Real Galaxy Dataset Pipeline](https://github.com/SVJLucas/DeepLense/assets/60625769/2413a133-2fe5-42d0-bd48-74e071e12183)
+![Real Galaxy Dataset Pipeline](https://github.com/SVJLucas/DeepLense/assets/60625769/87fd7c93-7189-46a7-ae56-2b67e7a5ab29)
 
 
 To construct the dataset, we perform **1,000** training simulations (comprising 50% No-Substructure Dark Matter and 50% Cold Dark Matter) and **1,000** testing simulations (also split evenly between No-Substructure Dark Matter and Cold Dark Matter).
