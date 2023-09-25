@@ -184,7 +184,7 @@ To delineate the strengths of the Lensiformer model in comparison to other state
 | Vision Transformer for Small Datasets (Inha University in South Korea) | 0.75 | 0.819 | 0.76 | 0.74 |
 | Lensiformer (Ours)                                | **0.80** | **0.865** | **0.80**| **0.79** |
 
-Table above provides a comprehensive summary of the performance metrics, including F1 scores for each class ('No Substructure Dark Matter' and 'Cold Dark Matter'). 
+Table above provides a comprehensive summary of the performance metrics, including F1 scores for each class ('No Substructure Dark Matter' and 'Cold Dark Matter').  you wish, you may [download the weights of the various models here](https://drive.google.com/file/d/1bWU8bMalSkLN9GAhjl0bcP0d0uie7cw0/view?usp=sharing).
 
 
 
