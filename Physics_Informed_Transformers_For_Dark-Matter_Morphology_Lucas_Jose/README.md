@@ -21,7 +21,7 @@ The observable distortions of distant galaxies, known as gravitational lensing, 
 
 # Real-Galaxy-Tiny Dataset: Using a True Galaxy as Source Galaxy.
 
-Instead of using a Sersic profile, as we previously did in Machine Learning for Science (ML4SCI), we propose a more realistic approach that utilizes actual galaxies as the source. To accomplish this, we will make use of the [Galaxy10 DECals Dataset](https://github.com/henrysky/Galaxy10), an extensive compilation of high-resolution galaxy images.
+Instead of using a Sersic profile, as we previously did in Machine Learning for Science (ML4SCI), **we propose a more realistic approach that utilizes actual galaxies as the source**. To accomplish this, we will make use of the [Galaxy10 DECals Dataset](https://github.com/henrysky/Galaxy10), an extensive compilation of high-resolution galaxy images.
 
 
 To create the **Real-Galaxy-Tiny Dataset**, we can do:
@@ -42,7 +42,7 @@ To construct the dataset, we perform **1,000** training simulations (comprising 
 
 The Real-Galaxy-Tiny Dataset is constrained in size due to the computational rigor required for simulating realistic galaxies and dark matter. Additionally, the dataset seeks to emulate the real-world complexity of manually identifying gravitational distortions in astrophysical images, a task that naturally comes with a limited number of cataloged examples. Hence, the dataset's limited size is a deliberate reflection of these multifaceted challenges, ensuring both high-quality data and alignment with real-world conditions.
 
-You can generate the dataset using the notebook **create_dataset.pynb** or [download the pre-generated dataset](https://drive.google.com/file/d/1ZNZE4pLcAsY8C-cp4efNNHsyDrNYNMaB/view?usp=sharing).
+You can generate the dataset using the notebook **create_dataset.ipynb** or [download the pre-generated dataset](https://drive.google.com/file/d/1ZNZE4pLcAsY8C-cp4efNNHsyDrNYNMaB/view?usp=sharing).
 
 # Lensiformer
 
@@ -168,7 +168,7 @@ To provide a more comprehensive understanding of each model's specifications and
 | Vision Transformer for Small Datasets (Inha University in South Korea) | 13.73M | 2  | 3000       |   5e-7     |   AdamW   |
 | Lensiformer (Ours)                                | 13.24M |         2         |    3000    |     5e-7     |   AdamW   |
 
-
+To access specific parameters for each model, refer to the notebook **training_and_compare_models.ipynb**, where the models are defined and trained. The implementation of the various Lensiformer models was carried out with the assistance of the [vit-pytorch project](https://github.com/lucidrains/vit-pytorch).
 
 
 # Results
