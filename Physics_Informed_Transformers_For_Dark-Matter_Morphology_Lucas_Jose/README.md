@@ -184,11 +184,11 @@ To provide a more comprehensive understanding of each model's specifications and
   
 |      Model Name      | Number of Parameters | Transformer Blocks | Num Epochs | Learning Rate | Optimizer |
 |:--------------------:|:------------------------:|:------------------:|:----------:|:-------------:|:---------:|
-| Class-Attention in Image Transformers (Facebook AI) | 13.77M |         2         |    3000    |     5e-7     |   AdamW   |
-| Convolutional Vision Transformer (Microsoft)       | 13.78M |         2         |    3000    |     5e-7     |   AdamW   |
-| Vision Transformer (Google)                       | 13.72M |         2         |    3000    |     5e-7     |   AdamW   |
-| Vision Transformer for Small Datasets (Inha University in South Korea) | 13.73M | 2  | 3000       |   5e-7     |   AdamW   |
-| Lensiformer (Ours)                                | 13.24M |         2         |    3000    |     5e-7     |   AdamW   |
+| Class-Attention in Image Transformers (Facebook AI) | 13M |         2         |    3000    |     5e-7     |   AdamW   |
+| Convolutional Vision Transformer (Microsoft)       | 13M |         2         |    3000    |     5e-7     |   AdamW   |
+| Vision Transformer (Google)                       | 13M |         2         |    3000    |     5e-7     |   AdamW   |
+| Vision Transformer for Small Datasets (Inha University in South Korea) | 13M | 2  | 3000       |   5e-7     |   AdamW   |
+| Lensiformer (Ours)                                | 13M |         2         |    3000    |     5e-7     |   AdamW   |
 
 To access specific parameters for each model, refer to the notebook **training_and_compare_models.ipynb**, where the models are defined and trained. The implementation of the various Lensiformer models was carried out with the assistance of the [vit-pytorch project](https://github.com/lucidrains/vit-pytorch).
 
