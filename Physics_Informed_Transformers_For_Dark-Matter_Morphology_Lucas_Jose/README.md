@@ -144,7 +144,7 @@ In Lensiformer, the original lensed image is used as the "query" and "key" for t
 
 # Experiment
 
-To rigorously evaluate the performance of the Lensiformer model, we plan to train a selection of state-of-the-art vision transformer models on the Real-Galaxy-Tiny Dataset. These selected models will be standardized for a fair comparison by ensuring they have the same number of parameters and transformer blocks. The chosen models for this comparative analysis are leading architectures in the realm of computer vision, and they originate from diverse research entities. Below is a brief overview of the selected models:
+To rigorously evaluate the performance of the Lensiformer model, we plan to train a selection of state-of-the-art vision transformer models on the **Real-Galaxy-Tiny Dataset**. These selected models will be standardized for a fair comparison by ensuring they have the same number of parameters and transformer blocks. The chosen models for this comparative analysis are leading architectures in the realm of computer vision, and they originate from diverse research entities. Below is a brief overview of the selected models:
 
 * **ViT (Vision Transformer):** Conceived by **Google**, the Vision Transformer (ViT) model employs a pure Transformer architecture that directly processes sequences of image patches. This approach bypasses the need for traditional Convolutional Neural Networks (CNNs) and has been proven to be especially effective when pre-trained on large datasets.
 
@@ -154,7 +154,19 @@ To rigorously evaluate the performance of the Lensiformer model, we plan to trai
 
 * **CaiT (Class-Attention in Image Transformers):** Originating from **Facebook AI**, the CaiT model focuses on optimizing deep Transformer architectures specifically for the task of image classification. It not only achieves state-of-the-art performance on the ImageNet benchmark but also does so with fewer Floating Point Operations Per Second (FLOPs) and parameters, making it computationally efficient.
 
+
+To provide a more comprehensive understanding of each model's specifications and settings, we have compiled the following table. It outlines the number of parameters, the number of transformer blocks used, the learning rate, and the optimizer for each model.
+
   
+|      Model Name      | Number of Parameters | Transformer Blocks | Num Epochs | Learning Rate | Optimizer |
+|:--------------------:|:------------------------:|:------------------:|:----------:|:-------------:|:---------:|
+| Class-Attention in Image Transformers (Facebook AI) | 13.77M |         2         |    3000    |     5e-7     |   AdamW   |
+| Convolutional Vision Transformer (Microsoft)       | 13.78M |         2         |    3000    |     5e-7     |   AdamW   |
+| Vision Transformer (Google)                       | 13.72M |         2         |    3000    |     5e-7     |   AdamW   |
+| Vision Transformer for Small Datasets (Inha University in South Korea) | 13.73M | 2  | 3000       |   5e-7     |   AdamW   |
+| Lensiformer (Ours)                                | 13.24M |         2         |    3000    |     5e-7     |   AdamW   |
+
+
 
 
 # Results
