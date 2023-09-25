@@ -40,6 +40,8 @@ The Real Galaxy Dataset Pipeline process is as follow:
 
 To construct the dataset, we perform **1,000** training simulations (comprising 50% No-Substructure Dark Matter and 50% Cold Dark Matter) and **1,000** testing simulations (also split evenly between No-Substructure Dark Matter and Cold Dark Matter).
 
+The Real-Galaxy-Tiny Dataset is constrained in size due to the computational rigor required for simulating realistic galaxies and dark matter. Additionally, the dataset seeks to emulate the real-world complexity of manually identifying gravitational distortions in astrophysical images, a task that naturally comes with a limited number of cataloged examples. Hence, the dataset's limited size is a deliberate reflection of these multifaceted challenges, ensuring both high-quality data and alignment with real-world conditions.
+
 
 
 # Lensiformer
@@ -65,7 +67,7 @@ The encoder is rooted in the principles of relativistic physics. It employs the 
 </div>
 
 
-The equation for gravitational lensing, in its dimensionless form, can be given by the following relation:
+In the Inverse Lens Layer, we use the equation for gravitational lensing, in its dimensionless form, that is given by the following relation:
 
 $$
 \begin{align}
@@ -126,7 +128,7 @@ To predict the values of $k$, we use the image of the lensed source galaxy and e
 ![k model](https://github.com/SVJLucas/DeepLense/assets/60625769/8742970e-b50e-4132-b6df-596dc0a3a3ba)
 
 
-During experiments, we observed that calibrating the values of $k_{ij}$ to fall within a range of 20% more or less than the values predicted by the Singular Isothermal Sphere (SIS) model facilitated faster convergence. Consequently, we opted for a saturation layer to ensure that the correction values remained within this specified range.
+During experiments, we observed that calibrating the values of $k_{ij}$ to fall within a range of **20%** more or less than the values predicted by the Singular Isothermal Sphere (SIS) model facilitated faster convergence. Consequently, we opted for a saturation layer to ensure that the correction values remained within this specified range.
 
 With the obtained values $k_{ij}$, we can estimate the potential $\Psi(x_i, y_i)$. Alongside the image, this allows us to solve the gravitational lens equation and generate an estimated image of the source galaxy. This image will then undergo **Shift Patch Tokenization (SPT)** and serve as the input for the decoder.
 
