@@ -6,7 +6,8 @@
 
 The Lensiformer architecture, developed as part of the international **Google Summer of Code** program in collaboration with **Machine Learning for Science (ML4SCI)**, serves as a transformer specifically designed for studies in relativistic gravitational lensing.
 
-We also have a [Medium Blog](https://medium.com/@lucas.jose.veloso.de.souza/lensiformer-a-relativistic-physics-informed-vision-transformer-architecture-for-dark-matter-a119f6d0dc0d) about the research.
+
+If you prefer a more comprehensive exploration of our research, you are welcome to visit our [Medium Blog](https://medium.com/@lucas.jose.veloso.de.souza/lensiformer-a-relativistic-physics-informed-vision-transformer-architecture-for-dark-matter-a119f6d0dc0d). There, we delve into the intricacies of the Lensiformer architecture and its groundbreaking applications in dark matter studies.
 
 # Problem Description
 
