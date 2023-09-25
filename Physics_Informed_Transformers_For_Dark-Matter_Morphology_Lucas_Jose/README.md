@@ -42,7 +42,7 @@ To construct the dataset, we perform **1,000** training simulations (comprising 
 
 The Real-Galaxy-Tiny Dataset is constrained in size due to the computational rigor required for simulating realistic galaxies and dark matter. Additionally, the dataset seeks to emulate the real-world complexity of manually identifying gravitational distortions in astrophysical images, a task that naturally comes with a limited number of cataloged examples. Hence, the dataset's limited size is a deliberate reflection of these multifaceted challenges, ensuring both high-quality data and alignment with real-world conditions.
 
-
+You can generate the dataset using the notebook **create_dataset.pynb** or download the pre-generated dataset [here](https://drive.google.com/file/d/1ZNZE4pLcAsY8C-cp4efNNHsyDrNYNMaB/view?usp=sharing).
 
 # Lensiformer
 
