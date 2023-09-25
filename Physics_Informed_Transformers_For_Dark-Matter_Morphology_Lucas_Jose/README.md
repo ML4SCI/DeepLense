@@ -16,26 +16,17 @@ However, even in simulations, in many instances, it becomes complex to different
 
 * **No-Substructure Dark Matter**: Unlike the CDM model, the "no-substructure" approach assumes that dark matter is evenly spread out, devoid of any smaller-scale clusters or sub-halos. This stands in stark contrast to the hierarchical structuring and layering of sub-halos within larger halos as predicted by CDM models.
 
-The observable distortions of distant galaxies, known as gravitational lensing, provide an intriguing connection between the types of dark matter and the roles of different galaxies. This phenomenon serves as an illustrative example of how different types of dark matter, despite their elusive nature, can exert gravitational influence and leave noticeable imprints on our observations. **Through gravitational lensing, dark matter influences the light path from the source galaxy, causing it to bend around the lensing galaxy.** This effect underscores the crucial role of dark matter in determining the large-scale structure of the universe.
+The observable distortions of distant galaxies, known as gravitational lensing, provide an intriguing connection between the types of dark matter and the roles of different galaxies. This phenomenon serves as an illustrative example of how different types of dark matter, despite their elusive nature, can exert gravitational influence and leave noticeable imprints on our observations. **Through gravitational lensing, dark matter influences the light path from the source galaxy, causing it to bend around the lensing galaxy.** This effect underscores the crucial role of dark matter in determining the large-scale structure of the universe. A detailed illustration that facilitates a deeper understanding of the phenomenon can be found below:
 
-
-<div align="center">
-  <img src="https://github.com/SVJLucas/DeepLense/assets/60625769/e36e31f7-d48f-4898-922f-d63952b76ae0" alt="Einstein Ring" width="350"/>
-</div>
-
-<div align="center">
-  An Einstein Ring is a phenomenon that occurs when the gravitational field of a massive object bends light from a more distant object.
-</div>
 
 <br>
 
-A detailed illustration that facilitates a deeper understanding of the phenomenon can be found below:
 
 <div align="center">
-  <img src="https://github.com/SVJLucas/DeepLense/assets/60625769/7d70dd28-dfa5-47c2-b54a-453b4c261217" alt="Phenomenon Description" width="750"/>
+  <img src="https://github.com/SVJLucas/DeepLense/assets/60625769/260b4df2-414a-4825-94c5-cba4ffa02742" alt="Phenomenon Description" width="900"/>
 </div>
 <div align="center">
-  Source: Bell Labs.
+Gravitational Lensing Phenomenon Description: In this figure, the distorted observation of the galaxy serves as an example of an Einstein Ring. This phenomenon occurs when the gravitational field of a massive object bends the light emanating from a more distant object. Source: Bell Labs and the Hubble Space Telescope. 
 </div>
 <br>
 
@@ -49,6 +40,7 @@ Consequently, given that the type of dark matter present in the galaxy serving a
 Simulations for both No-Substructure Dark Matter and Cold Dark Matter are conducted for the same source galaxy, positioned identically and at the same angle relative to the observer.
 </div>
 <br>
+
 
 # Real-Galaxy-Tiny Dataset: Using a True Galaxy as Source Galaxy.
 
