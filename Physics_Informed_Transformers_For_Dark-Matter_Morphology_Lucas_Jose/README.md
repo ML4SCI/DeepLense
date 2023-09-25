@@ -1,5 +1,5 @@
 
-# Lensiformer: a Relativistic Physics-Informed Vision Transformer Architecture for Dark Matter Morphology.
+# Lensiformer: A Relativistic Physics-Informed Vision Transformer Architecture for Dark Matter Morphology in Gravitational Lensing
 
 
 ![Google_Summer_of_Code_logo_(2021) svg](https://github.com/SVJLucas/Physics-Informed-Features-For-Dark-Matter-Morphology/assets/60625769/ac669c97-02ef-48cb-877c-1d794a506476)
