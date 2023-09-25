@@ -38,7 +38,7 @@ All results were calculated on a **separate test set**.
 ## Regression
 The goal here is to explore the properties of dark matter. We want to approximate the mass density of the vortex substructure of dark matter condensates on simulated strong lensing images. For this, I used the above two methods, contrastive learning and BYOL to capture representations present in the axion image, which could be beneficial for our regression task. A log10 transformation is required to make the distribution more normal-like and handle high-level outliers. Then the transform is removed after prediction. Here, the results clearly show that SSL performs better than standard baseline supervised regression:
 
-<img src="regression">
+<img src="regression.png">
 
 ## Conclusion and Future Goals
 So far, we can see that the results for self-supervised learning seem superior to their ResNet50 Baseline. 
