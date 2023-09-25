@@ -27,7 +27,28 @@ The observable distortions of distant galaxies, known as gravitational lensing, 
   An Einstein Ring is a phenomenon that occurs when the gravitational field of a massive object bends light from a more distant object.
 </div>
 
+<br>
 
+A detailed illustration that facilitates a deeper understanding of the phenomenon can be found below:
+
+<div align="center">
+  <img src="https://github.com/SVJLucas/DeepLense/assets/60625769/7d70dd28-dfa5-47c2-b54a-453b4c261217" alt="Phenomenon Description" width="750"/>
+</div>
+<div align="center">
+  Source: Bell Labs.
+</div>
+<br>
+
+Consequently, given that the type of dark matter present in the galaxy serving as the lens plays a crucial role in shaping the resulting image, **the primary motivation for this research is to simulate the phenomenon and develop Deep Learning models capable of capturing the differences between No-Substructure Dark Matter and Cold Dark Matter**.**Beyond that, the overarching objective is to establish a novel problem architecture that is able to incorporate domain-specific knowledge as well as the relevant relativistic equations**.
+
+
+<div align="center">
+  <img src="https://github.com/SVJLucas/DeepLense/assets/60625769/e0911866-0fe8-4567-8038-4b164c3139f9" alt="Description" width="750"/>
+</div>
+<div align="center">
+Simulations for both No-Substructure Dark Matter and Cold Dark Matter are conducted for the same source galaxy, positioned identically and at the same angle relative to the observer.
+</div>
+<br>
 
 # Real-Galaxy-Tiny Dataset: Using a True Galaxy as Source Galaxy.
 
