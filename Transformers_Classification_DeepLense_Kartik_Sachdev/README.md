@@ -101,6 +101,18 @@ Refer the following .ipynb files for the respective method:
 | BYOL | [BYOL.ipynb](/Transformers_Classification_DeepLense_Kartik_Sachdev/BYOL.ipynb) |
 
 
+```bash
+cd DeepLense/Transformers_Classification_DeepLense_Kartik_Sachdev
+python3 simsiam.py \
+  --num_workers 20 \
+  --dataset_name Model_II \
+  --train_config CvT \
+  --batch_size 16 \
+  --epochs_pretrain 15 \
+  --epochs_finetune 20 \
+  --cuda   
+```
+
 <br>
 
 ### __Hyperparameter optimization__

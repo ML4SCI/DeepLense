@@ -10,7 +10,6 @@ class FinetuneModel(nn.Module):
 
         # Combine the pretrained model and the projection head
         self.model = nn.Sequential(*list(backbone.children())[:-1], head)
-        deactivate_requires_grad(*list(self.model.children())[:1])
 
     def forward(self, x):
         x = self.model(x)
