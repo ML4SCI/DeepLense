@@ -5,12 +5,21 @@ LEVIT_CONFIG = {
     "network_type": "LeViT",
     "pretrained": False,
     "image_size": 224,
-    "batch_size": 128,
+    "batch_size": 64,
     "num_epochs": 15,
     "optimizer_config": {
         "name": "AdamW",
-        "weight_decay": 0.01,
+        "weight_decay": 1e-4, #0.01
         "lr": 0.001,
+        "momentum": 0.9,
+        "betas": (0.9, 0.999),
+        "warmup_epoch": 3,
+    },
+    "out_features": 128, 
+    "optimizer_finetune_config": {
+        "name": "AdamW",
+        "weight_decay": 0.01, #0.01
+        "lr": 3e-4,
         "momentum": 0.9,
         "betas": (0.9, 0.999),
         "warmup_epoch": 3,
@@ -27,11 +36,11 @@ LEVIT_CONFIG = {
     },
     "channels": 1,
     "network_config": {
-        "stages": 3,  # number of stages
-        "dim": (64, 128, 128),  # dimensions at each stage
-        "depth": 5,  # transformer of depth 4 at each stage
-        "heads": (2, 4, 5),  # heads at each stage
-        "mlp_mult": 2,
+        "stages": 4,  # number of stages
+        "dim": (128, 256, 128),  # dimensions at each stage
+        "depth": 7,  # transformer of depth 4 at each stage
+        "heads": (5, 6, 7),  # heads at each stage
+        "mlp_mult": 3,
         "dropout": 0.1,
     },
 }

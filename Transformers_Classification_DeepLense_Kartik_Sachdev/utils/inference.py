@@ -136,7 +136,9 @@ class InferenceABC(ABC):
         # Plot non-normalized confusion matrix
         plt.figure()
         self.plot_confusion_matrix(
-            cnf_matrix, classes=list(self.inv_map.values()), title="Confusion matrix",
+            cnf_matrix,
+            classes=list(self.inv_map.values()),
+            title="Confusion matrix",
         )
 
     def plot_roc_curve(self):
@@ -480,3 +482,102 @@ class InferenceSSL(InferenceABC):
                 self.label_true_arr_onehot.append(one_hot_t)
 
         self.plot_roc_curve()
+
+
+# TODO: combine all classes
+class InferenceRegressionSSL(InferenceABC):
+    def __init__(
+        self,
+        best_model: nn.Module,
+        test_loader: DataLoader,
+        device: str,
+        num_classes: int,
+        testset: Dataset,
+        dataset_name: str,
+        labels_map: dict,
+        image_size: int,
+        channels: int,
+        log_dir: str,
+        destination_dir="data",
+        current_time=None,
+    ) -> None:
+        super().__init__(
+            best_model,
+            test_loader,
+            device,
+            num_classes,
+            testset,
+            dataset_name,
+            labels_map,
+            image_size,
+            channels,
+            log_dir,
+            destination_dir,
+            current_time,
+        )
+
+        """Class for infering the trained model. \n
+        Plots `Confusion matrix`, computes `AUC` and `ROC` score.  `normalize=True`
+
+        Args:
+            best_model (nn.Module): best trained model to infer
+            test_loader (DataLoader): pytorch loader for testset
+            device (Union[int, str]): number or name of device
+            num_classes (int): # of classes for classification
+            testset (Dataset): dataset for testing
+            dataset_name (str): name of testeset
+            labels_map (dict): dict for mapping labels to number e.g `{0: "axion"}`
+            image_size (int): size of input image
+            channels (int): # of channels of input image
+            log_dir (str): directory for saving logs
+            destination_dir (str, optional): directory where data is saved. Defaults to "data".
+
+        Example:
+        >>>     infer_obj = Inference(
+        >>>             best_model= model,
+        >>>             test_loader= test_loader,
+        >>>             device=device,
+        >>>             num_classes=num_classes,
+        >>>             testset=testset,
+        >>>             dataset_name=dataset_name,
+        >>>             labels_map=classes,
+        >>>             image_size=image_size,
+        >>>             channels=train_config["channels"],
+        >>>             destination_dir="data",
+        >>>             log_dir=log_dir)
+        """
+
+    def infer(self):
+        """Plots `ROC` curve"""
+        print("Inference started ...")
+        total = 0
+        all_test_loss = []
+        all_test_accuracy = []
+        self.label_true_arr = []
+        self.label_true_arr_onehot = []
+        self.label_pred_arr = []
+        self.pred_arr = []
+        plt.rcParams.update(plt.rcParamsDefault)
+        fig = plt.figure()
+
+        correct = 0
+        with torch.no_grad():
+            self.best_model.eval()
+            for batch_idx, batch in enumerate(self.test_loader):
+                x = batch[0].to(self.device)
+                t = batch[-1].to(self.device)
+                y = self.best_model(x)
+
+                self.label_pred_arr.append(y.cpu().numpy().flatten())
+                self.label_true_arr.append(t.cpu().numpy())
+
+                # total += t.shape[0]
+                # correct += (prediction == t).sum().item()
+
+    def plot_scatter(self):
+        plt.scatter(self.label_true_arr, self.label_pred_arr, color="black")
+
+        plt.title("Validation Set")
+        plt.xlabel("Observed mass")
+        plt.ylabel("Predicted mass")
+        plt.show()

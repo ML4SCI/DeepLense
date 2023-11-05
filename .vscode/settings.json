@@ -2,19 +2,19 @@
     "python.defaultInterpreterPath": "~/anaconda3/envs/dlvr/bin/python3",
     "python.analysis.extraPaths": [
         "/home/kartik/git/DeepLense/Transformers_Classification_DeepLense_Kartik_Sachdev",
-        "/home/kartik/git/DeepLense/Transformers_Classification_DeepLense_Kartik_Sachdev/utils",
-        "/home/kartik/git/DeepLense/Transformers_Classification_DeepLense_Kartik_Sachdev/config"
+        "${workspaceFolder}/Transformers_Classification_DeepLense_Kartik_Sachdev/config"
     ],
     "python.languageServer": "Pylance",
     "editor.formatOnSave": true,
     "search.followSymlinks": false,
     "editor.tabSize": 2,
     "editor.insertSpaces": true,
-    "python.formatting.provider": "black",
+    "python.formatting.provider": "none",
     "[python]": {
         "editor.codeActionsOnSave": {
             "source.organizeImports": true
         },
         "editor.tabSize": 4,
+        "editor.defaultFormatter": "ms-python.black-formatter",
     },
 }

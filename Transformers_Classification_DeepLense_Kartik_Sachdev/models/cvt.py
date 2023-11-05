@@ -196,6 +196,15 @@ class CvT(nn.Module):
         s2_heads=3,
         s2_depth=2,
         s2_mlp_mult=4,
+        s3_emb_dim = 384,  
+        s3_emb_kernel = 3,
+        s3_emb_stride = 2,
+        s3_proj_kernel = 3,
+        s3_kv_proj_stride = 2,
+        s3_heads = 4,
+        s3_depth = 10,
+        s3_mlp_mult = 4,
+        stages= ["s1", "s2"],
         mlp_last=192,
         dropout=0.0,
     ):
@@ -205,7 +214,7 @@ class CvT(nn.Module):
         dim = channels
         layers = []
 
-        for prefix in ("s1", "s2"):
+        for prefix in stages:
             config, kwargs = group_by_key_prefix_and_remove_prefix(f"{prefix}_", kwargs)
 
             layers.append(
