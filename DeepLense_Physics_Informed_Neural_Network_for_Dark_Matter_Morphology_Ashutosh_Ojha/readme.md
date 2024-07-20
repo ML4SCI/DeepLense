@@ -1,6 +1,7 @@
 # Physics Informed Neural Network for Dark Matter Morphology
 
-![Image](https://upload.wikimedia.org/wikipedia/commons/e/e3/DeepLense_simulation.png)
+![image](https://github.com/user-attachments/assets/4c2f33d4-8ba2-46bc-83b9-eef6364b0cc4)
+
 
 ## Introduction
 
