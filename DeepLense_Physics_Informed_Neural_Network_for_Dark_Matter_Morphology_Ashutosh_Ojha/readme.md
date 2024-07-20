@@ -8,25 +8,7 @@ Greetings, everyone! I am very excited to share the progress of my project, "Phy
 
 ## Project Overview
 
-### DeepLense: Physics-Guided Machine Learning
-
-DeepLense is a deep learning framework designed for searching for particle dark matter through strong gravitational lensing.
-
-### Gravitational Lensing
-
-Gravitational Lensing is a phenomenon that occurs when a massive celestial body, such as a galaxy cluster, causes sufficient curvature of spacetime, bending the path of light around it as if by a lens.
-
-### Strong Gravitational Lensing
-
-Strong Gravitational Lensing occurs when the gravitational field of a massive galaxy or other celestial object is strong enough to produce multiple images of a source galaxy.
-
-### Dark Matter
-
-Dark matter doesn't emit or absorb light, making it invisible. However, we can detect its presence through its gravitational effects, such as observing more gravitational lensing than what we would expect from visible matter alone.
-
-## Project Goals
-
-This project aims to develop a physics-informed neural network framework to infer the properties and distribution of dark matter in the lensing galaxy responsible for strong gravitational lensing.
+Deep learning is one of the most crucial tools today, as many advancements are driven by neural networks. This project aims to develop a physics-informed neural network framework to infer the properties and distribution of dark matter in the lensing galaxy responsible for strong gravitational lensing.
 
 ## Data
 
@@ -39,56 +21,43 @@ The data includes gravitational lensing images categorized into three classes re
 
 ### Physics Informed Preprocessing
 
-We analyze the abnormal distribution of the intensity of the map, which depends on the lensing galaxy and its substructures.
+The goal of this project is to study dark matter through strong gravitational lensing. To achieve this, we can use a fundamental approach called Learning from Difference which is we analyze the abnormal distribution of the intensity of the map as  this distribution depends upon the Lensing galaxy and its substructures as they are causing the bending of light.
+![image](https://github.com/user-attachments/assets/0e6279d2-db08-41c3-afc8-3d73da441e2d)
+The intuition behind using (Imax/I)​​ is for contrast enhancement. The logarithm function is applied to compress and filter the dynamic range of intensities. Squaring is then used to ensure all intensities are positive, as negative intensities are not possible. Finally, normalization (which is optional) is achieved using the tanh function to map values to a desired range. If we perform the above transformation on each image then we get.
+![image](https://github.com/user-attachments/assets/ba01b771-fec1-4493-98b0-8709ed60eab5)
+
 
 ### Image Reconstruction
 
+![image](https://github.com/user-attachments/assets/cb41845e-4888-428a-8e66-fc764ea8967b)
 Using the Gravitational Lensing Equation, we perform lensing inversion to reconstruct the source image.
+For the Singular Isothermal Sphere (SIS) model, the angular deviation is proportional to Einstein's angle and is directed along the angular coordinate theta.
+![image](https://github.com/user-attachments/assets/ed66b40f-26c5-4038-94a2-8058f671984c)
 
-### Encoder
-
-The encoder encodes the magnitude of the angular deviation, which is the product of the Angular Diameter Distance and Einstein's Radius.
-
-### CNN as Decoder
-
-After obtaining the source image and the distorted image, we train the model to learn from the differences between these images.
 
 ### GradCAM Visualization
 
 Grad-CAM is used to interpret the model by highlighting the regions of an image where the model is focusing to make its decision.
+Below are some results for the GradCAM Visualization corresponding to ResNet18 model.
+![image](https://github.com/user-attachments/assets/91924180-b121-4723-9da9-9834cd7a8606)
+![image](https://github.com/user-attachments/assets/3a963852-7837-4243-a6df-7ad9e584f676)
+![image](https://github.com/user-attachments/assets/f15e6b51-d738-4a64-acad-65a71c0d810c)
 
 ## Results
 
-We tested and compared three models:
+I tested and compared three models:
 - Resnet18 (11.68M)
 - Lensiformer (15.78M)
 - New Model (14.43M)
-
-### Performance
-
-The new model converged faster and achieved a lower Cross Entropy Loss compared to Lensiformer and ResNet18.
-
-### F1 Score
-
-The new model achieved an F1 score of 0.997, the highest among the three models.
-
-### ROC Curve
-
-The new model achieved an ROC AUC score of 1, demonstrating its capability to differentiate between the classes across various decision thresholds.
+Below is the plot for comparing the ROC curve of the 3 models on test dataset.
+![image](https://github.com/user-attachments/assets/edd24833-8d81-4e4f-94dc-c1e046c95c7a)
+ 
 
 ## Future Goals
 
-- Test these models on a harder dataset.
-- Implement a physics-informed loss function to guide the model towards correct convergence and better reconstruction of the source galaxy.
-
-## Acknowledgements
-
-Special thanks to my incredible mentors: Sergei Gleyzer, Pranath Reddy, Anna Parul, PG Guan, and Mike Toomey.
-
-## Repository
-
-You can find my code, results, and all the plots on [GitHub](https://github.com/your-repo-link).
-
+-Grad-CAM and other explainable AI tools can be valuable for studying dark matter, as they help visualize and interpret model decisions. However, Grad-CAM is sensitive because it relies on gradients and weights that are randomly initialized, affecting its robustness.
+-Testing of these models on a harder dataset.
+-Implementing a physics-informed loss function helps guide the model towards correct convergence and better reconstruction of the source galaxy. This is achieved by incorporating physical principles and source profile information into the loss function.
 ## License
 
 This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
