@@ -18,7 +18,10 @@ The data includes gravitational lensing images categorized into three classes re
 - Cold Dark Matter
 - No Substructure
 
-All the images are single channel and have 64 x 64 dimensions. The dataset can be found at the [DeepLense Model II simulated dataset](https://github.com/mwt5345/DeepLenseSim/tree/main/Model_II).
+All the images are single-channel and have 64 x 64 dimensions. The dataset can be found at the [DeepLense Model II simulated dataset](https://github.com/mwt5345/DeepLenseSim/tree/main/Model_II).
+
+![image](https://github.com/user-attachments/assets/72ae3445-e491-4b10-bfd0-dd16ae931b8e)
+
 
 ## Methodology
 
