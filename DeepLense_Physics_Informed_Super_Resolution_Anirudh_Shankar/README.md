@@ -8,7 +8,7 @@ This article will guide you through the development, reasoning, implementation a
 3. Motivation and deliverables achieved
 4. Implementation
 5. Perspectives
-6. Appendix for side stories
+6. References
 
 ## 1. For replication: Code and relevant instructions
 
