@@ -3,6 +3,8 @@ This repository contains the code for my ongoing project with <a href = "https:/
 
 This project focuses on evaluating of self-supervised learning techniques with Transformers utilizing real-world strong gravitational lensing dataset.
 
+Before training, download the lenses dataset from <a href = "https://drive.google.com/drive/folders/1JHEQFgyGedSm0pVfYH66cHmYOqlqm992?usp=sharing"> drive </a> and the nonlenses dataset from <a href = "https://drive.google.com/drive/folders/11vdOCZKp3tt-Ls-1d8xIfoXgyuLmL9S9?usp=sharing"> drive </a> and place them in lenses and nonlenses subdirectories respectively. Update the `data path` field in the config file with the path to the dataset.
+
 # Supervised Learning Baseline
 The supervised learning baselines trained can be found in this <a href="https://github.com/iyersreehari/DeepLense_SSL_Sreehari_Iyer/tree/main/working/supervised"> folder </a> <br>
 Following is the evaluation results computed over a held-out test dataset. 
