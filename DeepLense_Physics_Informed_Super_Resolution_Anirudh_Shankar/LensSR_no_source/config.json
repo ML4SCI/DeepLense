@@ -1,0 +1,18 @@
+{
+    "resolution": 0.05,
+    "i_depth": 3,
+    "s_depth": 3,
+    "pretrain_epochs": 100,
+    "source_epochs": 50,
+    "magnification":2,
+    "n_magnification":1,
+    "image_shape": 75,
+    "i_latent_channels":64,
+    "alpha": 1.28149057,
+    "lens_centers_scale":0.7,
+    "lens_centers_disp":-0.35,
+    "lens_amp_scale":4,
+    "lens_amp_disp":1,
+    "source_scaling":3,
+    "image_epochs":10
+}

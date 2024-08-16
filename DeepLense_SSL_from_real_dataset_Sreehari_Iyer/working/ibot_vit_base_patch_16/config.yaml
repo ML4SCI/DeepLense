@@ -1,0 +1,88 @@
+experiment:
+  seed: 12
+  device: cuda 
+  expt_name: ibot_vit_base # experiment name
+  log_freq: 20 # knn accuracy is computed every `log_freq` epochs, additionally the trained model is also saved
+  output_dir: ../working/1407/ibot_vit_base # output results to this folder - files: logs.txt, {experiment_name}_models
+  ssl_training: ibot # training strategy to use
+  use_mixed_precision: true # if true uses fp16 for training, improves training speed
+# input image parameters
+input:
+  channels: 3 # num channels in input image
+  data path: ../input/real_lenses_dataset # path/to/dataset
+  indices: ../input/indices.pkl 
+  image size: 
+  - 64 # image height to perform center crop
+  - 64 # image width to perform center crop
+  num classes: 2
+# training network parameters
+network:
+  backbone: vit_base # backbone network
+  head_bottleneck_dim: 256 
+  head_hidden_dim: 512 
+  head_nlayers: 3
+  head_norm_last_layer: true
+  head_output_dim: 2048 
+  patch_out_dim: 2048
+  head_use_bn: true
+  patch_size: 16
+  pred_size: 16
+  use_dense_prediction: false
+  window_size: None
+  ape: None
+  use_L1: false
+  pred_ratio: 0.3
+  pred_ratio_var: 0.
+  pred_aspect_ratio: 
+  - 0.3
+  - 3.33
+  pred_shape: 'block'
+  pred_start_epoch: 0
+  shared_head: true
+  shared_head_teacher: true
+  return_all_tokens: true
+  masked_im_modeling: true
+optimizer:
+# small lr, cosine schedule lr, low init wd are good
+# expt 5 converged quickly, so trying out a larger lr to see if it will learn more
+  init_lr: 0.001 # anything more than this is unstable
+  init_wd: 0.000001 # low momentum helps, zero doesn't give better results
+  final_lr: 0.00001 # keeping this low helps, too low makes learning slow
+  final_wd: 0.000001 # high momentum at the end regularizes
+  momentum_teacher: 0.996 # less value would give higher acc initially then diverge
+  optimizer: AdamW
+  scheduler_warmup_epochs: 10 
+  teacher_temp: 0.04
+  teacher_patch_temp: 0.07
+  warmup_teacher_temp: 0.02
+  warmup_teacher_patch_temp: 0.04
+  warmup_teacher_temp_epochs: 30
+  clip_grad_magnitude: 0. 
+  lambda1: 0.8 # weight for dino loss
+  lambda2: 1.0 # weight for beit loss
+# restart training from checkpoint file ckpt
+restore:
+  ckpt_path: null # path/to/ckpt
+  restore: false # if true, restart from provided ckpt
+# keyword args for the ssl per data augmentation
+ssl augmentation kwargs: 
+  augmentation: AugmentationDINOSingleChannel
+  center_crop: 64
+  global_crop_scale_range: 
+  - 0.14
+  - 1.0
+  global_crop_size: 64
+  local_crop_scale_range: 
+  - 0.01
+  - 0.8
+  local_crop_size: 28
+  num_local_crops: 8
+# training parameters
+train args:
+  knn_neighbours: 20
+  batch_size: 128
+  num_epochs: 100
+  freeze_last_layer: 0
+  train_val_split: 
+  - 0.85
+  - 0.15
