@@ -1,14 +1,16 @@
 # DeepLense x Physics Informed Super Resolution of Strong Lensing Images: Anirudh Shankar
-Hey, I’m Anirudh Shankar. Through my Google Summer of Code (GSoC) project with Machine Learning for Science (ML4Sci) and DeepLense I’ve been working on interesting ways to integrate the Physics of Strong Lensing into Machine Learning models, which for now is through the super-resolution of Lensing images.
+Hey, I’m Anirudh Shankar. Through my [Google Summer of Code (GSoC)](https://summerofcode.withgoogle.com/) project with [Machine Learning for Science (ML4Sci)](https://ml4sci.org/) and [DeepLense](https://github.com/ML4SCI/DeepLense/tree/main/) I’ve been working on interesting ways to integrate the Physics of Strong Lensing into Machine Learning models, which for now is through the super-resolution of Lensing images.
 
-This article will guide you through the development, reasoning, implementation and experimentation with the architecture. Below is a list of its contents:
+For a more detailed walkthrough of the project (till the mid-term evaluation), please look at this [blog post](https://medium.com/@anirudhshankar99/lenssr-physics-informed-super-resolution-of-lensing-images-on-sparse-datasets-ml4sci-x-gsoc-2024-1e9bc099a2fc).
+Below is a list of contents:
 
 1. For replication: Code and relevant instructions
 2. What is gravitational lensing?
 3. Motivation and deliverables achieved
 4. Implementation
-5. Perspectives
-6. References
+5. Results
+6. Perspectives
+7. References
 
 ## 1. For replication: Code and relevant instructions
 
@@ -102,13 +104,41 @@ Below is an example of the upscaling achieved:
 
 ![with_source_example.png](/DeepLense_Physics_Informed_Super_Resolution_Anirudh_Shankar/README_resources/with_source_example.png)
 
-## 5. Perspectives
+# 5. Results
+
+Performance of the models was tested on two lens models, the Isothermal Sphere, and the Isothermal Ellipse, with and without noise. Three metrics are used to quantify the performance: 
+
+- **Mean Squared Error (MSE)**: It is the average of the square of the difference between the upscaled lensing image tensor and the true high resolution image tensor. It’s a measure of how different individual pixels are between the two tensors.
+- **Structural Similarity Index Measure (SSIM)**: This metric measures the similarity of relationships pixels have with their neighbourhoods. It considers changes in structural information, luminance, and contrast. It does essentially the opposite of the MSE, as the MSE looks for absolute pixel differences.
+- **Peak Signal-to-Noise Ratio (PSNR)**: PSNR is a ratio between the maximum possible power of a signal (in this case, the image) and the power of the noise (difference between the original and the distorted image). Higher PSNR values indicate better image quality, as they imply a lower level of noise. PSNR is particularly useful for comparing images that have undergone compression or other forms of degradation, such as noise.
+
+Below are performance evaluations of both techniques, i.e., with and without the source regeneration, done on 5000 images specially simulated for this purpose (i.e., never before seen by the models).
+
+## 5.1. SIS Lens
+
+|  | MSE | SSIM | PSNR |
+| --- | --- | --- | --- |
+| With source modelling (no noise) | 0.00841 ± 0.0154 | 0.692 ± 0.202 | 25.118 ± 5.131 |
+| With no source modelling (no noise) | 0.0062 ± 0.0022 | 0.640 ± 0.0561 | 22.271 ± 1.239 |
+| With source modelling (with noise) | 0.00802 ± 0.0146 | 0.697 ± 0.195 | 25.095 ± 5.010  |
+| With no source modelling (with noise) | 0.00399 ± 0.000892 | 0.655 ± 0.0685 | 24.0820 ± 0.816 |
+
+## 5.2. SIE Lens
+
+|  | MSE | SSIM | PSNR |
+| --- | --- | --- | --- |
+| With source modelling (no noise) | 0.00447 ± 0.00138 | 0.614 ± 0.0535 | 23.661 ± 1.160 |
+| With no source modelling (no noise) | 0.00413 ± 0.000813 | 0.639 ± 0.0606 | 23.918 ± 1.239 |
+| With source modelling (with noise) | 0.00950 ± 0.0119 | 0.668 ± 0.159 | 21.920 ± 3.222 |
+| With no source modelling (with noise) | 0.00413 ± 0.000813 | 0.639 ± 0.0606 | 23.918 ± 0.816 |
+
+## 6. Perspectives
 
 1. It is easily noted in Section 4.2’s example that we don’t really need a SISR network to generate upscaled lensing images. The re-lensing exercise already does that. What we could then do, is to use the SISR network to generate the deflection angle, enabling the model to handle any lens type. 
 2. In addition, a Sérsic profile can be assumed when the source profile isn’t known as it is a reasonable approximation anyways. These additions to the model will allow it to handle all lensing images unconditionally.
 3. The models can be tested on the **Real-Galaxy-Tiny Dataset**, constructed from observed galaxy profiles
 
-## 6. References
+## 7. References
 
 1. Scott Dodelson and Fabian Schmidt. Modern Cosmology. Elsevier, 2021.
 2. Schneider, P., Kochanek, C., & Wambsganss, J. (2006). Gravitational lensing: strong, weak and micro: Saas-Fee advanced course 33 (Vol. 33). Springer Science & Business Media.

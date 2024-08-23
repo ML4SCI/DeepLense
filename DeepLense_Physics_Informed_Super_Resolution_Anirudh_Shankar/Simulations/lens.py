@@ -12,7 +12,7 @@ from lenstronomy.LensModel.lens_model import LensModel
 from lenstronomy.SimulationAPI.sim_api import SimAPI
 
 
-NUMPIX = 75
+# NUMPIX = 75
 
 #TODO this is only valid for halo z=0.5
 def axion_length_to_mass(length):
@@ -237,7 +237,7 @@ class DeepLens(object):
 
         
 
-    def simple_sim(self):
+    def simple_sim(self, NUMPIX, deltaPix, noise = False):
         # import main simulation class of lenstronomy
         from lenstronomy.Util import util
         from lenstronomy.Data.imaging_data import ImageData
@@ -250,9 +250,9 @@ class DeepLens(object):
         background_rms = 1.e-2  #  background noise per pixel
         exp_time = 10**np.random.uniform(3,3.5)  #  exposure time (arbitrary units, flux per pixel is in units #photons/exp_time unit)
         numPix = NUMPIX  #  cutout pixel size per axis
-        deltaPix = 0.05  #  pixel size in arcsec (area per pixel = deltaPix**2)
+        # deltaPix = 0.05  #  pixel size in arcsec (area per pixel = deltaPix**2)
         fwhm = 0.087  # full width at half maximum of PSF
-        psf_type = 'GAUSSIAN'  # 'GAUSSIAN', 'PIXEL', 'NONE'
+        psf_type = 'NONE'  # 'GAUSSIAN', 'PIXEL', 'NONE'
 
         # generate the coordinate grid and image properties (we only read out the relevant lines we need)
         _, _, ra_at_xy_0, dec_at_xy_0, _, _, Mpix2coord, _ = util.make_grid_with_coordtransform(numPix=numPix, deltapix=deltaPix, center_ra=0, center_dec=0, subgrid_res=1, inverse=False)
@@ -268,7 +268,7 @@ class DeepLens(object):
 
         data_class = ImageData(**kwargs_data)
         # generate the psf variables
-        kwargs_psf = {'psf_type': 'GAUSSIAN', 'fwhm': fwhm, 'pixel_size': deltaPix, 'truncation': 3}
+        kwargs_psf = {'psf_type': psf_type, 'fwhm': fwhm, 'pixel_size': deltaPix, 'truncation': 3}
 
         # if you are using a PSF estimate from e.g. a star in the FoV of your exposure, you can set
         #kwargs_psf = {'psf_type': 'PIXEL', 'pixel_size': deltaPix, 'kernel_point_source': 'odd numbered 2d grid with centered star/PSF model'}
@@ -286,8 +286,9 @@ class DeepLens(object):
 
         poisson = image_util.add_poisson(image_model, exp_time=exp_time)
         bkg = image_util.add_background(image_model, sigma_bkd=background_rms)
-        # image_real = exp_time * (image_model + poisson + bkg)
-        image_real = exp_time * (image_model)
+        if noise == True:
+            image_real = exp_time * (image_model + poisson + bkg)
+        else: image_real = exp_time * (image_model)
 
         self.image_real = np.random.poisson(image_real.clip(min=0))#print(np.isnan(image_real).any())
         self.image_model = image_model
@@ -298,7 +299,7 @@ class DeepLens(object):
         data_class.update_data(image_real)
         kwargs_data['image_data'] = image_real
 
-    def simple_sim_2(self):
+    def simple_sim_2(self, NUMPIX):
         """
             Same structure as simple_sim but with Euclid resolution
         """
@@ -326,6 +327,7 @@ class DeepLens(object):
         imSim = sim.image_model_class(kwargs_numerics)
                    
         _, kwargs_source, _ = sim.magnitude2amplitude(None,self.kwargs_source)
+        print(self.kwargs_single_band)
 
 
         image = imSim.image(self.kwargs_lens_list,kwargs_source,None)
@@ -351,7 +353,7 @@ class DeepLens(object):
         else:
             pass
     
-    def get_lensing_potential(self):
+    def get_lensing_potential(self, NUMPIX):
         """
         Compute the lensing potential
         """
@@ -375,7 +377,7 @@ class DeepLens(object):
         # Reshape potential to match the grid shape
         self.potential = self.potential.reshape((NUMPIX, NUMPIX))
 
-    def get_alpha(self):
+    def get_alpha(self, NUMPIX, resolution):
         """
         Compute the lensing potential
         """
@@ -385,7 +387,7 @@ class DeepLens(object):
         # Compute the lensing potential
 
         # euclid_delta = 0.1
-        model_1_delta = 0.05
+        model_1_delta = resolution
         arcsec_bound = model_1_delta*NUMPIX/2
         x = np.linspace(-arcsec_bound, arcsec_bound, NUMPIX)
         y = np.linspace(-arcsec_bound, arcsec_bound, NUMPIX)
