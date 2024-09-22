@@ -85,12 +85,6 @@ For the small dataset case with 3000 images per class, the performance of the mo
 
 
 
-## Future Goals
-
-- Grad-CAM and other explainable AI tools can be valuable for studying dark matter, as they help visualize and interpret model decisions. However, Grad-CAM is sensitive because it relies on gradients and weights that are randomly initialized, affecting its robustness.
-- Testing these models on a harder dataset.
-- Implementing a physics-informed loss function to guide the model towards correct convergence and better reconstruction of the source galaxy. This is achieved by incorporating physical principles and source profile information into the loss function.
-
 ## License
 
 This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
