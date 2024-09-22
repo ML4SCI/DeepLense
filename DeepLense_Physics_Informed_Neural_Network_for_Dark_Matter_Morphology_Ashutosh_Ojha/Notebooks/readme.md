@@ -1,8 +1,8 @@
 # LensPIN Model Performance Comparison
 
 The LensPIN model was tested for two conditions:
-1. **Scarcity of data** (Small dataset)
-2. **Large dataset**
+1. **Small dataset** - 3000 samples per dataset
+2. **Large dataset** - 18000 samples per dataset
 
 ## Large Dataset Results
 The performance of different models on a large dataset is compared in the table below.
