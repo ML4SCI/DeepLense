@@ -51,16 +51,39 @@ Grad-CAM is used to interpret the model by highlighting the regions of an image 
 ![image](https://github.com/user-attachments/assets/3a963852-7837-4243-a6df-7ad9e584f676)
 ![image](https://github.com/user-attachments/assets/f15e6b51-d738-4a64-acad-65a71c0d810c)
 
-## Results
+## Performance
 
-I tested and compared three models:
-- Resnet18 (11.68M)
-- Lensiformer (15.78M)
-- New Model (14.43M)
+# Large Dataset Results
+The performance of different models on a large dataset is compared in the table below.
 
-Below is the plot for comparing the ROC curve of the three models on the test dataset.
+**Table 1: Performance Metrics of Different Models (Best in bold, Previous best underlined)**
 
-![image](https://github.com/user-attachments/assets/edd24833-8d81-4e4f-94dc-c1e046c95c7a)
+| Model Name        | Parameters (Millions) | Micro F1 Score | No Subs. | CDM  | Axion |
+|-------------------|-----------------------|----------------|---------------|----------|------|
+| ResNet18          | 11.17                 | 0.910          | 0.98          | 0.90     | 0.92 |       
+| ViT               | 13.7                  | 0.902          | 0.99          | 0.90     | 0.90 |       
+| CaiT              | 13.7                  | 0.936          | 0.98          | 0.92     | 0.95 |       
+| ViTSD             | 13.7                  | 0.911          | 0.99          | 0.91     | 0.90 |       
+| Lensiformer       | 15.7                  | 0.976          | 1.00          | 0.97     | 0.98 |       
+| LensCoAt_small    | 7.04                  | 0.994          | 1.00          | 0.99     | 0.99 |       
+| LensCoAt_large    | 14.43                 | **0.999**      | **1.00**      | **1.00** | **1.00** |
+
+# Small Dataset Results
+For the small dataset case with 3000 images per class, the performance of the models was as follows.
+
+**Table 2: Performance of Different Models (Parameters in millions; Best in bold, 2nd best underlined)**
+
+| Model Name        | Parameters (Millions) | Accuracy | Micro F1 Score | No Subs. | CDM  | Axion |
+|-------------------|-----------------------|----------|----------------|---------------|----------|------|
+| ResNet18          | 11.17                 | 0.818    | 0.817          | 0.97          | 0.85     | 0.95 |       
+| ViT               | 13.72                 | 0.863    | 0.864          | 0.99          | 0.66     | 0.96 |       
+| CaiT              | 13.76                 | 0.878    | 0.871          | 0.99          | 0.64     | 0.96 |       
+| ViTSD             | 13.73                 | 0.867    | 0.868          | 1.00          | 0.66     | 0.97 |       
+| Lensformer        | 15.7                  | 0.957    | 0.959          | 1.00          | 0.99     | 0.99 |       
+| LensPINN_small    | 7.17                  | 0.956    | 0.957          | 1.00          | 0.99     | 0.99 |       
+| LensPINN_large    | 14.56                 | **0.996** | **0.996**      | **1.00**      | **1.00** | **1.00** |
+
+
 
 ## Future Goals
 
