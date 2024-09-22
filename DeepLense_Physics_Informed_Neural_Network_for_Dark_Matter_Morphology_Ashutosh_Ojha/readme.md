@@ -53,7 +53,7 @@ Grad-CAM is used to interpret the model by highlighting the regions of an image 
 
 ## Performance
 
-## Large Dataset Results
+### Large Dataset Results
 The performance of different models on a large dataset is compared in the table below.
 
 **Table 1: Performance Metrics of Different Models (Best in bold, Previous best underlined)**
@@ -68,7 +68,7 @@ The performance of different models on a large dataset is compared in the table 
 | LensCoAt_small    | 7.04                  | 0.994          | 1.00          | 0.99     | 0.99 |       
 | LensCoAt_large    | 14.43                 | **0.999**      | **1.00**      | **1.00** | **1.00** |
 
-## Small Dataset Results
+### Small Dataset Results
 For the small dataset case with 3000 images per class, the performance of the models was as follows.
 
 **Table 2: Performance of Different Models (Parameters in millions; Best in bold, 2nd best underlined)**
