@@ -1,4 +1,6 @@
 # LensPIN Model Performance Comparison
+## Architecture
+![image](https://github.com/user-attachments/assets/75b0414a-bff4-4525-88b7-52f89511548c)
 
 The LensPIN model was tested for two conditions:
 1. **Small dataset** - 3000 samples per dataset
