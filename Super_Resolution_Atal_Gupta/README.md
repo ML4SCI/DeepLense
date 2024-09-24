@@ -31,11 +31,11 @@ The dataset consists of 2,834 pairs of Low Resolution (LR) and High Resolution (
 
 | Model   | PSNR  | SSIM  | Paper |
 |---------|-------|-------|-------|
-| [SRCNN]  | 31.76 | 0.873 | [Link](https://arxiv.org/abs/1501.00092) |
-| [RCAN]    | 32.60 | 0.890 | [Link](https://arxiv.org/abs/1807.02758) |
-| [SRGAN] | 26.52 | 0.566  | [Link](https://arxiv.org/abs/1609.04802) |
-| [VAESR]| 26.00 | 0.594 | [Link](https://arxiv.org/abs/1906.02691) |
-| [Iterative Auto Encoder]  | 33.56| 0.855 | [Link](https://openreview.net/forum?id=k0CWAzK17r) |
+| SRCNN  | 31.76 | 0.873 | [Link](https://arxiv.org/abs/1501.00092) |
+| RCAN    | 32.60 | 0.890 | [Link](https://arxiv.org/abs/1807.02758) |
+| SRGAN | 26.52 | 0.566  | [Link](https://arxiv.org/abs/1609.04802) |
+| VAESR| 26.00 | 0.594 | [Link](https://arxiv.org/abs/1906.02691) |
+| Iterative Auto Encoder  | 33.56| 0.855 | [Link](https://openreview.net/forum?id=k0CWAzK17r) |
 
 *Results on the Test Dataset*
 
