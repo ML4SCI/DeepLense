@@ -22,10 +22,11 @@ class Decoder(nn.Module):
                  transformer_activation: nn.Module,
                  feedforward_activation: nn.Module,
                  num_transformer_blocks: int,
+                 mode:str,
                  device: torch.device,
                  dropout_rate: float = 0.1):
         """
-        Initializes Lensiformer, a Relativistic Physics-Informed Vision Transformer (PIViT) Architecture for Dark Matter Morphology.
+        Initializes Lensformer, a Relativistic Physics-Informed Vision Transformer (PIViT) Architecture for Dark Matter Morphology.
 
         Args:
             image_size (int): Size of the input image (assumed square).
@@ -89,12 +90,25 @@ class Decoder(nn.Module):
 
         # Flatten and FeedForward layers
         self.flatten_layer = Flatten((self.initial_tokenizer.get_num_patches() + 1) * embed_dim)
-
-        self.decoder1 = timm.create_model("efficientnet_b0",pretrained = True)
-        self.decoder1.conv_stem = nn.Conv2d(1, 32, kernel_size=(3, 3), stride=(2, 2), padding=(1, 1), bias=False)
-        self.decoder2 = timm.create_model("efficientnet_b0",pretrained = True)
-        self.decoder2.conv_stem = nn.Conv2d(1, 32, kernel_size=(3, 3), stride=(2, 2), padding=(1, 1), bias=False)
-        self.fc = nn.Linear(1000*2,num_classes)
+        if mode=="large":
+            self.decoder1 = timm.create_model("efficientnet_b0",pretrained = True)
+            self.decoder1.conv_stem = nn.Conv2d(1, 32, kernel_size=(3, 3), stride=(2, 2), padding=(1, 1), bias=False)
+            self.decoder2 = timm.create_model("efficientnet_b0",pretrained = True)
+            self.decoder2.conv_stem = nn.Conv2d(1, 32, kernel_size=(3, 3), stride=(2, 2), padding=(1, 1), bias=False)
+        if mode=="small":
+            self.decoder1 = timm.create_model("mobilenetv3_small_050",pretrained = True)
+            self.decoder1.conv_stem = nn.Conv2d(1, 16, kernel_size=(3, 3), stride=(2, 2), padding=(1, 1), bias=False)
+            self.decoder2 = timm.create_model("mobilenetv3_small_050",pretrained = True)
+            self.decoder2.conv_stem = nn.Conv2d(1, 16, kernel_size=(3, 3), stride=(2, 2), padding=(1, 1), bias=False)
+        
+        self.fc = FeedForwardBlock(in_dim = 1000*2,
+                                                  out_dim = num_classes,
+                                                  hidden_dim = num_hidden_neurons,
+                                                  num_hidden_layers = num_hidden_layers,
+                                                  activation_function = feedforward_activation,
+                                                  task_type = 'multiclass',
+                                                  dropout=dropout_rate)
+        #self.fc = nn.Linear(1000*2,num_classes)
         
     def invert_lens(self, images: torch.Tensor) -> torch.Tensor:
         batch_size = images.size(0)
@@ -145,7 +159,7 @@ class Decoder(nn.Module):
             dis_feats = block(key = dis_patches,value = dis_patches)
         #concatenated = torch.concat((dis_patches,source_feats,initial_patches),dim=2)
         # Flatten the patches"""
-        concatenated = torch.concat((dis_feats-source_feats,image_feats),dim=1)
+        concatenated = torch.concat((image_feats-source_feats,dis_feats),dim=1)
         #flattened_patches = self.flatten_layer(dis_feats)
         # Generate final predictions
         final_predictions = self.fc(concatenated)
