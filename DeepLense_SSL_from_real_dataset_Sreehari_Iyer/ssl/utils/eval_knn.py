@@ -27,7 +27,7 @@ def knn_accuracy(
             if masked_loader:
                 X, y, _ = data
             else:
-                X, y = data
+                X, y, _ = data
             feat = None
             if return_all_tokens:
                 feat = model(X.to(device, non_blocking=True))[:, 0]
@@ -45,7 +45,7 @@ def knn_accuracy(
             if masked_loader:
                 X, y, _ = data
             else:
-                X, y = data
+                X, y, _ = data
             X, y = X.to(device, non_blocking=True), y.to(device, non_blocking=True)
             feat = None
             if return_all_tokens:

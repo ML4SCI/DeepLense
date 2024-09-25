@@ -3,14 +3,12 @@ import random
 import numpy as np
 import os
 
-# ---------------------------------------------------------------
 # utility function for reproducibility
 # call this before running the train loop
 SEED = 12
 def set_seed(seed: int = SEED, device: str = "cuda") -> None:
     '''
-    sets seed for reproducibility
-    while training
+    sets seed for reproducibility in training
     '''
     torch.manual_seed(seed)
     np.random.seed(seed)
@@ -28,4 +26,3 @@ set_seed()
 
 os.environ['CUBLAS_WORKSPACE_CONFIG'] = ':4096:8'
 #torch.use_deterministic_algorithms(True)
-# ---------------------------------------------------------------

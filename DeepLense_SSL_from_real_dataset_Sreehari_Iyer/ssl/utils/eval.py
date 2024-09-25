@@ -3,7 +3,7 @@ import torch
 import torch.nn as nn
 import torch.optim as optim
 import torchvision.transforms as Transforms
-from models.MLP import MLP
+from selfsupervised.models.MLP import MLP
 from torchvision import datasets
 from torch.utils.data import DataLoader
 from sklearn.metrics import confusion_matrix, accuracy_score, roc_auc_score, precision_recall_fscore_support
@@ -11,7 +11,6 @@ from typing import List
 from prettytable import PrettyTable
 from sklearn.metrics import confusion_matrix, roc_curve, auc, RocCurveDisplay, ConfusionMatrixDisplay
 import copy
-import matplotlib.pyplot as plt
 from typing import Optional, List
 
 def npy_loader(path):
@@ -86,21 +85,56 @@ def test_(
 
     return output, y_true, acc, auc
 
-def plot_cm_roc(output, y):
-    y_score = np.array(output)[:,1]
-    y = np.array(y)
+def train(
+        model,
+        train_loader,
+        val_loader,
+        criterion,
+        optimizer,
+        num_epochs: int = 100,
+        scheduler: Optional = None,
+        device: str = "cuda"
+    ):
+    model = model.to(device)
+    best_loss, best_val_loss, best_acc, best_model = None, None, None, None
+    for epoch in range(num_epochs):
+        model.train()
+        running_loss = 0.0
+        for inputs, labels in train_loader:
+            inputs, labels = inputs.to(device), labels.to(device)
+            optimizer.zero_grad()
+            outputs = model(inputs)
+            loss = criterion(outputs, labels)
+            loss.backward()
+            optimizer.step()
+            running_loss += loss.item()
+        if scheduler is not None:
+            scheduler.step()
 
-    fpr, tpr, _ = roc_curve(y, y_score)
-    roc_auc = auc(fpr, tpr)
-    
-    fig, ax = plt.subplots(1, 2, figsize=(15, 6))
-    
-    cm = confusion_matrix(y, np.argmax(np.array(output), axis=-1))
-    ConfusionMatrixDisplay(cm).plot(ax=ax[0])
-    ax[0].set_title('Confusion Matrix')
-    
-    RocCurveDisplay(fpr=fpr, tpr=tpr, roc_auc=roc_auc, estimator_name=f'Class Lenses').plot(ax=ax[1])
-    
-    ax[1].set_title('ROC AUC Curves')
-    plt.tight_layout()
-    plt.show()
+        model.eval()
+        val_loss = 0.0
+        correct = 0
+        total = 0
+
+        with torch.no_grad():
+            for inputs, labels in val_loader:
+                inputs, labels = inputs.to(device), labels.to(device)
+                outputs = model(inputs)
+                loss = criterion(outputs, labels)
+                val_loss += loss.item()
+                predicted = np.argmax(outputs.cpu().numpy(), axis=-1)
+                # val_preds.extend(predicted.tolist())
+                # val_y.extend(labels.tolist())
+                total += labels.size(0)
+                correct += (np.count_nonzero(predicted == labels.cpu().numpy()))
+        val_loss = val_loss/len(val_loader)
+        acc = 100 * correct / total
+        if best_val_loss is None or best_val_loss > val_loss:
+            best_val_loss = val_loss
+            best_loss = running_loss / len(train_loader)
+            best_model = copy.deepcopy(model)
+            best_acc = acc
+        print(f'[{epoch+1}/{num_epochs}] Train Loss: {(running_loss / len(train_loader)):.4f}, '
+              f'Val Loss: {val_loss:.4f}, '
+              f'Val Accuracy: {acc:.2f}%\n')
+    return model, best_model
