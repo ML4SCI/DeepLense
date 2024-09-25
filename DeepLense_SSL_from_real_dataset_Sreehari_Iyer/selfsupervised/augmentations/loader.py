@@ -1,9 +1,3 @@
-# Copyright (c) ByteDance, Inc. and its affiliates.
-# All rights reserved.
-#
-# This source code is licensed under the license found in the
-# LICENSE file in the root directory of this source tree.
-
 import random
 import math
 import numpy as np
@@ -24,11 +18,13 @@ class ImageDataset(Dataset):
             image_paths: List[str],
             labels: List[int],
             loader: Callable=npy_loader, 
-            transform=None):
+            transform=None,
+            return_indices=False):
         self.image_paths = image_paths
         self.label = labels
         self.transform = transform
         self.loader = loader
+        self.return_idx=return_indices
 
     def __len__(self):
         return len(self.image_paths)
@@ -39,8 +35,10 @@ class ImageDataset(Dataset):
         
         if self.transform:
             image = self.transform(image)
-
-        return image, self.label[idx]
+        if self.return_idx:
+            return image, self.label[idx], idx
+        else:
+            return image, self.label[idx]
 
 def get_dataloaders(
         data_path: str,
@@ -121,6 +119,8 @@ def get_dataloaders(
                     )
     return data_loader, train_loader, val_loader, test_loader
 
+# ImageDatasetMasked is based on the following implementation
+# https://github.com/bytedance/ibot/blob/main/loader.py
 class ImageDatasetMasked(Dataset):
     def __init__(
             self, 
@@ -198,8 +198,6 @@ class ImageDatasetMasked(Dataset):
             high = self.get_pred_ratio() * H * W
             
             if self.pred_shape == 'block':
-                # following BEiT (https://arxiv.org/abs/2106.08254), see at
-                # https://github.com/microsoft/unilm/blob/b94ec76c36f02fb2b0bf0dcb0b8554a2185173cd/beit/masking_generator.py#L55
                 mask = np.zeros((H, W), dtype=bool)
                 mask_count = 0
                 while mask_count < high:

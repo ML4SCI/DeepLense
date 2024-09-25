@@ -25,11 +25,6 @@ def get_simsiam_augmentations(
         
 # ---------------------------------------------------------------
 class AugmentationSIMSIAM(BaseAugmentationSIMSIAM):
-    '''   
-    implements the standard SWAV augmentations
-    contains augmentations that doesn't affect
-    channel information
-    '''
     def __init__(self, \
             center_crop: int = 64,
             crop_size: int = 64,
@@ -46,11 +41,11 @@ class AugmentationSIMSIAM(BaseAugmentationSIMSIAM):
                             scale_range = crop_scale_range,
                             horizontal_flip_probability = kwargs.get('horizontal_flip_probability', 0.5),
                             color_jitter = True,
-                            brightness_jitter = kwargs.get('brightness_jitter', 0.8), # 0.8
-                            contrast_jitter = kwargs.get('contrast_jitter', 0.8), # 0.8
+                            brightness_jitter = kwargs.get('brightness_jitter', 0.8),
+                            contrast_jitter = kwargs.get('contrast_jitter', 0.8),
                             saturation_jitter = kwargs.get('saturation_jitter', 0.0),
                             hue_jitter = kwargs.get('hue_jitter', 0.0),
-                            color_jitter_probability = kwargs.get('color_jitter_probability', 0.1), # 0.8
+                            color_jitter_probability = kwargs.get('color_jitter_probability', 0.1),
                             random_grayscale = False,
                             random_gaussian_blur = True,
                             gaussian_blur_sigma = kwargs.get('gaussian_blur_sigma', (0.01, 4.0)),
