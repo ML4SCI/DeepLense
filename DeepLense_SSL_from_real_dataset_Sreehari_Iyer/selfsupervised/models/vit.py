@@ -1,9 +1,7 @@
-
-
-
 # adapted from
 #     https://github.com/huggingface/pytorch-image-models/blob/main/timm/models/vision_transformer.py
 #     https://github.com/facebookresearch/dino/blob/main/vision_transformer.py
+
 import math
 import torch
 import torch.nn as nn

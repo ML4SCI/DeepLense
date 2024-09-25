@@ -1,5 +1,5 @@
-# adapted from
-#    https://github.com/facebookresearch/dino/blob/main/vision_transformer.py
+# adapted from https://github.com/facebookresearch/dino/blob/main/vision_transformer.py
+
 import torch
 import torch.nn as nn
 from typing import Union, Tuple, List, Optional

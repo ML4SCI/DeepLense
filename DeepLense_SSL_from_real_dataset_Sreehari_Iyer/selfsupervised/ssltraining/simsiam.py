@@ -3,8 +3,8 @@ import torch
 import torch.nn as nn
 from torch.utils.data import DataLoader
 from .base import TrainSSL
-from models import MLPHead, MultiCropWrapper
-from utils import cosine_scheduler
+from selfsupervised.models import MLPHead, MultiCropWrapper
+from selfsupervised.utils import cosine_scheduler
 from typing import List, Dict, Union, Optional, Tuple
 
 class TrainSIMSIAM(TrainSSL):

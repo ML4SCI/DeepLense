@@ -1,5 +1,4 @@
-# adapted from
-#     https://github.com/facebookresearch/dino/blob/main/main_dino.py
+# adapted from https://github.com/facebookresearch/dino/blob/main/main_dino.py
 
 import numpy as np
 import torch
@@ -10,17 +9,6 @@ import torch.nn.functional as F
 # ---------------------------------------------------------------
 # DINO Loss
 class DINOLoss(nn.Module):
-    '''
-    Implements the DINO loss function
-    as mentioned in the original work
-    
-    params:
-        131072
-            
-    return:
-        DINO loss 
-    '''
-    
     def __init__(
             self,
             output_dim,
@@ -31,8 +19,6 @@ class DINOLoss(nn.Module):
             nepochs,
             student_temp=0.1,
             center_momentum=0.9,
-            # L1=False,
-            # L1alpha=0.2,
         ):
         super(DINOLoss, self).__init__()
         self.num_crops = num_crops
@@ -44,8 +30,6 @@ class DINOLoss(nn.Module):
                         teacher_temp, warmup_teacher_temp_epochs),
             np.ones(nepochs - warmup_teacher_temp_epochs) * teacher_temp
         ))
-        # self.L1 = L1
-        # self.L1alpha = L1alpha
         
         
     def forward(
@@ -69,8 +53,6 @@ class DINOLoss(nn.Module):
                 if s_idx == t_idx: # same view
                     continue
                 loss = torch.sum(-t_out * F.log_softmax(s_out, dim=-1), dim=-1)
-                # if self.L1:
-                # loss += (1-self.L1alpha)*loss + (self.L1alpha)*torch.mean(torch.abs(t_out - s_out))
                 total_loss += loss.mean()
                 n_loss_terms += 1
                 

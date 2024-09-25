@@ -7,10 +7,10 @@ import torch
 import torch.nn as nn
 from torchvision import datasets
 from torch.utils.data import random_split, DataLoader, Dataset
-from utils import knn_accuracy
+from selfsupervised.utils import knn_accuracy
 import datetime
 from typing import List, Dict, Union, Callable 
-from augmentations import ImageDataset, ImageDatasetMasked
+from selfsupervised.augmentations import ImageDataset, ImageDatasetMasked
 
 def npy_loader(path):
     sample = torch.from_numpy(np.load(path))
@@ -46,7 +46,7 @@ class TrainSSL:
             masked_loader: bool = False,
             **kwargs,
         ):
-    #--------------------------------------------------------------------------------------------------------
+
         self.masked_loader = masked_loader
         self.output_dir = output_dir
         self.expt_name = expt_name
@@ -73,20 +73,17 @@ class TrainSSL:
         self.use_dense_prediction = use_dense_prediction
         assert data_augmentation_transforms is not None
         assert eval_transforms is not None
-    #--------------------------------------------------------------------------------------------------------
+
         
         indices = None
         with open(train_test_indices, "rb") as f:
             indices = pickle.load(f)
-                
-    #--------------------------------------------------------------------------------------------------------
+
         # get the sizes for train, validation, and test sets
         train_val_split = list(train_val_split) / np.sum(list(train_val_split)) 
         lens_train_size, nonlens_train_size = int(train_val_split[0] * len(indices["train"]["lenses"])), int(train_val_split[0] * len(indices["train"]["nonlenses"]))
         lens_val_size, nonlens_val_size = len(indices["train"]["lenses"]) - lens_train_size, len(indices["train"]["nonlenses"]) - nonlens_train_size
-    #--------------------------------------------------------------------------------------------------------
 
-    #--------------------------------------------------------------------------------------------------------
         # Split the dataset into train and validation sets
         
         # indices for train and validation datasets
@@ -116,10 +113,7 @@ class TrainSSL:
         train_size = len(train_paths)
         val_size = len(val_paths)
         test_size = len(test_paths)
-    #--------------------------------------------------------------------------------------------------------
-    
 
-    #--------------------------------------------------------------------------------------------------------
         # Create DatasetFolder instances for each split with the respective transforms
 
         # training dataset 
@@ -127,7 +121,8 @@ class TrainSSL:
             image_paths=train_paths,
             labels=train_labels,
             loader=npy_loader,
-            transform=data_augmentation_transforms
+            transform=data_augmentation_transforms,
+            return_indices=True,
         ) if not masked_loader else \
         ImageDatasetMasked(
             image_paths=train_paths,
@@ -147,7 +142,8 @@ class TrainSSL:
             image_paths=train_paths,
             labels=train_labels,
             loader=npy_loader,
-            transform=eval_transforms
+            transform=eval_transforms,
+            return_indices=True,
         ) if not masked_loader else \
         ImageDatasetMasked(
             image_paths=train_paths,
@@ -166,7 +162,8 @@ class TrainSSL:
             image_paths=val_paths,
             labels=val_labels,
             loader=npy_loader,
-            transform=eval_transforms
+            transform=eval_transforms,
+            return_indices=True,
         ) if not masked_loader else \
         ImageDatasetMasked(
             image_paths=val_paths,
@@ -185,7 +182,8 @@ class TrainSSL:
             image_paths=test_paths,
             labels=test_labels,
             loader=npy_loader,
-            transform=eval_transforms
+            transform=eval_transforms,
+            return_indices=True,
         ) if not masked_loader else \
         ImageDatasetMasked(
             image_paths=test_paths,
@@ -199,10 +197,7 @@ class TrainSSL:
             pred_shape=pred_shape,
             pred_start_epoch=pred_start_epoch
         )
-    #--------------------------------------------------------------------------------------------------------
-    
 
-    #--------------------------------------------------------------------------------------------------------
         # Dataloaders
         
         # train
@@ -247,9 +242,7 @@ class TrainSSL:
         self.logger.info(f"Val Dataset contains {val_size} images")
         self.logger.info(f"Test Dataset contains {test_size} images")
         self.steps_per_epoch = len(self.dataloader)
-    #--------------------------------------------------------------------------------------------------------
-        
-    #--------------------------------------------------------------------------------------------------------        
+
         # initialize history dict
         self.history = {
             "loss_stepwise": [],
@@ -265,11 +258,8 @@ class TrainSSL:
             "nonlens_val_indices": nonlens_val_indices,
         }
         self.state = None
-    #--------------------------------------------------------------------------------------------------------
 
-    #--------------------------------------------------------------------------------------------------------    
     def _init_state(self):
-    #--------------------------------------------------------------------------------------------------------
         # initialize the state variable
         self.state = {
             "info": {
@@ -287,19 +277,15 @@ class TrainSSL:
             "lr": self.lr_schedule, 
             "wd": self.wd_schedule
         }
-    #--------------------------------------------------------------------------------------------------------
 
-    #--------------------------------------------------------------------------------------------------------
         self.fp16_scaler = None
         if self.use_mixed_precision:
             self.fp16_scaler = torch.cuda.amp.GradScaler()
             self.state["fp16_scaler"]: self.fp16_scaler
-    #--------------------------------------------------------------------------------------------------------
 
-    #--------------------------------------------------------------------------------------------------------
         if self.restore_ckpt_path is not None:
             self._restore()
-    #--------------------------------------------------------------------------------------------------------
+
     
     def _restore(self) -> None:
         assert self.restore_ckpt_path is not None, "Checkpoint path to restore not provided"
@@ -344,44 +330,36 @@ class TrainSSL:
     def update_teacher(self):
         raise NotImplementedError
 
-    #--------------------------------------------------------------------------------------------------------
     # train for one epoch
     def train_one_epoch(self):
-
-    #--------------------------------------------------------------------------------------------------------
         self.optimizer.zero_grad()
-    #--------------------------------------------------------------------------------------------------------
-        
-    #--------------------------------------------------------------------------------------------------------
+
         losses = []
         cur_step = self.state["current_epoch"]*self.steps_per_epoch 
         for idx, input in enumerate(self.dataloader):
-    #--------------------------------------------------------------------------------------------------------
+
             img, mask = None, None 
             imgs, label, msk = None, None, None 
+            indices = None
             if self.masked_loader:
                 imgs, label, msk = input
                 img = [im.to(self.device, non_blocking=True) for im in imgs]
                 mask = [im.to(self.device, non_blocking=True) for im in msk]
             else:
-                imgs, label = input
+                imgs, label, indices = input
                 img = [im.to(self.device, non_blocking=True) for im in imgs]
-    #--------------------------------------------------------------------------------------------------------
 
-    #-------------------------------------------------------------------------------------------------------- 
             with torch.cuda.amp.autocast(self.fp16_scaler is not None):
                 teacher_output = self.forward_teacher(img) if self.teacher is not None else None
                 _img = (img, mask) if mask is not None else img
-                student_output = self.forward_student(_img)
+                student_output = self.forward_student(_img, labels=label, indices=indices)
                 loss = self.compute_loss_epoch(student_output=student_output, teacher_output=teacher_output, mask=mask)
                 losses.append(loss.item())
     
             if np.isinf(loss.item()):
                 self.logger.error(f"Loss is Infinite. Training stopped")
                 sys.exit(1)
-    #--------------------------------------------------------------------------------------------------------
-            
-    #--------------------------------------------------------------------------------------------------------
+
             self.set_lr_and_wd(cur_step+idx)
             
             if self.fp16_scaler is None:
@@ -397,20 +375,14 @@ class TrainSSL:
 
             if self.teacher is not None:
                 self.update_teacher(cur_step)
-    #--------------------------------------------------------------------------------------------------------
 
-    #--------------------------------------------------------------------------------------------------------
         self.history["loss_stepwise"].extend(losses)
         self.history["loss_epochwise"].append(np.mean(losses))
         return np.mean(losses)
-    #--------------------------------------------------------------------------------------------------------
 
-    #--------------------------------------------------------------------------------------------------------
     def train(self):
-    #--------------------------------------------------------------------------------------------------------
         if self.state is None:
             self._init_state()
-    #--------------------------------------------------------------------------------------------------------
         for epoch in range(self.state["current_epoch"], self.epochs): # this will help to restart training
             self.student.train() 
             if self.teacher is not None:
@@ -427,26 +399,20 @@ class TrainSSL:
             knn_top1 = self.compute_knn_accuracy()
                 
             self.history["knn_top1"].append(knn_top1)
-    #--------------------------------------------------------------------------------------------------------
-    
-    #--------------------------------------------------------------------------------------------------------
+
             self.save_checkpoint(self.ckpt_file)
             if self.state["current_epoch"]%self.log_freq == 0 or (self.state["current_epoch"] + 1) == self.epochs:
                 self.save_checkpoint(os.path.join(self.expt_path, f"epoch_{self.state['current_epoch']}_accknn_{knn_top1:.6f}_checkpoint.pth"))
             self.state["current_epoch"] += 1
-    #--------------------------------------------------------------------------------------------------------
         
-    #--------------------------------------------------------------------------------------------------------
+
         self.student.eval() 
         knn_top1 = self.compute_knn_accuracy(mode = "Test")
         self.history["Test"] = {
             "knn_top1": knn_top1,
         }
         self.save_checkpoint(self.ckpt_file)
-    #--------------------------------------------------------------------------------------------------------
-    
 
-    #--------------------------------------------------------------------------------------------------------
     @torch.no_grad()
     def compute_knn_accuracy(
             self, 
@@ -481,7 +447,6 @@ class TrainSSL:
         )
         self.logger.info(f"\t{mode}: KNN Acc@1:{top1:.6f} with neighbour count: {knn_k}")
         return top1
-    #--------------------------------------------------------------------------------------------------------
     
         
         

@@ -3,9 +3,9 @@ import torch
 import torch.nn as nn
 from torch.utils.data import DataLoader
 from .base import TrainSSL
-from models import MultiCropWrapper, iBOTHead
-from losses import iBOTLoss
-from utils import cosine_scheduler
+from selfsupervised.models import MultiCropWrapper, iBOTHead
+from selfsupervised.losses import iBOTLoss
+from selfsupervised.utils import cosine_scheduler
 from typing import List, Dict, Union, Optional, Tuple
 
 class TrainIBOT(TrainSSL):
@@ -106,8 +106,6 @@ class TrainIBOT(TrainSSL):
         self.num_local_crops = num_local_crops
         self.clip_grad_magnitude = clip_grad_magnitude
         self.freeze_last_layer = freeze_last_layer
-        #lr = min_lr if min_lr is not None else lr
-        #min_weight_decay = min_weight_decay if min_weight_decay is not None else weight_decay
 
         self.pred_size = patch_size 
         
@@ -168,10 +166,6 @@ class TrainIBOT(TrainSSL):
         for param in self.teacher.parameters():
             param.requires_grad = False
 
-        # print(self.student)
-        # print(self.teacher)
-        # sys.exit(1)
-        # self.teacher.load_state_dict(self.student.state_dict())
 
         self.logger.info("Built Student and Teacher networks.\nBoth are initialized with same parameters")
 
@@ -234,11 +228,11 @@ class TrainIBOT(TrainSSL):
 
         self._init_state()
 
-    def forward_teacher(self, img):
+    def forward_teacher(self, img, *args, **kwargs):
         # print(img[0].shape)
         return self.teacher(img[:2], return_backbone_feat=False) 
 
-    def forward_student(self, img, msk=None):
+    def forward_student(self, img, msk=None, *args, **kwargs):
         img, msk = img
         student_output = self.student(img[:2], mask=msk[:2], return_backbone_feat=False)
         # get local views

@@ -1,3 +1,5 @@
+# Adapted from https://github.com/bytedance/ibot/blob/main/main_ibot.py
+
 import numpy as np
 import torch
 import torch.nn as nn
@@ -22,8 +24,6 @@ class iBOTLoss(nn.Module):
         self.lambda1 = lambda1
         self.lambda2 = lambda2
 
-        # we apply a warm up for the teacher temperature because
-        # a too high temperature makes the training instable at the beginning
         self.teacher_temp_schedule = np.concatenate((
             np.linspace(warmup_teacher_temp,
                         teacher_temp, warmup_teacher_temp_epochs),

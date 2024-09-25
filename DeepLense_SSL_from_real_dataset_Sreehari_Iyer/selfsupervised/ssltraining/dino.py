@@ -3,9 +3,9 @@ import torch
 import torch.nn as nn
 from torch.utils.data import DataLoader
 from .base import TrainSSL
-from models import MLPHead, MultiCropWrapper
-from losses import DINOLoss, DDINOLoss, DDINOLossL1
-from utils import cosine_scheduler
+from selfsupervised.models import MLPHead, MultiCropWrapper
+from selfsupervised.losses import DINOLoss
+from selfsupervised.utils import cosine_scheduler
 from typing import List, Dict, Union, Optional, Tuple
 
 class TrainDINO(TrainSSL):

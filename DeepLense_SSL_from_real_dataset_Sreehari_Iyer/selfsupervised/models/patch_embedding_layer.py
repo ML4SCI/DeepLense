@@ -3,6 +3,7 @@ import torch.nn as nn
 import torch.nn.functional as F
 from typing import Tuple, List
 
+# adapted from https://github.com/facebookresearch/dino/blob/main/vision_transformer.py
 class patch_embedding(nn.Module):
     def __init__(
             self,
@@ -57,6 +58,7 @@ def conv3x3(in_planes, out_planes, stride=1):
         nn.BatchNorm2d(out_planes)
     )
     
+# adapted from https://github.com/insitro/ChannelViT/blob/main/channelvit/backbone/channel_vit.py
 class ConvPatchEmbed(nn.Module):
     """Image to Patch Embedding using multiple convolutional layers"""
 
