@@ -1,9 +1,9 @@
 experiment:
   seed: 12
   device: cuda 
-  expt_name: ibot_vit_base # experiment name
+  expt_name: ibot_vit_small # experiment name
   log_freq: 20 # knn accuracy is computed every `log_freq` epochs, additionally the trained model is also saved
-  output_dir: ../working/ibot_vit_base # output results to this folder - files: logs.txt, {experiment_name}_models
+  output_dir: ./working/ibot_vit_small # output results to this folder - files: logs.txt, {experiment_name}_models
   ssl_training: ibot # training strategy to use
   use_mixed_precision: true # if true uses fp16 for training, improves training speed
 # input image parameters
@@ -17,7 +17,7 @@ input:
   num classes: 2
 # training network parameters
 network:
-  backbone: vit_base # backbone network
+  backbone: vit_small # backbone network
   head_bottleneck_dim: 192
   head_hidden_dim: 256
   head_nlayers: 3
