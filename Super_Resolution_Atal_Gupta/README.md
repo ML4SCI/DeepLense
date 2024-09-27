@@ -31,20 +31,14 @@ The dataset consists of 2,834 pairs of Low Resolution (LR) and High Resolution (
 
 | Model   | PSNR  | SSIM  | Paper |
 |---------|-------|-------|-------|
-| [DDPM](https://arxiv.org/abs/2006.11239)    | 26.95 | 0.821 | [Link](https://arxiv.org/abs/2006.11239) |
-| [SR3](https://arxiv.org/abs/2104.07636)     | 28.81 | 0.854 | [Link](https://arxiv.org/abs/2104.07636) |
-| [SRDiff](https://arxiv.org/abs/2104.14951)  | 34.71 | 0.87  | [Link](https://arxiv.org/abs/2104.14951) |
-| [ResShift](https://arxiv.org/abs/2201.11745)| 35.55 | 0.879 | [Link](https://arxiv.org/abs/2201.11745) |
-| [CG-DPM](https://arxiv.org/abs/2106.07579)  | 33.447| 0.851 | [Link](https://arxiv.org/abs/2106.07579) |
+| SRCNN  | 31.76 | 0.873 | [Link](https://arxiv.org/abs/1501.00092) |
+| RCAN    | 32.60 | 0.890 | [Link](https://arxiv.org/abs/1807.02758) |
+| SRGAN | 26.52 | 0.566  | [Link](https://arxiv.org/abs/1609.04802) |
+| VAESR| 26.00 | 0.594 | [Link](https://arxiv.org/abs/1906.02691) |
+| Iterative Auto Encoder  | 33.56| 0.855 | [Link](https://openreview.net/forum?id=k0CWAzK17r) |
 
 *Results on the Test Dataset*
 
-## Future Work
-
-- Exploring Score-Based Conditional Diffusion Models.
-- Investigating Diffusion GANs.
-- Exploring various loss techniques.
-- Investigating the best techniques with a residual prediction approach.
 
 ## Installation
 
