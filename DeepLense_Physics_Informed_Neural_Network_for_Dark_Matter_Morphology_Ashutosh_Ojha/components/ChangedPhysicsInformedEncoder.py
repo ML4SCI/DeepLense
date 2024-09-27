@@ -155,3 +155,4 @@ class ChangedPhysicsInformedEncoder(nn.Module):
             source_image[i] = source_image_np
 
         return k_sigmoid,source_image
+
