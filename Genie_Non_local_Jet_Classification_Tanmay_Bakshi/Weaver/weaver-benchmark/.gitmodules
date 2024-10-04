@@ -1,0 +1,3 @@
+[submodule "weaver"]
+	path = weaver
+	url = https://github.com/hqucms/weaver.git

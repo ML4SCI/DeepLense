@@ -1,0 +1,57 @@
+name: "Test"
+
+on:
+  push:
+    branches: [main, github-actions-test]
+    paths-ignore:
+      - "docs/**"
+      - "README.md"
+      - "LICENSE.txt"
+      - ".gitignore"
+
+  pull_request:
+    branches: [main]
+    paths-ignore:
+      - "docs/**"
+      - "README.md"
+      - "LICENSE.txt"
+      - ".gitignore"
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.sha }}
+  cancel-in-progress: true
+
+jobs:
+  pytest:
+    runs-on: ${{ matrix.os }}
+
+    strategy:
+      matrix:
+        os: [ubuntu-latest]
+        python-version: ["3.10", "3.11"]
+
+    steps:
+      - uses: actions/checkout@v4
+      - name: Set up Python ${{ matrix.python-version }}
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python-version }}
+          cache: "pip"
+          cache-dependency-path: "pyproject.toml"
+
+      - name: Install main package [pip]
+        run: |
+          pip install --upgrade pip setuptools wheel
+          pip install -e .[all]
+      - name: Typecheck [mypy]
+        run: |
+          mypy -p topoembedx
+      - name: Run tests [pytest]
+        run: |
+          pytest --cov --cov-report=xml:coverage.xml
+      - name: Upload coverage
+        uses: codecov/codecov-action@v4
+        with:
+          token: ${{ secrets.CODECOV_TOKEN }}
+          file: coverage.xml
+          fail_ci_if_error: false

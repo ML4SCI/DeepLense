@@ -1,0 +1,59 @@
+selection:
+   ### use `&`, `|`, `~` for logical operations on numpy arrays
+   ### can use functions from `math`, `np` (numpy), and `awkward` in the expression
+
+new_variables:
+   ### [format] name: formula
+   ### can use functions from `math`, `np` (numpy), and `awkward` in the expression
+   is_bkg: np.logical_not(is_signal_new)
+
+preprocess:
+  ### method: [manual, auto] - whether to use manually specified parameters for variable standardization
+  method: manual
+  ### data_fraction: fraction of events to use when calculating the mean/scale for the standardization
+  data_fraction: 
+
+inputs:
+   pf_features:
+      length: 100
+      vars: 
+      ### [format 1]: var_name (no transformation)
+      ### [format 2]: [var_name, 
+      ###              subtract_by(optional, default=None, no transf. if preprocess.method=manual, auto transf. if preprocess.method=auto), 
+      ###              multiply_by(optional, default=1), 
+      ###              clip_min(optional, default=-5), 
+      ###              clip_max(optional, default=5), 
+      ###              pad_value(optional, default=0)]
+         - Part_Etarel
+         - Part_Phirel
+         - [Part_E_log, 2, 1]
+         - [Part_P_log, 2, 1]
+
+labels:
+   ### type can be `simple`, `custom`
+   ### [option 1] use `simple` for binary/multi-class classification, then `value` is a list of 0-1 labels
+   type: simple
+   value: [
+      is_signal_new, is_bkg
+      ]
+   ### [option 2] otherwise use `custom` to define the label, then `value` is a map
+   # type: custom
+   # value: 
+      # target_mass: np.where(fj_isQCD, fj_genjet_sdmass, fj_gen_mass) 
+
+observers:
+   - origIdx
+   - idx
+   - E_tot
+   - PX_tot
+   - PY_tot
+   - PZ_tot
+   - P_tot
+   - Eta_tot
+   - Phi_tot
+
+# weights:
+   ### [option 1] use precomputed weights stored in the input files
+   # use_precomputed_weights: true
+   # weight_branches: [weight, class_weight]
+   ### [option 2] compute weights on-the-fly using reweighting histograms

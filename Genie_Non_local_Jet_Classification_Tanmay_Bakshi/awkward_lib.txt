@@ -1,0 +1,36 @@
+To get started :
+
+1.) pip Installation -->
+
+pip install awkward
+
+2.) conda Installation -->
+
+conda install -c conda-forge awkward
+
+
+=> Why to use Awkward array representations ?
+Since we are dealing with jet events of arbitrary number of particles and features,
+that is "Particle Clouds", using conventional builtin lists, dicts and classes will cost
+a lot of speed and memory. So their use for large datasets is hard and limited.
+
+For tabular data, DataFrames are useful (along with cuDF, Dask DataFrame etc.) However,
+we have another degree of variability - different number of particles selected for
+each event. Moreover, we might want to append additional features based on domain knowledge and/or
+geometry and topology later, this will cost a lot of memory and speed.
+
+=> Why not pyarrow?
+Apache Arrow manages arrays of arbitrary data structures with great language interoperability
+and interprocess communication, but without functions oriented towards data analysis.
+
+HENCE :), we have Awkward Arrays which can be used interchangeably with NumPy and share
+data with Arrow and DataFrames. IT simplifies and accelerates computations.
+
+Imperative-style computations can be accelerated with Numba
+
+#TODO: Look into Numba
+`DISCUSS`:
+Numba translates a subset of Python and NumPy code into fast ML code.
+
+Translates Python functions to optimized ML code at runtime using the industry-standard
+LLVM compiler library. Numba-compiled numerical algorithms in Python can approach the speeds of C or FORTRAN

@@ -1,0 +1,146 @@
+selection:
+   ### use `&`, `|`, `~` for logical operations on numpy arrays
+   ### can use functions from `math`, `np` (numpy), and `awkward` in the expression
+   >-
+   (jet_tightId==1) & (np.abs(jet_eta)<4.7) & (jet_pt>15) & (jet_pt<1000) & (event_no%7!=0)
+   & ( (jet_hadronFlavour>0) | ((jet_hadronFlavour==0) & (np.abs(jet_partonFlavour)!=4) & (np.abs(jet_partonFlavour)!=5)) )
+   & ( ~((jet_genjet_pt>0) & (jet_hadronFlavour==0) & (jet_partonFlavour==0)) | ((jet_genjet_pt>0) & (jet_hadronFlavour==0) & (jet_partonFlavour==0) & (jet_pt<200)) )
+   & ( (jet_genjet_pt>0) | ((jet_genjet_pt<=0) & (jet_pt<60)) )
+
+test_time_selection:
+   # (jet_tightId==1) & (np.abs(jet_eta)<4.7) & (jet_pt>15) & (jet_pt<1000) & (event_no%7==0)
+   (jet_tightId==1) & (np.abs(jet_eta)<4.7) & (jet_pt>15) & (jet_pt<1000)
+
+new_variables:
+   ### [format] name: formula
+   ### can use functions from `math`, `np` (numpy), and `awkward` in the expression
+   pfcand_mask: awkward.JaggedArray.ones_like(pfcand_etarel)
+   sv_mask: awkward.JaggedArray.ones_like(sv_etarel)
+   label_b:     (jet_genjet_pt>0) & (jet_nBHadrons==1)
+   label_bb:    (jet_genjet_pt>0) & (jet_nBHadrons>1)
+   label_c:     (jet_genjet_pt>0) & (jet_nBHadrons==0) & (jet_nCHadrons==1)
+   label_cc:    (jet_genjet_pt>0) & (jet_nBHadrons==0) & (jet_nCHadrons>1)
+   label_uds:   (jet_genjet_pt>0) & (jet_hadronFlavour==0) & (np.abs(jet_partonFlavour)>0) & (np.abs(jet_partonFlavour)<4)
+   label_g:     (jet_genjet_pt>0) & (jet_hadronFlavour==0) & (jet_partonFlavour==21)
+   label_undef: (jet_genjet_pt>0) & (jet_hadronFlavour==0) & (jet_partonFlavour==0)
+   label_pu:    (jet_genjet_pt<=0)
+   label_catB: (jet_genjet_pt>0) & (jet_hadronFlavour==5)
+   label_catC: (jet_genjet_pt>0) & (jet_hadronFlavour==4)
+
+
+preprocess:
+  ### method: [manual, auto] - whether to use manually specified parameters for variable standardization
+  method: manual
+  ### data_fraction: fraction of events to use when calculating the mean/scale for the standardization
+  data_fraction: 
+
+inputs:
+   pf_points:
+      length: 50
+      vars: 
+         - [pfcand_etarel, null]
+         - [pfcand_phirel, null]
+   pf_features:
+      length: 50
+      vars: 
+      ### [format 1]: var_name (no transformation)
+      ### [format 2]: [var_name, 
+      ###              subtract_by(optional, default=None, no transf. if preprocess.method=manual, auto transf. if preprocess.method=auto), 
+      ###              multiply_by(optional, default=1), 
+      ###              clip_min(optional, default=-5), 
+      ###              clip_max(optional, default=5), 
+      ###              pad_value(optional, default=0)]
+         - [pfcand_pt_log_nopuppi, 0.8, 0.7]
+         - [pfcand_e_log_nopuppi, 1.2, 0.6]
+         - [pfcand_etarel, null]
+         - [pfcand_phirel, null]
+         - [pfcand_abseta, 0.8, 1.2]
+         - [pfcand_charge, null]
+         - [pfcand_VTX_ass, 4, 0.3]
+         - [pfcand_lostInnerHits, null]
+         - [pfcand_normchi2, 5, 0.2]
+         - [pfcand_quality, 0, 0.2]
+         - [pfcand_dz, 0, 150]
+         - [pfcand_dzsig, 0, 0.7]
+         - [pfcand_dxy, 0, 270]
+         - [pfcand_dxysig, 1.1]
+         - [pfcand_btagEtaRel, 2.1, 0.5]
+         - [pfcand_btagPtRatio, 0, 1]
+         - [pfcand_btagPParRatio, 0, 1]
+         - [pfcand_btagSip3dVal, 0, 90]
+         - [pfcand_btagSip3dSig, 0, 0.5]
+         - [pfcand_btagJetDistVal, 0, 50]
+   pf_mask:
+      length: 50
+      vars: 
+         - [pfcand_mask, null]
+   sv_points:
+      length: 5
+      vars:
+         - [sv_etarel, null]
+         - [sv_phirel, null]
+   sv_features:
+      length: 5
+      vars:
+         - [sv_pt_log, 2.8, 0.8]
+         - [sv_mass, 1.1, 0.6]
+         - [sv_etarel, null]
+         - [sv_phirel, null]
+         - [sv_abseta, 0.8, 1.2]
+         - [sv_ntracks, 3, 0.5]
+         - [sv_normchi2, 0.7, 0.7]
+         - [sv_dxy, 0.2, 0.6]
+         - [sv_dxysig, 5, 0.03]
+         - [sv_d3d, 0.35, 0.4]
+         - [sv_d3dsig, 5, 0.03]
+   sv_mask:
+      length: 5
+      vars:
+         - [sv_mask, null]
+
+labels:
+   ### type can be `simple`, `custom`
+   ### [option 1] use `simple` for binary/multi-class classification, then `value` is a list of 0-1 labels
+   type: simple
+   value: [label_b, label_bb, label_c, label_cc, label_uds, label_g, label_undef, label_pu]
+   ### [option 2] otherwise use `custom` to define the label, then `value` is a map
+   # type: custom
+   # value: 
+      # target_mass: np.where(fj_isQCD, fj_genjet_sdmass, fj_gen_mass) 
+
+observers:
+   - event_no
+   - jet_no
+   - jet_pt
+   - jet_eta
+   - jet_phi
+   - jet_hadronFlavour
+   - jet_partonFlavour
+   - jet_genjet_pt
+   - npfcands
+   - pfDeepFlavourJetTags_probb
+   - pfDeepFlavourJetTags_probbb
+   - pfDeepFlavourJetTags_problepb
+   - pfDeepFlavourJetTags_probc
+   - pfDeepFlavourJetTags_probuds
+   - pfDeepFlavourJetTags_probg
+   - jet_qgl
+
+weights:
+   ### [option 1] use precomputed weights stored in the input files
+   # use_precomputed_weights: true
+   # weight_branches: [weight, class_weight]
+   ### [option 2] compute weights on-the-fly using reweighting histograms
+   use_precomputed_weights: false
+   reweight_method: flat
+   reweight_vars:
+      # np.round(np.exp(np.linspace(np.log(15), np.log(1000), 9))).astype('int').tolist()
+      # jet_pt: [15, 25, 43, 72, 122, 207, 350, 592, 1000]
+      # np.round(np.exp(np.linspace(np.log(15), np.log(1000), 16))).astype('int').tolist()
+      jet_pt: [15, 20, 26, 35, 46, 61, 80, 106, 141, 186, 247, 326, 432, 571, 756, 1000]
+      jet_eta: [-4.7, -3.0, -2.5, -2.0, -1.5, -1.0, -0.5, 0.0, 0.5, 1.0, 1.5, 2.0, 2.5, 3.0, 4.7]
+   reweight_classes: [label_catB, label_catC, label_uds, label_g, label_undef, label_pu]
+   class_weights: [1, 1, 2.5, 5, 0.3, 0.2]
+   reweight_threshold: 25
+   reweight_hists:
+
