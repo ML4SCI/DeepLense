@@ -1,0 +1,41 @@
+default : &DEFAULT
+
+  # General
+  verbose: True 
+  device: 'cuda' 
+  plot_path: "plots/"
+
+  # Model
+  vae:
+    input_channels: 1
+    latent_dimension: 512
+    output_channels: 1
+    
+
+  # Optimizer
+  opt:
+    epochs: 1000
+    lr: 0.003
+    eps: 0.00001
+    weight_decay: 0.01
+
+    scheduler_T_max: 500 # For cosine only, typically take n_epochs
+    scheduler_patience: 100 # For ReduceLROnPlateau only
+    scheduler: 'OneCycleLR' # Or 'CosineAnnealingLR' OR 'ReduceLROnPlateau'
+    step_size: 10
+    gamma: 0.5
+    precision_schedule: None
+    
+
+  # Dataset related
+  data:
+    folder: '../Data/Model_II/cdm'
+    batch_size: 256
+    image_size:  64
+    train_test_split: 0.9
+    plot_freq: 10
+    eval_freq: 100
+    shuffle: True
+    num_classes: None
+
+  

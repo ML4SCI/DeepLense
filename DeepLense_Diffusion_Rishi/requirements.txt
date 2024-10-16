@@ -1,0 +1,9 @@
+torch
+torchvision
+tqdm
+numpy
+configmypy
+scikit-image
+scikit-learn
+matplotlib
+os
