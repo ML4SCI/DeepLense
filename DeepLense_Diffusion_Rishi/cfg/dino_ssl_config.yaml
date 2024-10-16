@@ -1,0 +1,65 @@
+default : &DEFAULT
+
+  # General
+  verbose: True
+  device: 'cuda' 
+  expt_name: dino_vit_small
+  log_freq: 20
+  use_mixed_precision: True
+
+  # Dataset related
+  data:
+    num_channels: 3
+    folder:
+    image_size: 64
+    num_classes: 2
+    batch_size: 256
+    epochs: 100
+    knn_neighbours: 20
+    freeze_last_layer: 0
+
+
+  # Optimizer
+  opt:
+    init_lr: 0.00005
+    init_wd: 0.001
+    final_lr: 0.00000005
+    final_wd: 0.001
+    momentum_teacher: 0.9996
+    optimizer: AdamW
+    schedular_warmup_epochs: 10
+    teacher_temp: 0.04
+    warmup_teacher_temp: 0.04
+    warmup_teacher_temp_epochs: 0
+    clip_grad_magnitude: 0.0
+
+  # Model
+  vit:
+    backbone: vit_small # backbone network
+    head_bottleneck_dim: 192 # here vit has embed dim 1024
+    head_hidden_dim: 256 # 512
+    head_nlayers: 3
+    head_norm_last_layer: true
+    head_output_dim: 512 # 2^12 
+    head_use_bn: true
+    patch_size: 16
+    use_dense_prediction: false
+    window_size: None
+    ape: None
+    use_L1: false
+
+  # Data Augumentation
+  ssl_augmentation:
+    augmentation: AugmentationDINOSingleChannel
+    center_crop: 64
+    global_crop_scale_range: 
+    - 0.14
+    - 1.0
+    global_crop_size: 64
+    local_crop_scale_range: 
+    - 0.01
+    - 0.4
+    local_crop_size: 28
+    num_local_crops: 8
+
+

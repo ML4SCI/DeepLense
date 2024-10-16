@@ -1,0 +1,50 @@
+default : &DEFAULT
+
+  # General
+  verbose: True 
+  device: 'cuda' 
+  
+
+  # Diffusion
+  diff:
+    noise_steps: 1000
+    beta_start:  0.0001
+    beta_end:    0.02
+
+  # Model
+  unet:
+    input_channels: 1
+    output_channels: 1
+    time_emb: 128
+    latent_dimension: 64
+    
+
+  # Optimizer
+  opt:
+    epochs: 500
+    lr: 0.0003 #0.0003
+    eps: 0.00001
+    weight_decay: 0.01
+
+    scheduler_T_max: 500 # For cosine only, typically take n_epochs
+    scheduler_patience: 10 #100 # For ReduceLROnPlateau only
+    scheduler: 'ReduceLROnPlateau' #'OneCycleLR' # Or 'CosineAnnealingLR' OR 'ReduceLROnPlateau'
+    step_size: 60
+    gamma: 0.5
+    precision_schedule: None
+    
+
+  # Dataset related
+  data:
+    folder: '../Data/cdm_regress_multi_param_model_ii/cdm_regress_multi_param/'
+    batch_size: 256 #32
+    image_size:  64
+    train_test_split: 0.9
+    plot_freq: 10
+    eval_freq: 100
+    shuffle: False
+    num_classes: 3
+    max: 2.099825382232666
+    min: -1.6998486518859863
+
+  

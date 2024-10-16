@@ -1,0 +1,40 @@
+default : &DEFAULT
+
+  # General
+  verbose: True 
+  device: 'cuda' 
+  
+  # Model
+  ae:
+    input_dim: 1
+    hidden_dim: 8
+    latent_dim: 32
+    
+
+  # Optimizer
+  opt:
+    epochs: 500
+    lr: 0.0003
+    eps: 0.00001
+    weight_decay: 0.01
+
+    scheduler_T_max: 500 # For cosine only, typically take n_epochs
+    scheduler_patience: 100 # For ReduceLROnPlateau only
+    scheduler: 'OneCycleLR' # Or 'CosineAnnealingLR' OR 'ReduceLROnPlateau'
+    step_size: 60
+    gamma: 0.5
+    precision_schedule: None
+    
+
+  # Dataset related
+  data:
+    folder: '../Data/Model_II/axion'
+    max_samples: 10000
+    batch_size: 256
+    train_test_split: 0.9
+    plot_freq: 10
+    eval_freq: 100
+    shuffle: True
+    num_classes: None
+
+  
