@@ -3,17 +3,17 @@ experiment:
   device: cuda 
   expt_name: ibot_vit_small # experiment name
   log_freq: 20 # knn accuracy is computed every `log_freq` epochs, additionally the trained model is also saved
-  output_dir: ./working/ibot_vit_small # output results to this folder - files: logs.txt, {experiment_name}_models
+  output_dir: ../working/ibot_vit_small # output results to this folder - files: logs.txt, {experiment_name}_models
   ssl_training: ibot # training strategy to use
   use_mixed_precision: true # if true uses fp16 for training, improves training speed
 # input image parameters
 input:
   channels: 3 # num channels in input image
-  data path: ./input/reallensdataset/real_lenses_dataset # path/to/dataset
-  indices: ./input/reallenses-traintestindices/indices.pkl
+  data path: # path/to/dataset
+  indices: # path/to/indices.pkl
   image size: 
-  - 32 # image height to perform center crop
-  - 32 # image width to perform center crop
+  - 32 # height for center crop
+  - 32 # width for center crop
   num classes: 2
 # training network parameters
 network:
@@ -43,10 +43,10 @@ network:
   return_all_tokens: true
   masked_im_modeling: true
 optimizer:
-  init_lr: 0.00005
-  init_wd: 0.001
-  final_lr: 0.00000005
-  final_wd: 0.001
+  init_lr: 0.00005 
+  init_wd: 0.001 
+  final_lr: 0.00000005 
+  final_wd: 0.001 
   momentum_teacher: 0.996 
   optimizer: AdamW
   scheduler_warmup_epochs: 10 
@@ -73,7 +73,7 @@ ssl augmentation kwargs:
   local_crop_scale_range: 
   - 0.01
   - 0.14
-  local_crop_size: 28
+  local_crop_size: 20
   num_local_crops: 12
 # training parameters
 train args:
