@@ -23,8 +23,8 @@ Following is the evaluation results for supervised baselines computed over a hel
 # Self-Supervised Learning 
 
 To train self supervised backbone, clone this repository and create a config file with the experiment parameters. The config file is expected to be a .yaml file. <br>
-Examples of the config files are provided in the <a href="https://github.com/iyersreehari/DeepLense_SSL_Sreehari_Iyer/tree/main/configs"> configs </a> folder.
-Update the `data path` field in the config file with the path to the dataset downloaded previously and the `indices` field with the path to the indices.pkl file. The indices.pkl file is present in <a href="https://github.com/iyersreehari/DeepLense_SSL_Sreehari_Iyer/tree/main/input"> input </a> folder.
+Examples of the config files are provided in the <a href="https://github.com/ML4SCI/DeepLense/tree/main/DeepLense_SSL_from_real_dataset_Sreehari_Iyer/configs"> configs </a> folder.
+Update the `data path` field in the config file with the path to the dataset downloaded previously and the `indices` field with the path to the indices.pkl file. The indices.pkl file is present in <a href="https://github.com/ML4SCI/DeepLense/tree/main/DeepLense_SSL_from_real_dataset_Sreehari_Iyer/input"> input </a> folder.
 
 Currently, ViT-S and ViT-B for the backbone and DINO, iBOT and SimSima algorithms for self supervised training have been implemented
 
