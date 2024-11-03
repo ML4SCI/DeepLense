@@ -49,7 +49,7 @@ class TrainDINO(TrainSSL):
             optimizer: Union["AdamW, Adam, SGD, LARS"] = "AdamW",
             log_freq: int = 5,
             device: str = "cuda",
-            use_mixed_precision: bool = "True",
+            use_mixed_precision: bool = "False",
             freeze_last_layer: int = 1,
             knn_neighbours: int = 5,
             use_L1: bool = False,
