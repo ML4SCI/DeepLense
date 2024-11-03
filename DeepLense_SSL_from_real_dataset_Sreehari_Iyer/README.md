@@ -50,8 +50,8 @@ Following is the evaluation results computed over a held-out test dataset for fi
 |ViT-B (patch size: 8)|600 | 92.2164% | 0.9667 |
 |ViT-S (patch size: 8)|1200 | 93.7995% | 0.9858 |
 |ViT-B (patch size: 8)|1200 | 93.2718% | 0.9798 |
-|ViT-S (patch size: 8)|3256 | 94.9868% | 0.9865 |
-|ViT-B (patch size: 8)|3256 | 94.1953% | 0.9876 |
+|ViT-S (patch size: 8)|3863 | 94.9868% | 0.9865 |
+|ViT-B (patch size: 8)|3863 | 94.1953% | 0.9876 |
 
 Following is the evaluation results computed over a held-out test dataset for fine-tuning of **Simsiam** pre-trained models.
 
@@ -63,8 +63,8 @@ Following is the evaluation results computed over a held-out test dataset for fi
 |ViT-B (patch size: 8)|600 | 92.0844% | 0.9589 |
 |ViT-S (patch size: 8)|1200 | 94.9868% | 0.9843 |
 |ViT-B (patch size: 8)|1200 | 93.5356% | 0.9817 |
-|ViT-S (patch size: 8)|3256 | 95.1187% | 0.9864 |
-|ViT-B (patch size: 8)|3256 | 94.8549% | 0.9832 |
+|ViT-S (patch size: 8)|3863 | 95.1187% | 0.9864 |
+|ViT-B (patch size: 8)|3863 | 94.8549% | 0.9832 |
 
 
 Following is the evaluation results computed over a held-out test dataset for fine-tuning of **iBot** pre-trained models.
@@ -77,8 +77,8 @@ Following is the evaluation results computed over a held-out test dataset for fi
 |ViT-B (patch size: 8)|600 | 92.6121% | 0.9696 |
 |ViT-S (patch size: 8)|1200 | 93.7995% | 0.9844 |
 |ViT-B (patch size: 8)|1200 | 93.1398% | 0.9814 |
-|ViT-S (patch size: 8)|3256 | 95.6464% | 0.9906 |
-|ViT-B (patch size: 8)|3256 | 94.4591% | 0.9885 |
+|ViT-S (patch size: 8)|3863 | 95.6464% | 0.9906 |
+|ViT-B (patch size: 8)|3863 | 94.4591% | 0.9885 |
 
 <br>
 
