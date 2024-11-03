@@ -10,7 +10,7 @@ experiment:
 input:
   channels: 3 # num channels in input image
   data path: # path/to/dataset
-  indices: # path/to/indices
+  indices: # path/to/indices.pkl
   image size:
   - 32 # height for center crop
   - 32 # width for center crop
