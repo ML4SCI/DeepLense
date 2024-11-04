@@ -1,0 +1,22 @@
+{
+    "alpha_depth": 3,
+    "pretrain_epochs": 50,
+    "magnification":2,
+    "n_magnification":1,
+    "image_shape": 75,
+    "image_shape_2": 64,
+    "latent_channels":64,
+    "alpha": 1.28149057,
+    "alpha_l":0.5,
+    "alpha_h":1.6,
+    "resolution": 0.05,
+    "resolution_2": 0.101,
+    "resolution_3": 0.08,
+    "alpha_t_scaling": 0.0025,
+    "alpha_t_scaling_2": 0.0025,
+    "R_l":0.08,
+    "R_h":0.2,
+    "seeing_1":0.087,
+    "seeing_2":0.16,
+    "seeing_3":0.08
+}

@@ -4,7 +4,7 @@ from astropy.cosmology import FlatLambdaCDM
 from astropy import units as u
 from astropy.constants import G, c, M_sun
 
-# from pyHalo.preset_models import CDM
+from pyHalo.preset_models import CDM
 
 
 from lenstronomy.LightModel.light_model import LightModel
@@ -35,7 +35,7 @@ class DeepLens(object):
     """
         class constructor
     """
-    def __init__(self,axion_mass=None,H0=70,Om0=0.3,Ob0=0.05,z_halo=0.5,z_gal=1.0):
+    def __init__(self,axion_mass=None,H0=70,Om0=0.3,Ob0=0.05,z_halo=0.5,z_gal=1.0, model_1 = False):
         # Cosmology
         self.H0  = H0
         self.Om0 = Om0
@@ -44,8 +44,9 @@ class DeepLens(object):
         self.z_halo = z_halo
         self.z_gal  = z_gal
 
-        # realizationsCDM = CDM(z_halo, z_gal,cone_opening_angle_arcsec=10)
-        # self.astropy_instance = realizationsCDM.astropy_instance
+        if model_1 == False:
+            realizationsCDM = CDM(z_halo, z_gal,cone_opening_angle_arcsec=10)
+            self.astropy_instance = realizationsCDM.astropy_instance
 
 
         self.axion_mass = axion_mass
@@ -206,8 +207,6 @@ class DeepLens(object):
         self.lens_model_class = LensModel(self.lens_model_list)
 
 
-
-
     def make_source_light(self):
         """
             Make light profile
@@ -299,7 +298,7 @@ class DeepLens(object):
         data_class.update_data(image_real)
         kwargs_data['image_data'] = image_real
 
-    def simple_sim_2(self, NUMPIX):
+    def simple_sim_2(self, NUMPIX, resolution_coeff, noise = True):
         """
             Same structure as simple_sim but with Euclid resolution
         """
@@ -323,20 +322,24 @@ class DeepLens(object):
         kwargs_numerics = {'point_source_supersampling_factor': 1}
 
         #######################################################################
+        # print(self.kwargs_single_band)
+        self.kwargs_single_band['pixel_scale'] /= resolution_coeff
         sim = SimAPI(numpix=numpix, kwargs_single_band=self.kwargs_single_band, kwargs_model=kwargs_model_physical)
         imSim = sim.image_model_class(kwargs_numerics)
                    
         _, kwargs_source, _ = sim.magnitude2amplitude(None,self.kwargs_source)
-        print(self.kwargs_single_band)
 
 
         image = imSim.image(self.kwargs_lens_list,kwargs_source,None)
 
         self.image_model = image
         self.poisson = sim.noise_for_model(model=image)
-        self.image_real = self.image_model + self.image_model
+        if noise == True:
+            self.image_real = self.image_model + self.poisson
+        else: self.image_real = self.image_model
+        # print(self.kwargs_single_band['pixel_scale'])
 
-    def set_instrument(self,inst_name):
+    def set_instrument(self,inst_name, coadd = 6):
         """
 	        set_instrument
 			
@@ -348,10 +351,15 @@ class DeepLens(object):
         # Note .lower() here is just to make string lower case
         elif inst_name.lower() == 'euclid':
             from lenstronomy.SimulationAPI.ObservationConfig.Euclid import Euclid
-            Euc = Euclid(band='VIS',psf_type='GAUSSIAN',coadd_years=6)
+            Euc = Euclid(band='VIS',psf_type='GAUSSIAN',coadd_years=coadd)
             self.kwargs_single_band = Euc.kwargs_single_band()
+        elif inst_name.lower() == 'hst':
+            from lenstronomy.SimulationAPI.ObservationConfig.HST import HST
+            Hst = HST(band='WFC3_F160W',psf_type='GAUSSIAN',coadd_years=None)
+            self.kwargs_single_band = Hst.kwargs_single_band()
         else:
             pass
+        # print(self.kwargs_single_band)
     
     def get_lensing_potential(self, NUMPIX):
         """
@@ -387,8 +395,7 @@ class DeepLens(object):
         # Compute the lensing potential
 
         # euclid_delta = 0.1
-        model_1_delta = resolution
-        arcsec_bound = model_1_delta*NUMPIX/2
+        arcsec_bound = resolution*NUMPIX/2
         x = np.linspace(-arcsec_bound, arcsec_bound, NUMPIX)
         y = np.linspace(-arcsec_bound, arcsec_bound, NUMPIX)
         xx, yy = np.meshgrid(x, y)
@@ -396,7 +403,8 @@ class DeepLens(object):
         y_coords = yy.ravel()
 
         # Get the lensing potential
-        self.alpha_x, self.alpha_y = self.lens_model_class.alpha(x_coords, y_coords, self.kwargs_lens_list)
+        self.alpha_x, self.alpha_y = self.lens_model_class.alpha(y_coords, x_coords, self.kwargs_lens_list)
+        
 
         # Reshape potential to match the grid shape
         self.alpha_x, self.alpha_y = self.alpha_x.reshape((NUMPIX, NUMPIX)), self.alpha_y.reshape((NUMPIX, NUMPIX))
@@ -412,8 +420,6 @@ if __name__ == "__main__":
     lens.set_instrument('Euclid')
     lens.make_source_light_mag()
     lens.simple_sim_2()
-
-    print(lens.kwargs_single_band)
 
     
     import matplotlib.pyplot as plt

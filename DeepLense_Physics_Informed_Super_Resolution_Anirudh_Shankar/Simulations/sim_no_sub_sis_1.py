@@ -2,33 +2,35 @@ import matplotlib.pyplot as plt
 import numpy as np
 import random
 from tqdm import tqdm
+import sys
 
 from lens import DeepLens
-
 
 # Number of sims
 num_sim = int(5e3)
 
-for i in tqdm(range(num_sim)):
-    lens = DeepLens()
-    lens.make_single_halo(1e12)
-    lens.make_no_sub()
-    lens.set_instrument('Euclid')
-    lens.make_source_light()
-    lens.simple_sim(75,0.05)
-    File = lens.image_real
-    np.save('/home/anirudh/Documents/GSoC/LensSR/Simulations/data_model_1/no_sub/no_sub_sim_%d'%i,File)
-    lens.simple_sim(150,0.025)
-    File = lens.image_real
-    np.save('/home/anirudh/Documents/GSoC/LensSR/Simulations/data_model_1/no_sub_HR/no_sub_HR_sim_%d'%i,File)
+directory = ''
+if len(sys.argv) == 2: directory = sys.argv[1] + '/'
+
 lens = DeepLens()
 lens.make_single_halo(1e12)
 lens.make_no_sub()
 lens.set_instrument('Euclid')
 lens.make_source_light()
 lens.simple_sim(75,0.05)
-lens.get_alpha()
+lens.get_alpha(150, 0.025)
 print(lens.alpha)
+for i in tqdm(range(num_sim)):
+    lens = DeepLens(model_1=True)
+    lens.make_single_halo(1e12)
+    lens.make_no_sub()
+    lens.make_source_light()
+    lens.simple_sim(75,0.05,noise=True)
+    File = lens.image_real
+    np.save(directory+'data_model_1/no_sub/no_sub_sim_%d'%i,File)
+    lens.simple_sim(150,0.025)
+    File = lens.image_real
+    np.save(directory+'data_model_1/no_sub_HR/no_sub_HR_sim_%d'%i,File)
 
 
 if False:
