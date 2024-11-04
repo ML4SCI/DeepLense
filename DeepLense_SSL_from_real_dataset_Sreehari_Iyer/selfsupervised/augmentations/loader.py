@@ -9,7 +9,7 @@ from torch.utils.data import Dataset, DataLoader
 from typing import Union, Tuple, List, Optional, Callable, Dict
 
 def npy_loader(path):
-    sample = torch.from_numpy(np.load(path))
+    sample = torch.from_numpy(np.load(path).astype(np.float32))
     return sample
 
 class ImageDataset(Dataset):

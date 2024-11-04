@@ -13,7 +13,7 @@ from typing import List, Dict, Union, Callable
 from selfsupervised.augmentations import ImageDataset, ImageDatasetMasked
 
 def npy_loader(path):
-    sample = torch.from_numpy(np.load(path))
+    sample = torch.from_numpy(np.load(path).astype(np.float32))
     return sample
 
 class TrainSSL:
@@ -74,35 +74,24 @@ class TrainSSL:
         assert data_augmentation_transforms is not None
         assert eval_transforms is not None
 
-        
         indices = None
         with open(train_test_indices, "rb") as f:
             indices = pickle.load(f)
+        train_indices = indices["train"]
 
-        # get the sizes for train, validation, and test sets
-        train_val_split = list(train_val_split) / np.sum(list(train_val_split)) 
-        lens_train_size, nonlens_train_size = int(train_val_split[0] * len(indices["train"]["lenses"])), int(train_val_split[0] * len(indices["train"]["nonlenses"]))
-        lens_val_size, nonlens_val_size = len(indices["train"]["lenses"]) - lens_train_size, len(indices["train"]["nonlenses"]) - nonlens_train_size
 
-        # Split the dataset into train and validation sets
-        
-        # indices for train and validation datasets
-        l_idx = np.arange(len(indices["train"]["lenses"]))
-        nl_idx = np.arange(len(indices["train"]["nonlenses"]))
-        lens_train_indices = np.random.choice(l_idx, size=lens_train_size, replace=False)
-        nonlens_train_indices = np.random.choice(nl_idx, size=nonlens_train_size, replace=False)
-        lens_val_indices = list(set(l_idx) - set(lens_train_indices))
-        nonlens_val_indices = list(set(nl_idx) - set(nonlens_train_indices))
 
-        # train images and labels
-        train_paths = [os.path.join(data_path, *["lenses", img]) for img in np.array(indices["train"]["lenses"])[lens_train_indices]] +\
-                        [os.path.join(data_path, *["nonlenses", img]) for img in np.array(indices["train"]["nonlenses"])[nonlens_train_indices]]
-        train_labels = [0]*len(lens_train_indices) + [1]*len(nonlens_train_indices)
+
+
+            # train images and labels
+        train_paths = [os.path.join(data_path, *["lenses", img]) for img in np.array(train_indices["lenses"])] +\
+                        [os.path.join(data_path, *["nonlenses", img]) for img in np.array(train_indices["nonlenses"])]
+        train_labels = [0]*len(train_indices["lenses"]) + [1]*len(train_indices["nonlenses"])
 
         # validation images and labels
-        val_paths = [os.path.join(data_path, *["lenses", img]) for img in np.array(indices["train"]["lenses"])[lens_val_indices]] +\
-                        [os.path.join(data_path, *["nonlenses", img]) for img in np.array(indices["train"]["nonlenses"])[nonlens_val_indices]]
-        val_labels = [0]*len(lens_val_indices) + [1]*len(nonlens_val_indices)
+        val_paths = [os.path.join(data_path, *["lenses", img]) for img in np.array(indices["val"]["lenses"])] +\
+                        [os.path.join(data_path, *["nonlenses", img]) for img in np.array(indices["val"]["nonlenses"])]
+        val_labels = [0]*len(indices["val"]["lenses"]) + [1]*len(indices["val"]["nonlenses"])
 
         # test images and labels
         test_paths = [os.path.join(data_path, *["lenses", img]) for img in np.array(indices["test"]["lenses"])] +\
@@ -113,7 +102,7 @@ class TrainSSL:
         train_size = len(train_paths)
         val_size = len(val_paths)
         test_size = len(test_paths)
-
+        #
         # Create DatasetFolder instances for each split with the respective transforms
 
         # training dataset 
@@ -252,10 +241,10 @@ class TrainSSL:
             "train_size": train_size,
             "val_size": val_size,
             "test_size": test_size,
-            "lens_train_indices": lens_train_indices,
-            "nonlens_train_indices": nonlens_train_indices,
-            "lens_val_indices": lens_val_indices,
-            "nonlens_val_indices": nonlens_val_indices,
+            # "lens_train_indices": lens_train_indices,
+            # "nonlens_train_indices": nonlens_train_indices,
+            # "lens_val_indices": lens_val_indices,
+            # "nonlens_val_indices": nonlens_val_indices,
         }
         self.state = None
 
@@ -332,12 +321,11 @@ class TrainSSL:
 
     # train for one epoch
     def train_one_epoch(self):
-        self.optimizer.zero_grad()
 
         losses = []
         cur_step = self.state["current_epoch"]*self.steps_per_epoch 
         for idx, input in enumerate(self.dataloader):
-
+            self.optimizer.zero_grad()
             img, mask = None, None 
             imgs, label, msk = None, None, None 
             indices = None
@@ -380,6 +368,7 @@ class TrainSSL:
         self.history["loss_epochwise"].append(np.mean(losses))
         return np.mean(losses)
 
+
     def train(self):
         if self.state is None:
             self._init_state()
@@ -391,13 +380,12 @@ class TrainSSL:
             loss = self.train_one_epoch()
             total_time = time.time() - start_time
             self.logger.info(f"Epoch: {epoch} finished in {datetime.timedelta(seconds=int(total_time))} seconds,")
-            self.logger.info(f"\tLoss: {loss:.6e}")
+            self.logger.info(f"\tTrain Loss: {loss:.6e}")
             
-            # knn_top1 = None, None
-            # if self.state["current_epoch"]%self.log_freq == 0 or (self.state["current_epoch"] + 1) == self.epochs:
-            self.student.eval() 
+            knn_top1 = None
+            self.student.eval()
             knn_top1 = self.compute_knn_accuracy()
-                
+
             self.history["knn_top1"].append(knn_top1)
 
             self.save_checkpoint(self.ckpt_file)
@@ -411,6 +399,7 @@ class TrainSSL:
         self.history["Test"] = {
             "knn_top1": knn_top1,
         }
+
         self.save_checkpoint(self.ckpt_file)
 
     @torch.no_grad()

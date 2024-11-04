@@ -3,7 +3,6 @@ import torch
 import torch.nn as nn
 import torch.optim as optim
 import torchvision.transforms as Transforms
-from selfsupervised.models.MLP import MLP
 from torchvision import datasets
 from torch.utils.data import DataLoader
 from sklearn.metrics import confusion_matrix, accuracy_score, roc_auc_score, precision_recall_fscore_support
