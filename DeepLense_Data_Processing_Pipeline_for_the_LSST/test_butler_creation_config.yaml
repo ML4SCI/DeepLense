@@ -1,0 +1,23 @@
+version: "1.0"
+description: "Test configuration for Butler repository creation functionality"
+
+butler:
+  repositories:
+    - name: "test_repo"
+      repo_path: "/Volumes/ExternalSSD/RIPPLe_data"
+      priority: 1
+      collections: null  # auto-discover
+
+processing:
+  mode: "batch"
+  batch_size: 100
+  data_products:
+    required:
+      - "raw"
+    optional:
+      - "calexp"
+
+data_selection:
+  filters: null
+  visits: null
+  detectors: null

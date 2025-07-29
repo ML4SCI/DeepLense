@@ -1,0 +1,32 @@
+butler:
+  collections: null
+  repo_path: rc2_subset/SMALL_HSC
+data_selection:
+  detectors: null
+  filters:
+  - y
+  sky_region:
+    dec_range: null
+    ra_range: null
+  visits:
+    ranges:
+    - - 322
+      - 322
+description: RIPPLe pipeline configuration
+output:
+  create_directories: true
+  dataset_name: ripple_dataset
+  format: fits
+  output_directory: ./output
+processing:
+  batch_size: 10
+  cutout_size: null
+  data_products:
+    optional:
+    - src
+    - postISRCCD
+    required:
+    - calexp
+  mode: batch
+  preprocessing_steps: []
+version: '1.0'
