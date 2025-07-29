@@ -1,0 +1,37 @@
+version: '1.0'
+description: 'RIPPLe pipeline with multiple Butler repositories'
+
+butler:
+  repositories:
+    - name: 'demo_repo'
+      repo_path: 'demo_data/pipelines_check-29.1.1/DATA_REPO'
+      collections: null  # auto-discover
+      priority: 2  # Higher priority - has processed data
+    - name: 'rc2_repo'
+      repo_path: 'rc2_subset/SMALL_HSC'
+      collections: null
+      priority: 1  # Lower priority - has raw data
+
+data_selection:
+  filters: ['r']
+  visits:
+    ranges: [[903342, 903342]]
+  detectors: null
+  sky_region:
+    ra_range: null
+    dec_range: null
+
+processing:
+  mode: 'batch'
+  batch_size: 10
+  data_products:
+    required: ['calexp']
+    optional: ['src', 'postISRCCD']
+  cutout_size: null
+  preprocessing_steps: []
+
+output:
+  output_directory: './output'
+  dataset_name: 'multi_repo_dataset'
+  format: 'fits'
+  create_directories: true

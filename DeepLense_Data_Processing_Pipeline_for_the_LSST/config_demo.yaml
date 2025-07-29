@@ -1,0 +1,35 @@
+# RIPPLe Demo Configuration
+# =========================
+# This configuration is set up to work with the demo data in the repository
+
+# Use the demo data folder to create a Butler repository
+data_source:
+  type: data_folder
+  path: /home/kartikmandar/RIPPLe/demo_data/pipelines_check-29.1.1/input_data
+  create_if_missing: true
+
+# HSC instrument configuration (matching demo data)
+instrument:
+  name: HSC
+  class_name: lsst.obs.subaru.HyperSuprimeCam      
+  filters: [r]  # Demo data only has r-band
+
+# Ingestion settings optimized for demo data
+ingestion:
+  transfer_mode: direct  # Use files in place
+  define_visits: false  # Skip for demo
+  write_curated_calibrations: false  # Demo already has calibrations
+  skip_existing: true
+
+# Use SQLite for simplicity
+butler:
+  registry_db: sqlite
+  standalone: false
+
+# Processing parameters
+processing:
+  cutout_size: 64
+  batch_size: 32
+  max_workers: 4
+  cache_size: 100
+  enable_performance_monitoring: true
