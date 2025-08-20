@@ -48,13 +48,25 @@ We fix the lens model and conduct a posterior study of lensing. This is because 
 ### Formulation of the task
 For a deflection angle field $\alpha(\theta)$, a PSF P in the image plane mapped by the coordinates $\theta(x,y)$, we can perform lensing to obtain the coordinates in the source plane in rectangular coordinates that are axi-symmetric with the pixel grid of the images. $$\beta(x,y) = \theta(x,y) - \alpha_\psi(x,y)$$
 For an observed image $i$, we can thus reconstruct the source $s$ by sampling $\circ$ the intensities in $i$ to positions $\beta(x,y)$.
+
 $$s=i\circ \beta$$
-If we have the corresponding high-resolution source image $\hat{s}$, we can re-lens it to the high-resolution counterpart of the observed image, $\hat{i}$, which is what we need. $$\hat{i}=\hat{s}\circ\theta$$ 
-The idea is to train a neural network $f_\theta$ with the set of trainable parameters $\phi$ that performs this mapping from the low resolution reconstructed source to its high-resolution version, $$\hat{s}=f_\phi(s)$$
+
+If we have the corresponding high-resolution source image $\hat{s}$, we can re-lens it to the high-resolution counterpart of the observed image, $\hat{i}$, which is what we need. 
+
+$$\hat{i}=\hat{s}\circ\theta$$ 
+
+The idea is to train a neural network $f_\theta$ with the set of trainable parameters $\phi$ that performs this mapping from the low resolution reconstructed source to its high-resolution version, 
+
+$$\hat{s}=f_\phi(s)$$
+
 We can then define the forward differentiable operator for the neural network with the downsampling operation $D$ that maps an image to its lower-resolution counterpart, $D(P*\hat{i}=\hat{i}')$ as
+
 $$F_\psi(i)=D(P*(f_\phi(i\circ\beta)\circ\theta))=\hat{i}'$$
+
 The network can thus be trained in the promised unsupervised fashion to minimise the following loss function, for a set of observed images $y$:
+
 $$L(\phi)=||F_\psi(y)-y||^2_{\sum^{-1}}+\lambda_{V}V(f_\psi(y))$$
+
 * $V$ is a function that computes the total variation between pixels, and it is used in combination with its weight $\lambda_V$ to penalise the occurance of sharp peaks or artefacts in the learned high-resolution source image. It is to note that this is a non-physical prior to stabilise convergence.
 * $||\cdot||^2_{\sum^{-1}}$ refers to the noise-weighted MSE, i.e., the chi-squared loss $\sum_i\frac{y_i-y_{model,i}}{\sigma_i^2}$, using the pixel-wise variance map if available. This can in addition be weighted by two terms-
     - A convergence mask $C(\beta)$ on to account for which pixels are actually constructed by the lensing operation, in order to prevent $f_\phi$ to hallucinate pixel values for pixels whose information does not exist. This mask can be constructed by $J\circ\beta$ where $J$ is the matrix of ones in the dimensions of the grid.
@@ -171,12 +183,15 @@ This closely mimics an interference pattern.
 Instead of scattering pixels in the image space to the source space through the lens equation, we can scatter the grid of pixel vertices, producing a distorted grid. This will allow us to map the intensities in the distorted grid back to an axis oriented square grid by computing the fractional area overlap between each cell of each grid. The square grid can then be directly cast to an image.
 
 Below is an example of the axis oriented grid $\theta$
+
 ![](readme/theta_grid.png)
 
 And the source grid $\beta$,
+
 ![](readme/beta_grid.png)
 
 Here's what the overlap looks like:
+
 ![](readme/cross_grid.png).
 
 We are no longer obliged to round off arcsecond positions to pixels, but can instead scatter pixel intensities proportional to the fractional area overlap between the the grid cells corresponding to the source pixel and the destination pixel.
