@@ -16,4 +16,4 @@ Here's an overview of the Python notebooks in this repository:
     * **Details:** This comparison is crucial for understanding whether key features of a source image survive the lensing operation or are lost due to noise or excessive smoothing.
 
 * **`LLMT Classifier.ipynb`**
-    * **Purpose:** Compares the performance of the LLMT Classifier and ResNet18, where the LLMT Classifier outperforms ResNet18 while having only a fraction of its parameters.
+    * **Purpose:** Compares the performance of the LLMT Classifier and ResNet18, where the LLMT Classifier outperforms ResNet18 while having only a fraction of Resnet18's parameters.
