@@ -1,4 +1,4 @@
-from logging import warn
+import warnings
 import torch
 from torch.nn import Softmax
 import numpy as np
@@ -33,7 +33,7 @@ def get_device(device):
         return "mps"
     if device == "cpu" or device == "best":
         return "cpu"
-    warn(f"Requested device {device} not found, running on CPU")
+    warnings.warn(f"Requested device {device} not found, running on CPU")
     return "cpu"
 
 
