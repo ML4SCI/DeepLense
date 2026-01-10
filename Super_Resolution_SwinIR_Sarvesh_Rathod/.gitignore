@@ -1,0 +1,20 @@
+# Data
+pairs/
+data_diff/
+*.npy
+*.h5
+
+# Model Checkpoints (avoid large binaries in git)
+*.pth
+
+# Virtual Environment
+venv/
+env/
+
+# Python Cache
+__pycache__/
+*.pyc
+
+# IDE settings
+.vscode/
+.idea/
