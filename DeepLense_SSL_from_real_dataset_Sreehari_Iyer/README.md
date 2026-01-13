@@ -7,6 +7,35 @@ Before training, download the lenses dataset from <a href = "https://drive.googl
 The train dataset contains 2333 lens images and 1530 non-lens images. The validation dataset contains 259 lens images and 170 non-lens images. The test dataset contains 458 lens images and 300 non-lens images. Each image has 3 channels, g, r and i, corresponding to green, red and infrared filters respectively. Each image has 3 channels, g, r and i, corresponding to green, red and infrared filters respectively. The images are center cropped to 32 × 32 pixel as this empirically resulted in better prediction accuracy. The models are evaluated for the downstream task of classifying images into lenses and non-lenses on the held out test split of the dataset.<br>
 To understand how well SSL works with different fractions of labelled and unlabelled data, the model is pre-trained through self supervision on the entire train data and then finetuned on the labelled fraction of the train data and compared with supervised baseline trained only on that labeled fraction. This simulates the real world scenario where only a fraction of dataset may have associated labels.  <br>
 
+## Dataset Setup (Required)
+
+The BYOL notebooks and training scripts **assume a local dataset** and will fail on a
+fresh setup if the dataset is not downloaded and placed correctly.
+This section explains the exact steps required before running any code.
+
+---
+
+### 1. Download the datasets
+
+Download the following datasets:
+
+- **Lenses dataset**  
+  https://drive.google.com/drive/folders/17DSF-uz6ke_koU3O36n61Q3IrQ7rjrfk
+
+- **Non-lenses dataset**  
+  https://drive.google.com/drive/folders/1qZ5kB7PrmmwqH_4b3LFenFSJagOLuIeY
+
+Ensure that all images are fully downloaded before proceeding.
+
+---
+
+### 2. Directory structure (Important)
+
+After downloading, place the datasets inside the `input/` directory with the
+following structure:
+
+
+
 # Supervised Learning Baseline
 Following is the evaluation results for supervised baselines computed over a held-out test dataset. 
 |Backbone | # labelled data for <br> training/fine-tuning | Accuracy | AUC |
