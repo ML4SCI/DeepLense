@@ -4,5 +4,10 @@ numpy
 opencv-python
 matplotlib
 timm
-pytorch_msssim
-tqdm
+scikit-image
+pytorch-msssim
+wandb
+lenstronomy
+h5py
+astropy
+scipy

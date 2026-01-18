@@ -276,12 +276,20 @@ class SwinIR(nn.Module):
         self.norm = norm_layer(embed_dim)
         self.conv_after = nn.Conv2d(embed_dim, embed_dim, 3, 1, 1)
 
-        # 3. High Quality Image Reconstruction
         self.upsample = nn.Sequential(
             nn.Conv2d(embed_dim, embed_dim * (upscale ** 2), 3, 1, 1),
             nn.PixelShuffle(upscale),
             nn.Conv2d(embed_dim, in_chans, 3, 1, 1)
         )
+        self._init_weights()
+
+    def _init_weights(self):
+        for m in self.modules():
+            if isinstance(m, nn.Conv2d):
+                nn.init.kaiming_normal_(m.weight, mode='fan_out', nonlinearity='relu')
+            elif isinstance(m, (nn.LayerNorm, nn.BatchNorm2d)):
+                nn.init.constant_(m.weight, 1)
+                nn.init.constant_(m.bias, 0)
 
     def forward(self, x):
         # x: (B, 1, H, W)

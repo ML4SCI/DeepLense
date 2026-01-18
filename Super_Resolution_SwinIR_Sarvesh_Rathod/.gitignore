@@ -7,6 +7,10 @@ data_diff/
 # Model Checkpoints (avoid large binaries in git)
 *.pth
 
+# Generated Results
+results.png
+*.onnx
+
 # Virtual Environment
 venv/
 env/
@@ -18,3 +22,6 @@ __pycache__/
 # IDE settings
 .vscode/
 .idea/
+
+# Jupyter Notebook checkpoints
+.ipynb_checkpoints/
