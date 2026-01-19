@@ -38,3 +38,15 @@ All results were calculated on a **separate test set**.
 ## Conclusion and Future Goals
 So far, we can see that the results for self-supervised learning seem superior to their ResNet50 Baseline. 
 Future goals consist of testing models for regression, implementing vision transformers (twin networks) and testing some more self-supervised learning methods.
+
+
+
+## BYOL Dataset Setup
+
+The BYOL self-supervised learning notebooks require the `Model_I` dataset
+from the DeepLenseSim repository.
+
+Before running the BYOL notebooks, download the dataset using:
+
+```bash
+python scripts/setup_byol_dataset.py
