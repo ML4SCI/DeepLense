@@ -47,20 +47,25 @@ def test_validator_for_repo(repo_path: str, repo_name: str):
         
         # Test coverage report
         logger.info("\n=== Coverage Report ===")
-        coverage = validator.get_data_coverage(
-            dataset_types=["calexp", "src"],
-            filters=["r"]
-        )
-        
-        logger.info(f"Total data IDs: {coverage.total_data_ids}")
-        logger.info(f"Available: {coverage.available_data_ids}")
-        logger.info(f"Missing: {coverage.missing_data_ids}")
-        logger.info(f"Coverage: {coverage.coverage_percentage:.1f}%")
-        logger.info(f"Instruments: {coverage.instruments}")
-        logger.info(f"Filters: {coverage.filters}")
-        
-        if coverage.failed_data_ids:
-            logger.info(f"Failed data IDs (first 3): {coverage.failed_data_ids[:3]}")
+        try:
+            coverage = validator.get_data_coverage(
+                dataset_types=["calexp", "src"],
+                filters=["r"],
+                instruments=list(result.instruments)  # FIX: Added to prevent governor dimension errors
+            )
+            
+            logger.info(f"Total data IDs: {coverage.total_data_ids}")
+            logger.info(f"Available: {coverage.available_data_ids}")
+            logger.info(f"Missing: {coverage.missing_data_ids}")
+            logger.info(f"Coverage: {coverage.coverage_percentage:.1f}%")
+            logger.info(f"Instruments: {coverage.instruments}")
+            logger.info(f"Filters: {coverage.filters}")
+            
+            if coverage.failed_data_ids:
+                logger.info(f"Failed data IDs (first 3): {coverage.failed_data_ids[:3]}")
+                
+        except Exception as e:
+            logger.error(f"Coverage report generation failed: {e}")
         
     else:
         logger.error(f"✗ Repository validation failed: {result.error_message}")
