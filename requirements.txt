@@ -1,0 +1,6 @@
+numpy>=1.23
+scipy>=1.9
+matplotlib>=3.7
+mcfit>=0.0.21
+pyHalo>=1.4.3
+lenstronomy>=1.11,<1.13
