@@ -1,6 +1,6 @@
 import torch
 import numpy as np
-    
+import os    
 class LensingDataset(torch.utils.data.Dataset):
     def __init__(self, directory, classes, num_samples):
         """
@@ -20,15 +20,26 @@ class LensingDataset(torch.utils.data.Dataset):
         """
         return self.num_samples*len(self.classes)
     
+    
+
+
+
     def __getitem__(self, index):
         """
         Supplies LR images
-
-        :param index: Index in the dataset to look for
-        :return: LR image, min-max normalized
         """
-        selected_class = self.classes[index//self.num_samples]
-        class_index = index%self.num_samples
-        image = torch.tensor(np.array([np.load(self.directory+selected_class+'/sim_%d.npy'%(class_index))]))
-        image = (image - torch.min(image))/(torch.max(image)-torch.min(image))
+        selected_class = self.classes[index // self.num_samples]
+        class_index = index % self.num_samples
+        
+        # USE os.path.join for portability
+        file_path = os.path.join(self.directory, selected_class, 'sim_%d.npy' % class_index)
+        
+        image = torch.tensor(np.array([np.load(file_path)]))
+        
+        # Small safety check: handle division by zero if image is blank
+        img_min = torch.min(image)
+        img_max = torch.max(image)
+        if img_max > img_min:
+            image = (image - img_min) / (img_max - img_min)
+            
         return image
