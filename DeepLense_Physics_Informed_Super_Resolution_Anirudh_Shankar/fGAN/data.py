@@ -33,5 +33,5 @@ class LensingDataset(torch.utils.data.Dataset):
         class_index = index%self.num_samples
         image = torch.tensor(np.array([np.load(self.directory+selected_class+'/%s'%selected_class+self.aux+'%d.npy'%(class_index))]))
         if self.aux == '_sim_':
-            image = (image - torch.min(image))/(torch.max(image)-torch.min(image))
+            image = (image - torch.min(image))/(torch.max(image)-torch.min(image) + 1e-8)
         return image
