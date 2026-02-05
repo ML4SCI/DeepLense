@@ -11,6 +11,8 @@ import torchvision.transforms as Transforms
 import matplotlib.pyplot as plt
 from typing import List, Optional, Tuple
 
+from dataset.transforms import get_transforms
+
 # Default paths to check for data
 # Determine the absolute path to the directory containing this script
 SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
@@ -22,15 +24,9 @@ DEFAULT_DATA_PATHS = [
     os.path.join(SCRIPT_DIR, "../Data/real_lenses_dataset/lenses"),
 ]
 
+# def get_transforms() -> Transforms.Compose:  <-- Removing local definition
+# Using imported get_transforms instead
 
-def get_transforms() -> Transforms.Compose:
-    """Returns the transformation pipeline."""
-    return Transforms.Compose(
-        [
-            Transforms.CenterCrop(64),
-            # Transforms.Normalize(mean=[...], std=[...]),  # uncomment when you have stats
-        ]
-    )
 
 
 def find_valid_data_dir(paths: List[str]) -> Optional[str]:
