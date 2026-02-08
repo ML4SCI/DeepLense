@@ -13,7 +13,7 @@
     "python.formatting.provider": "black",
     "[python]": {
         "editor.codeActionsOnSave": {
-            "source.organizeImports": true
+            "source.organizeImports": "explicit"
         },
         "editor.tabSize": 4,
     },

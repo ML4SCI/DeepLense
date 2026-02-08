@@ -1,33 +1,65 @@
 import torch
 import numpy as np
 import os
-
 import torchvision.transforms as Transforms
 import matplotlib.pyplot as plt
 
-#root_dir = '../Data/cdm_regress_multi_param_model_ii/cdm_regress_multi_param/'
-#root_dir = '../Data/npy_lenses-20240731T044737Z-001/npy_lenses/'
-root_dir = '../Data/real_lenses_dataset/lenses'
-data_list_cdm = [ f for f in os.listdir(root_dir) if f.endswith('.npy')]
-#print(data_list_cdm)
-data_file_path = os.path.join(root_dir, data_list_cdm[50])
-data = np.load(data_file_path)#, allow_pickle=True)
-print(data.shape)
-data = (data - np.min(data))/(np.max(data)-np.min(data))
-print(np.min(data))
-print(np.max(data))
+# Dataset paths defined in the issue
+DATASET_PATHS = [
+    '../Data/cdm_regress_multi_param_model_ii/cdm_regress_multi_param/',
+    '../Data/npy_lenses-20240731T044737Z-001/npy_lenses/',
+    '../Data/real_lenses_dataset/lenses'
+]
 
-transforms = Transforms.Compose([
-                # Transforms.ToTensor(), # npy loader returns torch.Tensor
-                Transforms.CenterCrop(64),
-                #Transforms.Normalize(mean = [0.06814773380756378, 0.21582692861557007, 0.4182431399822235],\
-                 #                       std = [0.16798585653305054, 0.5532506108283997, 1.1966736316680908]),
-            ]) 
+def run_test_pipeline():
+    # Ensure output directory exists for saving plots
+    if not os.path.exists("plots"):
+        os.makedirs("plots")
 
-data_torch = torch.from_numpy(data)
-data_torch = transforms(data_torch)
-# print(torch.min(data_torch))
-# print(torch.max(data_torch))
-data_torch = data_torch.permute(1, 2, 0).to('cpu').numpy()
-plt.imshow(data_torch)
-plt.savefig(os.path.join("plots", f"ddpm_ssl_actual.jpg"))
+    # Modular transform pipeline
+    preprocess = Transforms.Compose([
+        Transforms.CenterCrop(64),
+    ])
+
+    for path in DATASET_PATHS:
+        # Check if directory exists before processing
+        if not os.path.exists(path):
+            print(f"Skipping: {path} (Directory not found)")
+            continue
+
+        print(f"Processing: {path}")
+        
+        # Filter for .npy files
+        files = [f for f in os.listdir(path) if f.endswith('.npy')]
+        
+        if not files:
+            print(f"No .npy files found in {path}")
+            continue
+
+        # Load a sample file for testing
+        sample_path = os.path.join(path, files[0])
+        
+        try:
+            data = np.load(sample_path)
+            
+            # Simple min-max normalization
+            data = (data - np.min(data)) / (np.max(data) - np.min(data))
+            
+            # Convert to tensor and apply transforms
+            img_tensor = torch.from_numpy(data)
+            img_tensor = preprocess(img_tensor)
+            
+            # Reorder dimensions if necessary for matplotlib (C, H, W) -> (H, W, C)
+            if img_tensor.ndim == 3:
+                img_tensor = img_tensor.permute(1, 2, 0)
+            
+            plt.imshow(img_tensor.numpy())
+            plot_filename = f"test_{os.path.basename(os.path.normpath(path))}.jpg"
+            plt.savefig(os.path.join("plots", plot_filename))
+            print(f"Result saved to plots/{plot_filename}")
+            
+        except Exception as e:
+            print(f"Could not process {files[0]}: {e}")
+
+if __name__ == "__main__":
+    run_test_pipeline()
