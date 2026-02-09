@@ -7,6 +7,8 @@ import torch.nn as nn
 import torchvision.transforms.functional as F
 from typing import Tuple, Union, List
 import time
+from components.MultiLocallySelfAttention import MultiLocallySelfAttention
+from components.FeedForwardBlock import FeedForwardBlock
 
 class TransformerLSABlock(nn.Module):
     def __init__(self,

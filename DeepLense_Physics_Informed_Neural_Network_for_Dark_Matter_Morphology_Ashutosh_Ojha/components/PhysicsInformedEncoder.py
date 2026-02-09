@@ -7,6 +7,7 @@ import torch.nn as nn
 import torchvision.transforms.functional as F
 from typing import Tuple, Union, List
 import time
+from components.TransformerLSABlock import TransformerLSABlock
 
 class PhysicsInformedEncoder(nn.Module):
     def __init__(self, image_size, patch_size, embedding_dim, num_patches, num_heads,
