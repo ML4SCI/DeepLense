@@ -64,10 +64,7 @@ if __name__ == '__main__':
     criterion = nn.CrossEntropyLoss()
     model = EffNetB1_backbone_model().to(device)
 
-    if device != 'cpu':
-        model.load_state_dict(torch.load(MODEL_PATH))
-    else:
-        model.load_state_dict(torch.load(MODEL_PATH, map_location = torch.device('cpu')))
+    model.load_state_dict(torch.load(MODEL_PATH, map_location=device, weights_only=True))
     
     _, _, test_loader, class_map = create_data_loaders(TRAIN_DATA_PATH, TEST_DATA_PATH, 
                                             val_split = 0.2, batch_size = BATCH_SIZE,

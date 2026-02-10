@@ -39,10 +39,7 @@ if __name__ == '__main__':
     set_seed(7)
 
     model = Autoencoder().to(device)
-    if device != 'cpu':
-        model.load_state_dict(torch.load(MODEL_PATH))
-    else:
-        model.load_state_dict(torch.load(MODEL_PATH, map_location = torch.device('cpu')))
+    model.load_state_dict(torch.load(MODEL_PATH, map_location=device, weights_only=True))
 
     full_test_loader, class_map = create_full_test_dataloader(FULL_TEST_DATA_PATH, test_transforms, BATCH_SIZE)
     criterion = nn.MSELoss()

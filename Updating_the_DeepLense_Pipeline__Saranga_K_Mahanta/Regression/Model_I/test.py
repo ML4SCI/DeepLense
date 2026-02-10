@@ -20,10 +20,7 @@ if __name__ == "__main__":
     set_seed(7)
     criterion = nn.HuberLoss()
     model = Regressor().to(device)
-    if device != 'cpu':
-        model.load_state_dict(torch.load(MODEL_PATH))
-    else:
-        model.load_state_dict(torch.load(MODEL_PATH, map_location = torch.device('cpu')))
+    model.load_state_dict(torch.load(MODEL_PATH, map_location=device, weights_only=True))
 
     train_loader, val_loader, test_loader = create_dataloaders(
         TRAIN_DATA_PATH, TEST_DATA_PATH, 
