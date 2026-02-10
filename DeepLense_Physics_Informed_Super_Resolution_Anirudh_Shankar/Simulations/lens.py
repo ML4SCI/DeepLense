@@ -4,7 +4,12 @@ from astropy.cosmology import FlatLambdaCDM
 from astropy import units as u
 from astropy.constants import G, c, M_sun
 
-from pyHalo.preset_models import CDM
+#from pyHalo.preset_models import CDM
+from pyHalo.preset_models import preset_model_from_name
+
+# Then, where CDM was used, you call it by name:
+#model = preset_model_from_name('CDM')
+
 
 
 from lenstronomy.LightModel.light_model import LightModel
@@ -45,9 +50,9 @@ class DeepLens(object):
         self.z_gal  = z_gal
 
         if model_1 == False:
-            realizationsCDM = CDM(z_halo, z_gal,cone_opening_angle_arcsec=10)
+            # We use the factory function to get the CDM model
+            realizationsCDM = preset_model_from_name('CDM')(z_halo, z_gal, cone_opening_angle_arcsec=10)
             self.astropy_instance = realizationsCDM.astropy_instance
-
 
         self.axion_mass = axion_mass
 
@@ -419,8 +424,7 @@ if __name__ == "__main__":
     lens.make_vortex(1e10)
     lens.set_instrument('Euclid')
     lens.make_source_light_mag()
-    lens.simple_sim_2()
-
+    lens.simple_sim_2(64, 1)
     
     import matplotlib.pyplot as plt
 
