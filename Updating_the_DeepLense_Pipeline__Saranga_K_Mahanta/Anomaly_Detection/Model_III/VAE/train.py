@@ -122,7 +122,7 @@ def fit_model(model,checkpoint_path):
     
 
         optimizer = optim.Adam(model.parameters(), lr = LEARNING_RATE)
-        scheduler = optim.lr_scheduler.OneCycleLR(optimizer, LEARNING_RATE, epochs = EPOCHS, steps_per_epoch = len(train_loader), verbose = False)
+        scheduler = optim.lr_scheduler.OneCycleLR(optimizer, LEARNING_RATE, epochs=EPOCHS, steps_per_epoch=len(train_loader))
         criterion = nn.MSELoss()
 
         loss_dict = {'train_loss':[],'val_loss':[], 'train_kld_loss':[], 'val_kld_loss':[]}
@@ -171,10 +171,7 @@ if __name__ == "__main__":
     model = VAE(encoder, decoder).to(device)
 
     if LOAD_PRETRAINED_MODEL:
-        if device != 'cpu':
-            model.load_state_dict(torch.load(MODEL_PATH))
-        else:
-            model.load_state_dict(torch.load(MODEL_PATH, map_location = torch.device('cpu')))
+        model.load_state_dict(torch.load(MODEL_PATH, map_location=device, weights_only=True))
             
     model, loss_dict = fit_model(model, checkpoint_path = MODEL_PATH)
 

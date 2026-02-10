@@ -203,14 +203,9 @@ if __name__ == "__main__":
     disc = Discriminator().to(device)
 
     if LOAD_PRETRAINED_MODEL:
-        if device != 'cpu':
-            encoder.load_state_dict(torch.load(MODEL_PATH + 'encoder.pth'))
-            decoder.load_state_dict(torch.load(MODEL_PATH + 'decoder.pth'))
-            disc.load_state_dict(torch.load(MODEL_PATH + 'discriminator.pth'))
-        else:
-            encoder.load_state_dict(torch.load(MODEL_PATH + 'encoder.pth', map_location = torch.device('cpu')))
-            decoder.load_state_dict(torch.load(MODEL_PATH + 'decoder.pth', map_location = torch.device('cpu')))
-            disc.load_state_dict(torch.load(MODEL_PATH + 'discriminator.pth', map_location = torch.device('cpu')))
+        encoder.load_state_dict(torch.load(MODEL_PATH + 'encoder.pth', map_location=device, weights_only=True))
+        decoder.load_state_dict(torch.load(MODEL_PATH + 'decoder.pth', map_location=device, weights_only=True))
+        disc.load_state_dict(torch.load(MODEL_PATH + 'discriminator.pth', map_location=device, weights_only=True))
 
     model = {'enc':encoder,
             'dec': decoder,

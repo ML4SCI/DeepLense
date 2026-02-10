@@ -93,8 +93,5 @@ if __name__ == '__main__':
     encoder = Encoder()
     decoder = Decoder()
     model = VAE(encoder, decoder)
-    if device != 'cpu':
-        model.load_state_dict(torch.load(MODEL_PATH))
-    else:
-        model.load_state_dict(torch.load(MODEL_PATH, map_location = torch.device('cpu')))
+    model.load_state_dict(torch.load(MODEL_PATH, map_location=device, weights_only=True))
     print(model)
