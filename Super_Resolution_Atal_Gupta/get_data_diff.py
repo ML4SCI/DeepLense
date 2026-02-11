@@ -5,6 +5,11 @@ import matplotlib.pyplot as plt
 import cv2
 
 mypath = './pairs'
+if not os.path.exists(mypath):
+    raise FileNotFoundError(
+        "Dataset folder 'pairs/' not found. Please see README for dataset generation instructions."
+    )
+
 files = [os.path.join(mypath, f) for f in os.listdir(mypath) if f.endswith(".npy")]
 
 HR = defaultdict()
