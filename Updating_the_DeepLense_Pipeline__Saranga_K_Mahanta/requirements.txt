@@ -16,3 +16,4 @@ timm>=0.9
 torch>=2.1
 torchvision>=0.16
 torchaudio>=2.1
+
