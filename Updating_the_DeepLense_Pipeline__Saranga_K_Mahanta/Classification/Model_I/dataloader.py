@@ -13,7 +13,8 @@ from utils import transforms
 
 class CustomDataset(Dataset):
     def __init__(self, root_dir, transform = None):
-        root_list = glob.glob(root_dir)
+        root_list = glob.glob(os.path.join(root_dir, "*", "*.npy"))
+
         self.class_map = {}
         self.class_distribution = {}
         self.transform = transform
