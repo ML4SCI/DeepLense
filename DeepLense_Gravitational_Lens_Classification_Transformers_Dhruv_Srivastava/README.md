@@ -30,3 +30,74 @@ Once dataloaders have been saved, simply load them through
 train_loader = torch.load('/content/drive/MyDrive/Model_III_dataset/train_loader.pth', weights_only=False)
 val_loader = torch.load('/content/drive/MyDrive/Model_III_dataset/val_loader.pth', weights_only=False)
 ```
+
+Datasets
+--------
+
+This repository contains multiple independent experiments.Each notebook expects a different dataset format.
+
+1. Cached Simulation Dataset (.npz)
+---
+Used in transformer-based classification notebooks.
+
+Example filename:
+
+`dataset_4task_log10_11349samples_1858.npz   `
+
+Expected contents:
+
+*   Numpy arrays containing 64×64 images
+    
+*   Labels stored inside the archive
+    
+
+Colab loading example:
+
+`data = np.load('/content/drive/MyDrive/dataset_4task_log10_11349samples_1858.npz')  print(data.files)   `
+
+### 2. Folder Classification Dataset (Model III)
+
+Used in CNN classification notebooks.
+
+Expected structure:
+
+` Model_III_dataset/  └── Model_III/      ├── axion/      ├── cdm/      └── no_sub/   `
+
+Each folder represents a class of dark matter substructure.
+
+### 3. Alternative Classification Dataset (Model V)
+
+Used in extended classification experiments.
+
+Expected structure:
+
+`  Model_V/  └── Model_V/      ├── class_1/      ├── class_2/      └── ...`
+
+Dataset Generation
+---
+
+This project does not include pre-generated datasets due to their large size.
+
+All datasets used in the notebooks are generated using the DeepLense simulation pipeline:
+
+<https://github.com/mwt5345/DeepLenseSim>
+
+Please follow the instructions in that repository to generate the required datasets.
+
+After generation, place the produced folders/files inside Google Drive as expected by each notebook.
+
+Example expected structure:
+`
+Model_III_dataset/
+ └── Model_III/
+     ├── axion/
+     ├── cdm/
+     └── no_sub/
+   `
+
+Important
+---
+
+The repository does not host datasets directly.Users must obtain them separately.
+
+Each notebook requires a specific dataset format.Please verify dataset compatibility before running training.
