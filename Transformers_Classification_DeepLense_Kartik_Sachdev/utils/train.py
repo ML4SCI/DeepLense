@@ -60,7 +60,8 @@ def train(
     >>>     dataset_name=dataset_name)
     """
     wandb.init(config=config, group=dataset_name, job_type="train")  # ,mode="disabled"
-    wandb.watch(model, criterion, log="all", log_freq=log_freq)
+    wandb.unwatch(model)
+    wandb.watch(model, criterion, log="gradients", log_freq=log_freq)
 
     steps = 0
     all_train_loss = []
