@@ -104,7 +104,8 @@ def train(
     )  # Used to initialize parameters in lazy layers
 
     # Alert wandb to log this training
-    wandb.watch(model, criterion, log="all", log_freq=log_interval)
+    wandb.unwatch(model)
+    wandb.watch(model, criterion, log="gradients", log_freq=log_interval)
 
     best_val_auroc, best_val_metrics = 0.0, dict()
     batch_num = 0
