@@ -18,10 +18,18 @@ from models.byol import BYOLSingleChannel, FinetuneModelByol
 import torchvision
 from models.utils.finetune_model import FinetuneModel
 
-# Set device
-device = "cuda"  # torch.device("cuda" if torch.cuda.is_available() else "cpu")
+import argparse
+
+parser = argparse.ArgumentParser(description="Finetune BYOL model")
+parser.add_argument("--saved_model_path", type=str, required=True, help="Path to saved BYOL checkpoint (.pt file)")
+parser.add_argument("--finetuned_model_path", type=str, required=True, help="Path to save finetuned model (.pt file)")
+parser.add_argument("--device", type=str, default="cuda" if torch.cuda.is_available() else "cpu", help="Device to use")
+args = parser.parse_args()
+
+device = args.device
 learning_method = "contrastive_embedding"
-saved_model_path = "/home/kartik/git/DeepLense/Transformers_Classification_DeepLense_Kartik_Sachdev/logger/2023-07-23-13-30-24/checkpoint/Resnet_finetune_Model_II_2023-07-23-13-30-24.pt"
+saved_model_path = args.saved_model_path
+finetuned_model_path = args.finetuned_model_path 
 
 # Set hyperparameters
 batch_size = 512
@@ -90,6 +98,6 @@ train_simplistic(
     train_loader,
     criterion,
     optimizer,
-    saved_model_path,
+    finetuned_model_path, 
     valid_loader=val_loader,
 )

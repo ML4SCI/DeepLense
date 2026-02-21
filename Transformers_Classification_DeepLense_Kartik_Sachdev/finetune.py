@@ -9,10 +9,18 @@ from utils.train import train_simplistic
 from utils.util import load_model_add_head
 from torchsummary import summary
 
-# Set device
-device = "cuda"  # torch.device("cuda" if torch.cuda.is_available() else "cpu")
+import argparse
+
+parser = argparse.ArgumentParser(description="Finetune pretrained model")
+parser.add_argument("--saved_model_path", type=str, required=True, help="Path to pretrained model (.pth file)")
+parser.add_argument("--device", type=str, default="cuda" if torch.cuda.is_available() else "cpu", help="Device to use")
+parser.add_argument("--output_model_path", type=str, required=True, help="Path to save finetuned model (.pth file)")
+args = parser.parse_args()
+
+device = args.device
 learning_method = "contrastive_embedding"
-saved_model_path = "/home/kartik/git/deepLense_transformer_ssl/output/pretrained_contrastive_embedding.pth"
+saved_model_path = args.saved_model_path
+output_model_path = args.output_model_path
 
 # Set hyperparameters
 batch_size = 128
@@ -55,5 +63,5 @@ criterion = nn.CrossEntropyLoss()
 
 # Training loop
 train_simplistic(
-    epochs, model, device, train_loader, criterion, optimizer, saved_model_path
+    epochs, model, device, train_loader, criterion, optimizer, output_model_path  # ✅
 )
