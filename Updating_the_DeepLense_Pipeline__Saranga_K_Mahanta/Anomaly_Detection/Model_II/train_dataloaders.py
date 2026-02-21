@@ -33,14 +33,19 @@ class CustomDataset(Dataset):
     def __getitem__(self, idx):
         path = self.data[idx]
         img = np.load(path, allow_pickle = True)
-        img = (img - np.min(img))/(np.max(img) - np.min(img))
+        den = np.max(img) - np.min(img)
+        if den != 0:
+           img = (img - np.min(img)) / den
 
        
         if self.transform:
             aug = self.transform(image = img)
             img = aug['image']
         
-        img = img.to(torch.float)        
+        if isinstance(img, torch.Tensor):
+           img = img.to(torch.float)
+        else:
+         img = torch.tensor(img, dtype=torch.float)        
 
         return img
 
@@ -96,7 +101,7 @@ if __name__ == '__main__':
         BATCH_SIZE
         )
     single_batch = next(iter(test_loader))
-    print(f"Shape of a single batch of data: {single_batch[0].shape}")
+    print(f"Shape of a single batch of data: {single_batch.shape}")
 
     single_batch_grid = utils.make_grid(single_batch[:16], nrow=8)
     plt.figure(figsize = (20,70))
