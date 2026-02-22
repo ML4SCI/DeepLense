@@ -33,9 +33,10 @@ class CustomDataset(Dataset):
     def __getitem__(self, idx):
         path = self.data[idx]
         img = np.load(path, allow_pickle = True)
-        den = np.max(img) - np.min(img)
-        if den != 0:
-           img = (img - np.min(img)) / den
+        eps = 1e-8
+        img_min = np.min(img)
+        img_max = np.max(img)
+        img = (img - img_min) / (img_max - img_min + eps)
 
        
         if self.transform:
@@ -43,9 +44,9 @@ class CustomDataset(Dataset):
             img = aug['image']
         
         if isinstance(img, torch.Tensor):
-           img = img.to(torch.float)
+           img = img.to(torch.float32)
         else:
-         img = torch.tensor(img, dtype=torch.float)        
+         img = torch.tensor(img, dtype=torch.float32)        
 
         return img
 
