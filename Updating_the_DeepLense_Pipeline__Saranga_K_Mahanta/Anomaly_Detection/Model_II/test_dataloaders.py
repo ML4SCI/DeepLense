@@ -48,13 +48,16 @@ class CustomDataset(Dataset):
         img = np.load(img_path, allow_pickle = True)
         if class_name == 'axion':
             img = img[0]
-        img = (img - np.min(img))/(np.max(img) - np.min(img))
+        eps = 1e-8
+        img_min = np.min(img)
+        img_max = np.max(img)
+        img = (img - img_min) / (img_max - img_min + eps)
         
         if self.transform:
             aug = self.transform(image=img)
             img = aug['image']
         
-        img = img.to(torch.float)
+        img = img.to(torch.float32)
         class_id = self.class_map[class_name]
         class_id = torch.tensor(class_id)
 
@@ -80,4 +83,10 @@ if __name__ == '__main__':
             )
 
     full_test_loader, class_map = create_full_test_dataloader(FULL_TEST_DATA_PATH, test_transforms, BATCH_SIZE)
-    
+        # ---- normalization sanity check ----
+    const_img = np.ones((64, 64))
+
+    eps = 1e-8
+    out = (const_img - const_img.min()) / (const_img.max() - const_img.min() + eps)
+
+    print("Normalization NaN check:", np.isnan(out).any())
