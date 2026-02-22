@@ -104,10 +104,17 @@ def get_transfomer_finetuned(saved_model_path, device, num_classes) -> nn.Module
 
 
 def main():
-    # Set device
-    device = "cuda"  # torch.device("cuda" if torch.cuda.is_available() else "cpu")
-    pretrained_model_path = "/home/kartik/git/DeepLense/Transformers_Classification_DeepLense_Kartik_Sachdev/logger/2023-07-25-06-27-13/checkpoint/CrossFormer_pretrained_Model_II_2023-07-25-06-27-13.pt"
-    finetuned_model_path = "/home/kartik/git/DeepLense/Transformers_Classification_DeepLense_Kartik_Sachdev/logger/2023-07-25-06-27-13/checkpoint/CrossFormer_finetuned_Model_II_2023-07-25-06-27-13.pt"
+    
+    import argparse
+    parser = argparse.ArgumentParser(description="Finetune BYOL transformer model")
+    parser.add_argument("--pretrained_model_path", type=str, required=True, help="Path to pretrained model checkpoint (.pt file)")
+    parser.add_argument("--finetuned_model_path", type=str, required=True, help="Path to save finetuned model (.pt file)")
+    parser.add_argument("--device", type=str, default="cuda" if torch.cuda.is_available() else "cpu", help="Device to use")
+    args = parser.parse_args()
+
+    device = args.device
+    pretrained_model_path = args.pretrained_model_path
+    finetuned_model_path = args.finetuned_model_path
 
     # Set hyperparameters
     batch_size = 512

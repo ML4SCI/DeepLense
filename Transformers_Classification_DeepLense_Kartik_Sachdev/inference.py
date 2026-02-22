@@ -13,14 +13,23 @@ from torchsummary import summary
 
 
 def main():
-    device = "cuda"
+    import argparse
+
+    parser = argparse.ArgumentParser(description="Run inference")
+    parser.add_argument("--log_dir", type=str, required=True, help="Path to log directory")
+    parser.add_argument("--finetune_model_path", type=str, required=True, help="Path to finetuned model (.pt file)")
+    parser.add_argument("--device", type=str, default="cuda" if torch.cuda.is_available() else "cpu", help="Device to use")
+    args = parser.parse_args()
+
+    device = args.device
     num_classes = 3
     dataset_name = "Model_II"
     labels_map = {0: "axion", 1: "cdm", 2: "no_sub"}
     image_size = 224
     channels = 1
-    log_dir = "/home/kartik/git/DeepLense/Transformers_Classification_DeepLense_Kartik_Sachdev/logger/2023-07-23-13-30-24"
-    finetune_model_path = "/home/kartik/git/DeepLense/Transformers_Classification_DeepLense_Kartik_Sachdev/logger/2023-07-23-13-30-24/checkpoint/Resnet_finetune_Model_II.pt"
+    log_dir = args.log_dir
+    finetune_model_path = args.finetune_model_path
+    # ... rest of main() stays exactly the same
     batch_size = 512
     num_workers = 8
 
