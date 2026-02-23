@@ -10,7 +10,7 @@ from utils.util import (
     get_device,
     init_logging_handler,
 )
-from utils.dataset import DeepLenseDataset
+from utils.dataset import LensDataset
 from utils.train_ray import train
 from argparse import ArgumentParser
 from config.data_config import DATASET
@@ -123,7 +123,7 @@ def main():
 
     make_directories([dataset_dir])
 
-    trainset = DeepLenseDataset(
+    trainset = LensDataset(
         dataset_dir,
         "train",
         dataset_name,

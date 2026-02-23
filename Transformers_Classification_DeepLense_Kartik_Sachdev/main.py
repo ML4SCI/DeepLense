@@ -15,7 +15,7 @@ from utils.util import (
     get_device,
     init_logging_handler,
 )
-from utils.dataset import download_dataset, DeepLenseDataset, visualize_samples
+from utils.dataset import download_dataset, LensDataset, visualize_samples
 from utils.train import train
 from utils.inference import Inference
 from argparse import ArgumentParser
@@ -137,7 +137,7 @@ def main():
 
     make_directories([dataset_dir])
 
-    trainset = DeepLenseDataset(
+    trainset = LensDataset(
         dataset_dir,
         "train",
         dataset_name,

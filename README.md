@@ -116,3 +116,59 @@ Finally, DeepLense help combat the problem of noisy and low-resolution of real l
 
 #### 3.3.3 Physics-Informed Unsupervised Super-Resolution of Strong Lensing Images
 **Anirudh Shankar** explores the unsupervised super-resolution of strong lensing images through a Physics-Informed approach in his [GSoC 2024 project](https://summerofcode.withgoogle.com/programs/2024/projects/AvlaMMJJ), built to handle sparse datasets. They use custom datasets using different lens models and light profiles. 
+
+> ⚠️ **Note**
+>
+> This repository is a script-based research monorepo and is **not**
+> distributed as a Python package.  
+> It does **not** support `pip install .` or `pip install -e .`.
+> Dependencies must be installed using `requirements.txt`.
+
+
+
+## 3. Installation (Windows)
+
+> ⚠️ **Installation Note**
+>
+> This repository does **not** support:
+> - `pip install .`
+> - `pip install -e .`
+>
+> Dependencies must be installed using `requirements.txt`.
+
+### 3.1 Create and activate a virtual environment
+
+```bat
+python -m venv venv
+venv\Scripts\activate
+
+3.2 Install common dependencies
+python -m pip install --upgrade pip
+pip install -r requirements.txt
+
+
+This installs common dependencies used across multiple DeepLense projects, such as:
+
+numpy
+scip
+matplotlib
+lenstronomy
+pyHalo
+
+Some projects may require additional dependencies (e.g. torch).
+Please refer to the README inside the relevant project directory if available.
+
+
+After installing dependencies, you can verify that the environment is correctly set up.
+
+python -c "import numpy, scipy, matplotlib, lenstronomy, pyHalo"
+
+If no error is raised, the core dependencies are installed successfully.
+
+cd <project_directory>
+
+python <script_name>.py
+python <script_name>.py
+
+Jupyter issue if any 
+pip install jupyter

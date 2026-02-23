@@ -18,7 +18,7 @@ from torchvision.transforms import (
     Grayscale,
 )
 from sklearn.metrics import roc_curve, auc, confusion_matrix
-from utils.dataset import DeepLenseDataset
+from utils.dataset import LensDataset
 import torch.nn as nn
 from torch.utils.data import DataLoader, Dataset
 from typing import *
@@ -367,7 +367,7 @@ class Inference(InferenceABC):
         """Tests equivariance of the trained model.
         Evaluates the `model` on 8 rotated versions an image from `testset`
         """
-        valset_notransform = DeepLenseDataset(
+        valset_notransform = LensDataset(
             self.destination_dir, "test", self.dataset_name, transform=None
         )
         x, y = next(iter(valset_notransform))

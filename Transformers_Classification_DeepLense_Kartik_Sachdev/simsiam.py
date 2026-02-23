@@ -25,7 +25,7 @@ from utils.inference import InferenceSSL
 from utils.util import *
 from config import *
 from utils.transforms.simsiam_transform import SimSiamTransform
-from utils.dataset import visualize_samples_ssl, DeepLenseDatasetSSL
+from utils.dataset import visualize_samples_ssl, LensDataset
 from models.self_supervised.simsiam import SimSiamTransformer
 from utils.trainer.simsiam_train import simsiam_train
 from utils.trainer.finetune import finetune
@@ -97,7 +97,7 @@ def main(args):
     # trainset
     dino_transform = SimSiamTransform()
     train_transforms = dino_transform.get_transforms()
-    train_dataset = DeepLenseDatasetSSL(
+    train_dataset = LensDatasetSSL(
         destination_dir=dataset_dir,
         transforms=train_transforms,
         mode="train",
@@ -129,7 +129,7 @@ def main(args):
     )
 
     test_dataset_dir = dataset_dir
-    test_dataset = DeepLenseDatasetSSL(
+    test_dataset = LensDatasetSSL(
         destination_dir=test_dataset_dir,
         transforms=train_transforms,
         mode="test",
