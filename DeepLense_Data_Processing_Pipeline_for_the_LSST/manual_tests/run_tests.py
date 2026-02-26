@@ -29,10 +29,11 @@ def run_test(test_number, test_name, script_path):
     try:
         # Run the test script
         result = subprocess.run(
-            [sys.executable, script_path],
-            capture_output=True,
-            text=True,
-            cwd=Path(__file__).parent
+           [sys.executable, script_path],
+           capture_output=True,
+           text=True,
+           cwd=Path(__file__).parent,
+           timeout=300
         )
         
         # Print output
@@ -51,8 +52,13 @@ def run_test(test_number, test_name, script_path):
 def main():
     """Run manual tests."""
     parser = argparse.ArgumentParser(description='Run RIPPLe manual tests')
-    parser.add_argument('tests', nargs='?', default='all', 
-                       help='Test number(s) to run (e.g., 1, 1-3, or all)')
+    parser.add_argument('tests', nargs='?', default='all',
+        help='Test number(s) to run (e.g., 1, 1-3, or all)')
+    parser.add_argument(
+        '--non-interactive',
+        action='store_true',
+        help='Run without prompts (useful for CI)'
+    )
     args = parser.parse_args()
     
     # Define all tests
@@ -69,7 +75,12 @@ def main():
         tests_to_run = all_tests
     elif '-' in args.tests:
         # Range of tests
-        start, end = map(int, args.tests.split('-'))
+        try:
+           start, end = map(int, args.tests.split('-'))
+        except ValueError:
+            print("Invalid test range format. Use like 1-3")
+            return False
+
         tests_to_run = [t for t in all_tests if start <= t[0] <= end]
     else:
         # Single test
@@ -101,9 +112,12 @@ def main():
             print(f"\n❌ Test {test_num} failed. Consider fixing before continuing.")
             # Ask if user wants to continue
             if len(tests_to_run) > 1:
-                continue_response = input("\nContinue with remaining tests? (y/n): ")
-                if continue_response.lower() != 'y':
-                    break
+                if args.non_interactive:
+                    continue
+                else:
+                    continue_response = input("\nContinue with remaining tests? (y/n): ")
+                    if continue_response.lower() != 'y':
+                        break
     
     # Summary
     print(f"\n{'='*60}")
