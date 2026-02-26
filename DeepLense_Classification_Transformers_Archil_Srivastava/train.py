@@ -44,9 +44,8 @@ def train_step(model, images, labels, optimizer, scheduler, criterion, device="c
         Loss value from the forward pass
     """
     # Send to device
-    images, labels = images.to(device, dtype=torch.float), labels.type(
-        torch.LongTensor
-    ).to(device)
+    images, labels = images.to(device, dtype=torch.float)  # FIX 1: Split into two lines
+    labels = labels.long().to(device)                       # FIX 1: Use .long().to(device) instead of .type(torch.LongTensor).to(device)
     model.train()  # Set train mode
     optimizer.zero_grad()  # Reset gradients
     logits = model(images)  # Forward pass
@@ -54,7 +53,7 @@ def train_step(model, images, labels, optimizer, scheduler, criterion, device="c
     loss.backward()  # Backward pass
     optimizer.step()  # Optimize weights step
     if scheduler is not None:
-        scheduler.step(loss)  # Modify learning rate if scheduler is set
+        scheduler.step()  # FIX 2: Removed loss argument - CosineAnnealingWarmRestarts doesn't use it
     return loss
 
 
