@@ -30,3 +30,25 @@ Once dataloaders have been saved, simply load them through
 train_loader = torch.load('/content/drive/MyDrive/Model_III_dataset/train_loader.pth', weights_only=False)
 val_loader = torch.load('/content/drive/MyDrive/Model_III_dataset/val_loader.pth', weights_only=False)
 ```
+## ⚠️ Dataset Structure (Important)
+
+The dataset loader expects the following folder structure:
+
+```id="1fm9hx"
+Model_III_dataset/
+  Model_III/
+    axion/
+      *.npy
+    cdm/
+      *.npy
+    no_sub/
+      *.npy
+```
+
+Notes:
+
+* Each class directory must contain `.npy` files.
+* The dataset loader reads files using class names: `axion`, `cdm`, and `no_sub`.
+* If the structure is incorrect, the dataset size may become zero and DataLoader creation will fail.
+
+If dataloaders are not available, uncomment the dataset creation section in `vision_transformer_basic.ipynb` to generate them.
