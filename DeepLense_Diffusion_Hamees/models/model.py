@@ -222,6 +222,9 @@ class DiTBlock(nn.Module):
         x = x + gate_mlp.unsqueeze(1) * self.mlp(modulate(self.norm2(x), shift_mlp, scale_mlp))
         return x
 
+#################################################################################
+#                                Final Layer                                    #
+#################################################################################
 
 class FinalLayer(nn.Module):
     """
@@ -240,6 +243,9 @@ class FinalLayer(nn.Module):
         x = self.linear(x)
         return x
 
+#################################################################################
+#                         Nano Diffusion Transformer                            #
+#################################################################################
 
 class NanoDiT(nn.Module):
     """
