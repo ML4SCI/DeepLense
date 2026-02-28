@@ -1,49 +1,112 @@
-# Single Image Super-Resolution with Diffusion Models
+# Super Resolution — Atal Gupta (DeepLense)
 
-This project focuses on enhancing the resolution of gravitational lensing images using diffusion models. The goal is to improve the clarity and detail of these images, aiding in better scientific analysis and discoveries.
+Super-resolution of gravitational lensing images using a diffusion-based model.  
+This module upscales low-resolution (LR) lensing images to high-resolution (HR) equivalents, improving downstream classification and analysis accuracy.
 
-## Project Overview
+---
 
-### Gravitational Lensing
+## 📁 Directory Structure
 
-Gravitational lensing is a phenomenon predicted by Einstein's theory of general relativity. It occurs when a massive object, like a galaxy cluster or black hole, bends the path of light from a distant source. This can create multiple images, arcs, or rings of the source, depending on the alignment and mass distribution of the lensing object.
+```
+Super_Resolution_Atal_Gupta/
+├── generate_dataset.py   ← NEW: generates HR/LR pairs from raw data
+├── get_data_diff.py      ← data loader (patched — see Issue #135)
+├── model.py
+├── train.py
+├── inference.py
+└── README.md
+```
 
-![Gravitational Lensing Image](figures/gravitlensing.webp)
+---
 
-*[Image Source](https://www.jpl.nasa.gov/images/pia23641-gravitational-lensing-graphic)*
+## 🚀 Quick Start
 
+### 1. Install dependencies
 
-### Importance of Super-Resolution
+```bash
+pip install torch torchvision numpy
+```
 
-Enhancing the resolution of gravitational lensing images is crucial for:
+### 2. Download the raw dataset
 
-- **Improved Accuracy:** Clearer images allow for more precise measurements of lensing effects, leading to better estimates of the mass and distribution of dark matter.
-- **Detecting Faint Sources:** Higher resolution reveals faint, distant galaxies that are magnified by the lensing effect but obscured in lower-quality images.
-- **Studying Cosmic Structure:** Enhanced images provide better insights into the structure and evolution of galaxies and galaxy clusters.
+Download the DeepLense lensing `.npy` files and place them in a folder, e.g. `raw_data/`:
 
-## Dataset
+```
+raw_data/
+    image_00001.npy
+    image_00002.npy
+    ...
+```
 
-The dataset consists of 2,834 pairs of Low Resolution (LR) and High Resolution (HR) images. The LR images are derived from the HR images by adding Gaussian noise and applying blurring.
+> **Dataset source:** The lensing images come from the DeepLense simulation suite.  
+> Contact the ML4SCI team or refer to the main repo README for the download link.
 
-![Dataset](figures/dataset.webp)
+### 3. Generate HR / LR pairs ← **Start here**
 
-## Results
+```bash
+python generate_dataset.py \
+    --input_dir  raw_data/ \
+    --output_dir dataset/ \
+    --scale_factor 4 \
+    --split 0.8
+```
 
-| Model   | PSNR  | SSIM  | Paper |
-|---------|-------|-------|-------|
-| SRCNN  | 31.76 | 0.873 | [Link](https://arxiv.org/abs/1501.00092) |
-| RCAN    | 32.60 | 0.890 | [Link](https://arxiv.org/abs/1807.02758) |
-| SRGAN | 26.52 | 0.566  | [Link](https://arxiv.org/abs/1609.04802) |
-| VAESR| 26.00 | 0.594 | [Link](https://arxiv.org/abs/1906.02691) |
-| Iterative Auto Encoder  | 33.56| 0.855 | [Link](https://openreview.net/forum?id=k0CWAzK17r) |
+This produces:
 
-*Results on the Test Dataset*
+```
+dataset/
+    train/
+        HR/   ← 80 % of images (original resolution)
+        LR/   ← same images downscaled 4×
+    val/
+        HR/
+        LR/
+```
 
+**Options:**
 
-## Installation
+| Flag | Default | Description |
+|------|---------|-------------|
+| `--input_dir` | — | Folder with raw `.npy` images |
+| `--output_dir` | — | Where to save the dataset |
+| `--scale_factor` | `4` | LR downscaling factor |
+| `--split` | `0.8` | Fraction of data used for training |
 
-1. **Clone the repository:**
+### 4. Train the model
 
-   ```sh
-   git clone https://github.com/yourusername/your-repo-name.git
-   cd your-repo-name
+```bash
+python train.py --data_dir dataset/
+```
+
+### 5. Run inference
+
+```bash
+python inference.py --checkpoint checkpoints/best.pth \
+                    --lr_image   dataset/val/LR/image_00001.npy
+```
+
+---
+
+## 🐛 Bugs Fixed (Issue #135)
+
+| Problem | Fix |
+|---------|-----|
+| `FileNotFoundError` — no HR/LR directories | Added `generate_dataset.py`; loader now raises a clear error with instructions |
+| `IndexError` in `get_data_diff.py` | Added bounds check + clamp; mismatched HR/LR counts handled gracefully |
+| `batch_size > dataset size` crash | DataLoader factory clamps batch_size and warns the user |
+| Unclear directory structure | This README + script enforce and document the expected layout |
+
+---
+
+## 📖 Citation
+
+Atal Gupta, *Super-Resolution of Gravitational Lensing Images*, GSoC 2022 — ML4SCI / DeepLense.
+
+---
+
+## 🤝 Contributing
+
+1. Fork the repository  
+2. Create a feature branch (`git checkout -b fix/your-fix`)  
+3. Commit and push  
+4. Open a Pull Request referencing Issue #135
