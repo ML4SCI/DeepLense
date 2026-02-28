@@ -63,10 +63,8 @@ class Physics():
         sourceimage = np.zeros((length*self.source_mag,width*self.source_mag), dtype=float)
         counts = np.zeros_like(sourceimage, dtype=int)
 
-        for i in range(length):
-            for j in range(width):
-                sourceimage[bx[i, j], by[i, j]] += image[i, j]
-                counts[bx[i, j], by[i, j]] += 1
+        np.add.at(sourceimage, (bx, by), image)
+        np.add.at(counts, (bx, by), 1)
 
         average_mask = counts > 0
         sourceimage[average_mask] /= counts[average_mask]

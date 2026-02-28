@@ -8,6 +8,10 @@ import torchvision.transforms.functional as F
 from typing import Tuple, Union, List
 import time
 
+# --- ADDED IMPORTS TO FIX UNDEFINED VARIABLES ---
+from Physics import Physics
+from TransformerLSABlock import TransformerLSABlock
+
 class PhysicsInformedEncoder(nn.Module):
     def __init__(self, image_size, patch_size, embedding_dim, num_patches, num_heads,
                  hidden_dim, transformer_block_activation_function, num_transformer_block,
@@ -57,25 +61,45 @@ class PhysicsInformedEncoder(nn.Module):
         self.profile_size = self.image_size
         self.half_profile_size = self.profile_size // 2
 
+        # --- OPTIMIZATION: Precompute static coordinate grids to save memory/time in forward pass ---
+        self.cached_pixel_width = (self.max_angle - self.min_angle) / self.image_size
+        self.cached_centre_x, self.cached_centre_y = self.image_size // 2, self.image_size // 2
+        range_x = torch.arange(-(self.cached_centre_x - 1), self.image_size - (self.cached_centre_x - 1), device=self.device)
+        range_y = torch.arange(-(self.cached_centre_y - 1), self.image_size - (self.cached_centre_y - 1), device=self.device)
+        grid_x, grid_y = torch.meshgrid(range_x, range_y, indexing='ij')
+        self.cached_x = grid_x * self.cached_pixel_width
+        self.cached_y = grid_y * self.cached_pixel_width
+        r_grid = torch.sqrt(self.cached_x**2 + self.cached_y**2)
+        r_grid[r_grid == 0] = 1
+        self.cached_r = r_grid
+        # -----------------------------------------------------------------------------------------
+
     def image_to_source(self, image, centre=None, E_r=None, deflection=None, gradient=None):
         length, width = image.shape
-        pixel_width = (self.max_angle - self.min_angle) / length
-        if centre is None:
-            centre = (length // 2, width // 2)
-        centre_x, centre_y = centre
-        if False:
-            centre_x = centre_x.item()
-            centre_y = centre_y.item()
         
-        range_indices_x = torch.arange(-(centre_x - 1), length - (centre_x - 1), device=self.device)
-        range_indices_y = torch.arange(-(centre_y - 1), width - (centre_y - 1), device=self.device)
+        # OPTIMIZATION: Use cached grids if using default image size to avoid redundant GPU allocations
+        if centre is None and length == self.image_size and width == self.image_size:
+            pixel_width = self.cached_pixel_width
+            centre_x, centre_y = self.cached_centre_x, self.cached_centre_y
+            x, y, r = self.cached_x, self.cached_y, self.cached_r
+        else:
+            pixel_width = (self.max_angle - self.min_angle) / length
+            if centre is None:
+                centre = (length // 2, width // 2)
+            centre_x, centre_y = centre
+            if False:
+                centre_x = centre_x.item()
+                centre_y = centre_y.item()
+            
+            range_indices_x = torch.arange(-(centre_x - 1), length - (centre_x - 1), device=self.device)
+            range_indices_y = torch.arange(-(centre_y - 1), width - (centre_y - 1), device=self.device)
 
-        x, y = torch.meshgrid(range_indices_x, range_indices_y, indexing='ij')
-        x, y = x * pixel_width, y * pixel_width
+            x, y = torch.meshgrid(range_indices_x, range_indices_y, indexing='ij')
+            x, y = x * pixel_width, y * pixel_width
 
-        r = torch.sqrt(x**2 + y**2)
-        mask = (r == 0)
-        r[mask] = 1
+            r = torch.sqrt(x**2 + y**2)
+            mask = (r == 0)
+            r[mask] = 1
 
         if deflection is not None:
             if deflection.shape != (length, width):
