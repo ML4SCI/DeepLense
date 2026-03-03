@@ -1,0 +1,22 @@
+# lsst_deeplense requirements
+# ────────────────────────────
+# Core (always required)
+numpy>=1.24
+pandas>=2.0
+pyyaml>=6.0
+
+# Data access (Rubin Science Platform)
+pyvo>=1.4          # TAP + SIA v2 client
+astropy>=5.3       # FITS parsing
+
+# Image processing
+Pillow>=10.0       # fallback resize (cv2 preferred when available)
+opencv-python-headless>=4.8  # fast image resize
+
+# ML (required for RubinLensDataset and transforms)
+torch>=2.0
+torchvision>=0.15
+
+# Notebooks
+matplotlib>=3.7
+ipykernel>=6.0
