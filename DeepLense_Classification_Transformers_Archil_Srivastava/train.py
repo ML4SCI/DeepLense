@@ -17,45 +17,46 @@ from utils import get_device, set_seed
 from eval import evaluate
 
 
-def train_step(model, images, labels, optimizer, scheduler, criterion, device="cpu"):
+def train_step(model, images, labels, optimizer, scheduler, criterion):
     """
-    Takes one train step (forward + backward pass) on a batch
+Takes one train step (forward + backward pass) on a batch
 
-    Parameters
-    ----------
-    model : torch.nn.Module
-        Model to train
-    images : torch.Tensor
-        Batch of images of shape [None, H, W, C]
-    labels : torch.Tensor
-        Ground truth of shape [None]
-    optimizer : torch.optim.Optimizer
-        Optimizer algorithm
-    scheduler : torch.optim.lr_scheduler._LRScheduler (or something similar)
-        Train scheduler to use (If None, no scheduler is used)
-    criterion : torch.nn.CrossEntropyLoss (or similar)
-        Loss Function
-    device : str
-        Device to use for training
+Parameters
+----------
+model : torch.nn.Module
+    Model to train
+images : torch.Tensor
+    Batch of images of shape [None, H, W, C]
+labels : torch.Tensor
+    Ground truth labels of shape [None]
+optimizer : torch.optim.Optimizer
+    Optimizer used for updating model parameters
+scheduler : torch.optim.lr_scheduler._LRScheduler, optional
+    Learning rate scheduler. If provided, it will be stepped once per batch.
+criterion : torch.nn.Module
+    Loss function used for training
+device : str
+    Device to use for training
 
-    Returns
-    -------
-    float
-        Loss value from the forward pass
-    """
+Returns
+-------
+float
+    Scalar loss value from the forward pass
+"""
     # Send to device
-    images, labels = images.to(device, dtype=torch.float), labels.type(
-        torch.LongTensor
-    ).to(device)
-    model.train()  # Set train mode
-    optimizer.zero_grad()  # Reset gradients
-    logits = model(images)  # Forward pass
-    loss = criterion(logits, labels)  # Compute loss
-    loss.backward()  # Backward pass
-    optimizer.step()  # Optimize weights step
+    model.train()
+    optimizer.zero_grad()
+
+    logits = model(images)
+    loss = criterion(logits, labels)
+
+    loss.backward()
+    optimizer.step()
+
     if scheduler is not None:
-        scheduler.step(loss)  # Modify learning rate if scheduler is set
-    return loss
+        scheduler.step()
+
+    return loss.item()
 
 
 def train(
@@ -113,9 +114,11 @@ def train(
             batch_num += 1
             model.train()  # Set train mode
             images, labels = batch_data  # Get data
+            images = images.to(device)
+            labels = labels.to(device).long()
             # Do forward + backward pass
             loss = train_step(
-                model, images, labels, optimizer, scheduler, criterion, device=device
+                model, images, labels, optimizer, scheduler, criterion
             )
 
             # Compute metrics for validation data after every few epochs
