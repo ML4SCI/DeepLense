@@ -21,8 +21,29 @@ from models.utils.finetune_model import FinetuneModel
 # Set device
 device = "cuda"  # torch.device("cuda" if torch.cuda.is_available() else "cpu")
 learning_method = "contrastive_embedding"
-pretrained_model_path = "/home/kartik/git/DeepLense/Transformers_Classification_DeepLense_Kartik_Sachdev/logger/2023-07-23-13-30-24/checkpoint/Resnet_finetune_Model_II_2023-07-23-13-30-24.pt"
-finetuned_model_path = "/home/kartik/git/DeepLense/Transformers_Classification_DeepLense_Kartik_Sachdev/logger/2023-07-23-13-30-24/checkpoint/Resnet_finetune_Model_II.pt"
+
+# Define base directory relative to script location
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+pretrained_model_path = os.path.join(
+    BASE_DIR,
+    "..",
+    "..",
+    "..",
+    "logger",
+    "2023-07-23-13-30-24",
+    "checkpoint",
+    "Resnet_finetune_Model_II_2023-07-23-13-30-24.pt"
+)
+finetuned_model_path = os.path.join(
+    BASE_DIR,
+    "..",
+    "..",
+    "..",
+    "logger",
+    "2023-07-23-13-30-24",
+    "checkpoint",
+    "Resnet_finetune_Model_II.pt"
+)
 
 # Set hyperparameters
 batch_size = 512
