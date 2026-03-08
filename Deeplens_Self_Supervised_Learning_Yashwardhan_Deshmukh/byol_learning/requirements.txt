@@ -1,0 +1,4 @@
+tensorflow
+imageio
+numpy
+matplotlib
