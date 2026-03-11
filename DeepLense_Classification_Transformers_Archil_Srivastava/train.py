@@ -8,6 +8,7 @@ import numpy as np
 import argparse
 import os
 import wandb
+from pathlib import Path
 
 from data import LensDataset, WrapperDataset, get_transforms
 from constants import *
@@ -273,14 +274,19 @@ if __name__ == "__main__":
             )
 
         # Initialize train dataset
-        train_dataset = LensDataset(
-            root_dir=os.path.join("./data", f"{run_config.dataset}", "train")
-        )
+       
 
+BASE_DIR = Path(__file__).resolve().parent
+
+train_dataset = LensDataset(
+    root_dir=str(BASE_DIR / "data" / run_config.dataset)
+)
         # 90%-10% Train-validation split
-        train_size = int(len(train_dataset) * 0.9)
-        val_size = len(train_dataset) - train_size
-        train_dataset, val_dataset = random_split(train_dataset, [train_size, val_size])
+        # 90%-10% Train-validation split
+train_size = int(len(train_dataset) * 0.9)
+val_size = len(train_dataset) - train_size
+
+train_dataset, val_dataset = random_split(train_dataset, [train_size, val_size])
 
         # Initialize train and validation datasets
         train_dataset = WrapperDataset(
