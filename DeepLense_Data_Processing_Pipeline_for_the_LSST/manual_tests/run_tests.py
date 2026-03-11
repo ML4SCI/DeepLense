@@ -32,6 +32,7 @@ def run_test(test_number, test_name, script_path):
             [sys.executable, script_path],
             capture_output=True,
             text=True,
+            timeout=60
             cwd=Path(__file__).parent
         )
         
