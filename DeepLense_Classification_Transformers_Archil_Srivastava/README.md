@@ -196,3 +196,10 @@ So far, around 9 model families (including EfficientNet as baseline and 8 transf
   ```
   
 * Apoorva Singh, Yurii Halychanskyi, Marcos Tidball, DeepLense, (2021), GitHub repository, https://github.com/ML4SCI/DeepLense
+## Project Structure
+
+- train.py – training pipeline
+- eval.py – evaluation scripts
+- data.py – dataset loading
+- layers.py – neural network layers
+- utils.py – helper utilities

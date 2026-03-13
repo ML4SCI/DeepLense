@@ -8,6 +8,7 @@ import numpy as np
 import argparse
 import os
 import wandb
+from pathlib import Path
 
 from data import LensDataset, WrapperDataset, get_transforms
 from constants import *
@@ -44,9 +45,7 @@ def train_step(model, images, labels, optimizer, scheduler, criterion, device="c
         Loss value from the forward pass
     """
     # Send to device
-    images, labels = images.to(device, dtype=torch.float), labels.type(
-        torch.LongTensor
-    ).to(device)
+    images, labels = images.to(device, dtype=torch.float), labels.long().to(device)
     model.train()  # Set train mode
     optimizer.zero_grad()  # Reset gradients
     logits = model(images)  # Forward pass
@@ -70,7 +69,7 @@ def train(
     log_interval=100,
 ):
     """
-    Train the model, log it on W&B, save best model in disk and return the validation metrics
+    Train the model, log it on W&B,and save best model to disk and return the validation metrics
 
     Parameters
     ----------
@@ -273,14 +272,19 @@ if __name__ == "__main__":
             )
 
         # Initialize train dataset
-        train_dataset = LensDataset(
-            root_dir=os.path.join("./data", f"{run_config.dataset}", "train")
-        )
+       
 
+BASE_DIR = Path(__file__).resolve().parent
+
+train_dataset = LensDataset(
+    root_dir=str(BASE_DIR / "data" / run_config.dataset)
+)
         # 90%-10% Train-validation split
-        train_size = int(len(train_dataset) * 0.9)
-        val_size = len(train_dataset) - train_size
-        train_dataset, val_dataset = random_split(train_dataset, [train_size, val_size])
+        # 90%-10% Train-validation split
+train_size = int(len(train_dataset) * 0.9)
+val_size = len(train_dataset) - train_size
+
+train_dataset, val_dataset = random_split(train_dataset, [train_size, val_size])
 
         # Initialize train and validation datasets
         train_dataset = WrapperDataset(

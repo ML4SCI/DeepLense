@@ -32,6 +32,7 @@ def run_test(test_number, test_name, script_path):
             [sys.executable, script_path],
             capture_output=True,
             text=True,
+            timeout=60
             cwd=Path(__file__).parent
         )
         
@@ -54,6 +55,12 @@ def main():
     parser.add_argument('tests', nargs='?', default='all', 
                        help='Test number(s) to run (e.g., 1, 1-3, or all)')
     args = parser.parse_args()
+    # Validate test selection input
+if args.tests != "all":
+    valid = args.tests.replace("-", "").isdigit()
+    if not valid:
+        print("❌ Invalid test selection. Use formats like: 1, 1-3, or 'all'")
+        sys.exit(1)
     
     # Define all tests
     all_tests = [
