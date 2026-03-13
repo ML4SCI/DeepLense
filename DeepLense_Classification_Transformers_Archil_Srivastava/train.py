@@ -69,7 +69,7 @@ def train(
     log_interval=100,
 ):
     """
-    Train the model, log it on W&B, save best model in disk and return the validation metrics
+    Train the model, log it on W&B,and save best model to disk and return the validation metrics
 
     Parameters
     ----------
