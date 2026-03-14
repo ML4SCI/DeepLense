@@ -1,3 +1,4 @@
+import os
 import torch
 import torch.nn as nn
 import torch.optim as optim
@@ -106,8 +107,31 @@ def get_transfomer_finetuned(saved_model_path, device, num_classes) -> nn.Module
 def main():
     # Set device
     device = "cuda"  # torch.device("cuda" if torch.cuda.is_available() else "cpu")
-    pretrained_model_path = "/home/kartik/git/DeepLense/Transformers_Classification_DeepLense_Kartik_Sachdev/logger/2023-07-25-06-27-13/checkpoint/CrossFormer_pretrained_Model_II_2023-07-25-06-27-13.pt"
-    finetuned_model_path = "/home/kartik/git/DeepLense/Transformers_Classification_DeepLense_Kartik_Sachdev/logger/2023-07-25-06-27-13/checkpoint/CrossFormer_finetuned_Model_II_2023-07-25-06-27-13.pt"
+    
+    # Define base directory relative to script location
+    BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+    
+    # Use relative paths instead of hardcoded absolute paths
+    pretrained_model_path = os.path.join(
+        BASE_DIR,
+        "..",
+        "..",
+        "..",
+        "logger",
+        "2023-07-25-06-27-13",
+        "checkpoint",
+        "CrossFormer_pretrained_Model_II_2023-07-25-06-27-13.pt"
+    )
+    finetuned_model_path = os.path.join(
+        BASE_DIR,
+        "..",
+        "..",
+        "..",
+        "logger",
+        "2023-07-25-06-27-13",
+        "checkpoint",
+        "CrossFormer_finetuned_Model_II_2023-07-25-06-27-13.pt"
+    )
 
     # Set hyperparameters
     batch_size = 512

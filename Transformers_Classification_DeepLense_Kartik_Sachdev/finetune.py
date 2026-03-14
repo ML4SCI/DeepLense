@@ -1,3 +1,4 @@
+import os
 import torch
 import torch.nn as nn
 import torch.optim as optim
@@ -12,7 +13,10 @@ from torchsummary import summary
 # Set device
 device = "cuda"  # torch.device("cuda" if torch.cuda.is_available() else "cpu")
 learning_method = "contrastive_embedding"
-saved_model_path = "/home/kartik/git/deepLense_transformer_ssl/output/pretrained_contrastive_embedding.pth"
+
+# Define base directory relative to script location
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+saved_model_path = os.path.join(BASE_DIR, "output", "pretrained_contrastive_embedding.pth")
 
 # Set hyperparameters
 batch_size = 128
