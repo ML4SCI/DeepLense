@@ -94,6 +94,9 @@ parser.add_argument("--cuda", action="store_true", help="whether to use cuda")
 parser.add_argument(
     "--no-cuda", dest="cuda", action="store_false", help="not to use cuda"
 )
+parser.add_argument(
+    "--seed", type=int, default=42, help="random seed for reproducible experiments"
+)
 parser.set_defaults(cuda=True)
 
 args = parser.parse_args()
@@ -155,7 +158,7 @@ def main():
     train_len = len(trainset) - valid_len
     trainset, testset = random_split(trainset, [train_len, valid_len])
 
-    seed_everything(seed=42)
+    seed_everything(seed=args.seed)
     device = get_device(use_cuda=use_cuda, cuda_idx=0)
 
     # logging

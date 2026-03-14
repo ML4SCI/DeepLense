@@ -88,6 +88,7 @@ python3 main.py \
 | train_config | Transformer config: [CvT, CCT, TwinsSVT, LeViT, CaiT, CrossViT, PiT, Swin, T2TViT, CrossFormer] |
 | cuda | Use cuda |
 | no-cuda | Not use cuda |
+| seed | Random seed for reproducible experiments (default: 42) |
 
 
 ### __Self-Supervised Learning__
@@ -136,6 +137,7 @@ python3 main_ray.py \
 | cuda | Use cuda |
 | no-cuda | Not use cuda |
 | num_samples | Number of samples for [ASHA scheduler](https://docs.ray.io/en/latest/tune/api_docs/schedulers.html)  |
+| seed | Random seed for reproducible experiments (default: 42) |
 
 
 <br>
@@ -153,6 +155,26 @@ Modify the file `jobscript.sh` as per the system and user specifics and then, tr
 ```bash
 sbatch < jobscript.sh
 ```
+<br>
+
+# __Reproducibility__
+
+All training scripts support a `--seed` argument to ensure reproducible experiments. This sets seeds for Python's `random`, NumPy, PyTorch CPU, and CUDA:
+
+```bash
+# Supervised training with a custom seed
+python3 main.py --dataset_name Model_II --train_config CvT --seed 123
+
+# SSL pre-training with a custom seed
+python3 pretrain.py --seed 123
+
+# Finetuning with a custom seed
+python3 finetune.py --seed 123
+python3 finetune_byol.py --seed 123
+```
+
+The default seed is `42` if `--seed` is not specified.
+
 <br>
 
 # __Results__
