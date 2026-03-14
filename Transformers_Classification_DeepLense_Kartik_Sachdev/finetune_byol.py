@@ -13,11 +13,23 @@ from utils.util import (
     load_model_add_head,
     get_second_last_layer,
     get_last_layer_features,
+    seed_everything,
 )
 from torchsummary import summary
 from models.byol import BYOLSingleChannel, FinetuneModelByol
 import torchvision
 from models.utils.finetune_model import FinetuneModel
+from argparse import ArgumentParser
+
+parser = ArgumentParser()
+parser.add_argument(
+    "--seed", type=int, default=42, help="random seed for reproducible experiments"
+)
+args = parser.parse_args()
+
+# Set reproducible seed
+seed_everything(seed=args.seed)
+
 
 # Set device
 device = "cuda"  # torch.device("cuda" if torch.cuda.is_available() else "cpu")
