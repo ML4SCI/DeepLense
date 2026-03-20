@@ -28,6 +28,31 @@ ___Note__: Axion files have extra data corresponding to mass of axion used in si
 - Modeled after HST observation characteristics as done by default in lenstronomy.
 - Modeled with simple Sersic light profile
 
+## __Dataset Setup__
+
+Download the datasets from [DeepLenseSim repository](https://github.com/mwt5345/DeepLenseSim)
+
+### Model III (used in this project)
+- **Images:** 64 x 64 pixels, single channel
+- **Classes:** No substructure, Axion (vortex), CDM (point mass subhalos)
+- **Training set:** 30,000 images per class — [Download](https://drive.google.com/file/d/1ynKMJoEeKKJqLfuKRR1Y7rQjeBMM0w94/view?usp=sharing)
+- **Test set:** 5,000 images per class — [Download](https://drive.google.com/file/d/18BuCv40t6qmiNnhjJF1y9rqSBhBOfDon/view?usp=sharing)
+
+Place the downloaded `.npy` files into the `data/` directory:
+
+```text
+data/
+└── Model_III/
+    ├── train/
+    │   ├── axion/
+    │   ├── cdm/
+    │   └── no_sub/
+    └── test/
+        ├── axion/
+        ├── cdm/
+        └── no_sub/
+```
+
 <br>
 
 # __Training__

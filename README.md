@@ -35,6 +35,29 @@ All datasets are constructed using Lenstronomy, by Michael W. Toomey, as present
 |Model 3 dataset|Sheared Isothermal Elliptical lens | Sérsic light profile | HST's observation characteristics, Axion DM and CDM substructure appended to base halo to create 3 sub-structure classes
 |Model 4 dataset|Two Isothermal Elliptical lenses | Three-channel **real galaxy** images | Euclid's observation characteristics, Axion DM and CDM substructure appended to base halo to create 3 sub-structure classes
 
+### 2.1 Dataset Setup
+
+Depending on the sub-project, download the required datasets from the links below and place the `.npy` files into the project's `data/` directory. Most projects expect a sub-folder for the specific dataset (e.g., `Model_I`, `Model_II`, etc.), organized into `train`/`test` splits for each class (`axion`, `cdm`, `no_sub`):
+
+```text
+data/
+└── <Dataset_Name>/
+    ├── train/
+    │   ├── axion/
+    │   ├── cdm/
+    │   └── no_sub/
+    └── test/
+        ├── axion/
+        ├── cdm/
+        └── no_sub/
+```
+
+#### Download Links
+- **Model I**: [Train](https://drive.google.com/file/d/1QMVLpqag6S9JWqzmGM_pK4C0F1eBVIfV/view?usp=sharing) | [Test](https://drive.google.com/file/d/1rUAKLLS3p9jDaL9R9m84JVKvMcUuVsO1/view?usp=sharing)
+- **Model II**: [Train](https://drive.google.com/file/d/1HYPkdtVUj9xsoGzFDxT4rhl37KmqDCg4/view?usp=sharing) | [Test](https://drive.google.com/file/d/1PFdpqk7XOAKtg0Cnav4HTzyJiudx9dZv/view?usp=sharing)
+- **Model III**: [Train](https://drive.google.com/file/d/1ynKMJoEeKKJqLfuKRR1Y7rQjeBMM0w94/view?usp=sharing) | [Test](https://drive.google.com/file/d/18BuCv40t6qmiNnhjJF1y9rqSBhBOfDon/view?usp=sharing)
+- **Model IV**: [Train & Test](https://github.com/mwt5345/DeepLenseSim/tree/main/Model_IV)
+
 ## 3. Projects
 
 ![Project compositions](/Images_for_README/DeepLense%20project%20composition.jpeg)
