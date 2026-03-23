@@ -1,0 +1,13 @@
+# Install PyTorch and torchvision for your platform first if needed:
+# https://pytorch.org/get-started/locally/
+
+einops>=0.6,<1
+matplotlib>=3.7,<4
+numpy>=1.24,<3
+scikit-learn>=1.3,<2
+timm>=0.9,<1
+torch>=2.1,<3
+torchmetrics>=1.3,<2
+torchvision>=0.16,<1
+tqdm>=4.66,<5
+wandb>=0.16,<1

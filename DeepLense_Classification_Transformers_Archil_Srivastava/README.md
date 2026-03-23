@@ -30,6 +30,15 @@ ___Note__: Axion files have extra data corresponding to mass of axion used in si
 
 <br>
 
+# __Setup__
+
+Install the Python dependencies for this project before running training or evaluation:
+```bash
+python3 -m pip install -r requirements.txt
+```
+
+If PyTorch is not installed yet, install a compatible `torch` and `torchvision` build for your platform first from the [official PyTorch install guide](https://pytorch.org/get-started/locally/), then install the remaining project requirements.
+
 # __Training__
 
 Use the train.py script to train a particular model (using timm model name). The script will ask for a WandB login key, hence a WandB account is needed. Example: 
