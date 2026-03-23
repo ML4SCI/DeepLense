@@ -1,25 +1,97 @@
 ![ML4Sci x DeepLense](/Images_for_README/DEEPLENSE.png)
 
+## Project Overview
+
+DeepLense is a research repository from ML4SCI focused on applying machine learning to strong gravitational lensing. The repository brings together multiple independent projects covering classification, regression, domain adaptation, self-supervised learning, and super-resolution for lensing data.
+
+In practice, this repository works as a collection of project folders rather than a single Python package with one entry point. Each subdirectory usually contains its own notebooks, scripts, trained weights, and dependency list.
+
+## Repository Structure
+
+- `README.md`: top-level overview of the datasets and research directions in DeepLense.
+- `Images_for_README/`: figures used by the root documentation.
+- Project directories such as `DeepLense_Physics_Informed_Super_Resolution_Anirudh_Shankar/`, `DeepLense_Diffusion_Rishi/`, and `Transformers_Classification_DeepLense_Kartik_Sachdev/`: self-contained research efforts with their own code and notebooks.
+
+## How to Run
+
+Because DeepLense is a multi-project repository, you should run one subproject at a time.
+
+### 1. Clone the repository
+
+```bash
+git clone https://github.com/<your-username>/DeepLense.git
+cd DeepLense
+```
+
+### 2. Create and activate a virtual environment
+
+```bash
+python3 -m venv .venv
+source .venv/bin/activate
+python -m pip install --upgrade pip
+```
+
+### 3. Choose a project directory
+
+Examples:
+
+- `DeepLense_Physics_Informed_Super_Resolution_Anirudh_Shankar/`
+- `DeepLense_Diffusion_Rishi/`
+- `DeepLense_Gravitational_Lensing_Mriganka_Nath/`
+
+### 4. Install that project's dependencies
+
+Many subprojects include their own `requirements.txt`. Install dependencies from the directory you want to work in.
+
+Example:
+
+```bash
+cd DeepLense_Physics_Informed_Super_Resolution_Anirudh_Shankar
+pip install -r requirements.txt
+```
+
+Some projects also include extra dependency files for specific tasks. For example, the simulation workflow in `DeepLense_Physics_Informed_Super_Resolution_Anirudh_Shankar/` uses:
+
+```bash
+pip install -r simulations.txt
+```
+
+### 5. Run notebooks or project-specific scripts from the selected project
+
+Typical workflows in this repository are notebook-driven:
+
+```bash
+jupyter lab
+```
+
+Then open the notebook for the subproject you want to explore.
+
+Some projects also provide helper scripts under folders such as `scripts/` or `train/`. Use the commands documented in that project's README rather than assuming a shared entry point across the repository.
+
+### 6. Check project-specific README files
+
+The root README gives a repository-level overview, but setup details can differ across projects. Before running a specific workflow, read the README inside that project folder if one is available.
+
 ## 1. Background
 
-We at DeepLense explore cutting-edge Machine Learning techniques for the study of Strong Gravitational Lensing and Dark Matter Sub-structure. We use both simulated and real lensing images, for a variety of tasks, using a variety of techniques.
+At DeepLense, we explore machine learning techniques for studying strong gravitational lensing and dark matter substructure. We use both simulated and real lensing images across several tasks and model families.
 
-We also actively mentor [Google Summer of Code (GSoC)](https://summerofcode.withgoogle.com/) projects, that you can find listed [here](#3-projects). 
+We also actively mentor [Google Summer of Code (GSoC)](https://summerofcode.withgoogle.com/) projects, many of which are listed [here](#3-projects). 
 
-1. Find below a description of [gravitational lensing](#11-gravitational-lensing) and [dark matter sub-structure](#12-dark-matter-and-sub-structure).
-2. [Section 2](#2-models) contains a detailed description of the datasets used in the various projects
-3. [Section 3](#3-projects) beins with a short description followed by an expansion on the various (GSoC) projects conducted at DeepLense
+1. A short introduction to [gravitational lensing](#11-gravitational-lensing) and [dark matter substructure](#12-dark-matter-and-sub-structure) is provided below.
+2. [Section 2](#2-datasets) describes the datasets used across the projects.
+3. [Section 3](#3-projects) starts with a summary and then expands on the various DeepLense and GSoC projects.
 
 ### 1.1 Gravitational Lensing
 
-Gravitational lensing is the phenomenon of the bending of light in the gravity of a massive celestial object (such as a massive galaxy or a group of galaxies); the object essentially behaving as a cosmic lens. We, as a result see the distorted image(s) of light sources (typically another galaxy) behind it. 
+Gravitational lensing is the bending of light by the gravity of a massive celestial object, such as a galaxy or galaxy cluster. The object effectively acts as a cosmic lens, so we observe distorted images of background light sources, typically other galaxies.
 
 ![Lensing Schematic](https://upload.wikimedia.org/wikipedia/commons/thumb/0/02/Gravitational_lens-full.jpg/330px-Gravitational_lens-full.jpg)
 
 The dynamics of lensing depends on both the composition of the lens and the nature of the source. We explore different lens models and source light profiles including real galaxy images in DeepLense, that you can find [here](#2-datasets).
 ### 1.2 Dark Matter and Sub-structure 
 
-In DeepLense, we’re mainly dealing with three kinds of simulated Dark Matter:
+In DeepLense, we mainly work with three kinds of simulated dark matter:
 * **Axion Dark Matter (Vortex)**: Axions are hypothetical particles that are considered as candidates for dark matter. In the context of axion dark matter, vortex substructures refer to specific topological features that can form in the distribution of axion fields.
 * **Cold Dark Matter (Subhalo)**: This model suggests that dark matter consists of slow-moving particles. In the CDM paradigm, smaller clusters of dark matter, known as subhalos, are approximated as “point masses.” This simplification facilitates computational modeling by treating these subhalos as singular points in the overall distribution of dark matter.
 * **No-Substructure Dark Matter**: Unlike the CDM model, the “no-substructure” approach assumes that dark matter is evenly spread out, devoid of any smaller-scale clusters or sub-halos. This stands in stark contrast to the hierarchical structuring and layering of sub-halos within larger halos as predicted by CDM models.
@@ -83,7 +155,7 @@ Classification of lensing images into their intrinsic dark matter sub-structure 
 
 #### 3.1.6 Contrastive Learning vs BYOL
 
-**Yashwardhan Deshmukh** compares the performance of the self-supervised learning techniques in their [GSoC 2023 project](https://summerofcode.withgoogle.com/archive/2023/projects/TBOsy4MA), Contranstive Learning and Bootstrap Your Own Latent (BYOL) on the three datasets, Model 1, 2 and 3.
+**Yashwardhan Deshmukh** compares the performance of the self-supervised learning techniques in their [GSoC 2023 project](https://summerofcode.withgoogle.com/archive/2023/projects/TBOsy4MA), Contrastive Learning and Bootstrap Your Own Latent (BYOL), on the three datasets: Model 1, 2, and 3.
 
 #### 3.1.7 Domain Adaptation for Simulation-Based Dark Matter Searches Using Strong Gravitational Lensing
 
@@ -102,11 +174,11 @@ Their work has been published as a [paper](https://iopscience.iop.org/article/10
 ### 3.2 Dark matter property estimation through regression
 
 Another means of dark matter study through strong lensing is through the approximation of their properties. **Yurii Halychanskyi** and **Zhongchao Guan** approximate the mass density of vortex substructure of dark matter condensates on the three datasets, Model 1, 2 and 3. 
-Yurii uses the ResNet18Hybrid and CmtTi architectures in their [GSoc 2021](https://summerofcode.withgoogle.com/archive/2021/projects/5719965138681856) and [2022](https://summerofcode.withgoogle.com/archive/2022/projects/58Y5QOU4) projects, while Zhongchao demonstres with ResNet18, ViT, CNN-T, MobileNet V2 and CvT-13, in their [GSoc 2022 project](https://summerofcode.withgoogle.com/archive/2022/projects/lnptRFqq).
+Yurii uses the ResNet18Hybrid and CmtTi architectures in their [GSoc 2021](https://summerofcode.withgoogle.com/archive/2021/projects/5719965138681856) and [2022](https://summerofcode.withgoogle.com/archive/2022/projects/58Y5QOU4) projects, while Zhongchao demonstrates results with ResNet18, ViT, CNN-T, MobileNet V2, and CvT-13 in their [GSoc 2022 project](https://summerofcode.withgoogle.com/archive/2022/projects/lnptRFqq).
 
 ### 3.3 Super-resolution of lensing images
 
-Finally, DeepLense help combat the problem of noisy and low-resolution of real lensing images through various super-resolution techniques. Denoising and upscaling of lensing images can help make their study more accurate.
+Finally, DeepLense helps address the problem of noisy, low-resolution real lensing images through various super-resolution techniques. Denoising and upscaling these images can make scientific analysis more accurate.
 
 #### 3.3.1 Single Image Super-Resolution with Diffusion Models
 **Atal Gupta** achieves super-resolution of the real-galaxy lensing dataset, in their [GSoC 2024 project](https://summerofcode.withgoogle.com/programs/2024/projects/3YAQgkHr), Model 4 using a variety of Diffusion Models (DDPM, SR3, SRDiff, ResShift and CG-DPM).

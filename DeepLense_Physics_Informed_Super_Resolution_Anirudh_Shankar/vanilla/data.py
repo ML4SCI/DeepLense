@@ -1,5 +1,6 @@
 import torch
 import numpy as np
+from pathlib import Path
     
 class LensingDataset(torch.utils.data.Dataset):
     def __init__(self, directory, classes, num_samples, aux='_sim_'):
@@ -12,10 +13,11 @@ class LensingDataset(torch.utils.data.Dataset):
         :param aux: Used to indicate whether the dataset contains image sumulations ('_sim_') or deflection angles ('_alpha_')
         """
         super(LensingDataset, self).__init__()
-        self.directory = directory
+        self.directory = Path(directory)
         self.classes = classes
         self.num_samples = num_samples
         self.aux = aux
+
     def __len__(self):
         """
         :return: Returns the length of the dataset
@@ -30,8 +32,23 @@ class LensingDataset(torch.utils.data.Dataset):
         :return: LR image, min-max normalized
         """
         selected_class = self.classes[index//self.num_samples]
-        class_index = index%self.num_samples
-        image = torch.tensor(np.array([np.load(self.directory+selected_class+'/%s'%selected_class+self.aux+'%d.npy'%(class_index))]))
+        sample_index = index%self.num_samples
+        image_path = self.directory / selected_class / f"{selected_class}{self.aux}{sample_index}.npy"
+
+        if not image_path.exists():
+            raise FileNotFoundError(f"Expected sample not found: {image_path}")
+
+        # Keep the returned tensor in the original single-channel format: [1, H, W].
+        image = torch.tensor(np.array([np.load(image_path)]))
+
         if self.aux == '_sim_':
-            image = (image - torch.min(image))/(torch.max(image)-torch.min(image))
+            image_min = torch.min(image)
+            image_max = torch.max(image)
+
+            # Avoid dividing by zero if a sample is constant-valued.
+            if torch.isclose(image_max, image_min):
+                return torch.zeros_like(image)
+
+            image = (image - image_min)/(image_max - image_min)
+
         return image

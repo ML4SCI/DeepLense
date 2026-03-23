@@ -21,21 +21,21 @@ Find below the list of contents of this description:
 11. [Appendix](#11-appendix)
 
 ## 1. Replication and set-up
-The Git repository can be accessed from here, as part of the parent ML4Sci repository.
+This project lives inside the parent ML4Sci DeepLense repository.
 
 It contains all the Python Notebooks used in training and testing, the trained model weights, dataset simulation scripts, set-up instructions and some examples.
 
-Requirements are divided into two, for each of the tasks:
+The dependencies are split into two groups based on the workflow:
 
-**1. Image simulation**: Use the following in an environment of your choice to install the libraries required for simulating the datasets: 
+**1. Image simulation**: Use the following command in your environment to install the libraries required for simulating datasets:
 
-`pip install simulations.txt` 
+`pip install -r simulations.txt`
 
 The Simulations directory contains the code used to create the dataset, and is adopted from [Michael Toomey’s work](https://github.com/mwt5345/DeepLenseSim/tree/main/Model_I), one of my project mentors.
 
-**2. Super-resolution and related tasks (basically, everything else)**: Use the following in an environment of your choice to install the libraries required for everything else presented in this project:
+**2. Super-resolution and related tasks (everything else)**: Use the following command to install the libraries required for the training and evaluation notebooks:
 
-`pip install requirements.txt`
+`pip install -r requirements.txt`
 
 ## 2. What is gravitational lensing ?
 
@@ -77,7 +77,7 @@ Training is done on low-resolution lensing images alone, as described in the [fo
 ## 4. Datasets
 
 Three datasets are used, each of which mimics a telescope:
-* Model 1 dataset: mimics an artifically constructed telescope
+* Model 1 dataset: mimics an artificially constructed telescope
 * Model 2 dataset: mimics Euclid
 * Model 3 dataset: mimics the Hubble Space Telescope
 
@@ -100,7 +100,7 @@ The model is trained in an unsupervised fashion using a multi-faceted physics-ba
   * Sub-low-resolution scale (0.5x): At dimensions that are further lower than the low-resolution input images
 * Mean squared error (MSE) between the Sérsic profile and the reconstructed source image
 * MSE between the interpolated images and the images produced by the model
-* Intensity constraints between the Sérsic source and the upscaled lensing images. This is elabored on in the [Appendix](#11-appendix)
+* Intensity constraints between the Sérsic source and the upscaled lensing images. This is elaborated on in the [Appendix](#11-appendix)
 * The deflection angle is ensured to be > 0, as this is a physical constraint on the system owing to the non-negativity of the mass distribution
 * A variation density loss (VDL) that restricts the local variability of the deflection angle. This loss ensures that the produced deflection angles remain physical, and without any artifacts or aphysical fluctuations. More in the [Appendix](#11-appendix).
 
@@ -122,7 +122,7 @@ Models are trained on the training dataset described in [Section 4](#4-datasets)
 
 Performance of the models are evaluated using the following metrics:
 * **MSE**: The MSE between the SR and true HR images acts as a simple estimate of closeness of individual pixels in both images.
-* **Structural Similarity Index Measure (SSIM)**: This metric also evalutates how different the relation between pixels and their neighbours are, in the SR and true HR images.
+* **Structural Similarity Index Measure (SSIM)**: This metric also evaluates how different the relationships between neighbouring pixels are in the SR and true HR images.
 * **Peak Signal-to-Noise Ratio (PSNR)**: This metric acts as a measure of the amount of noise present in the image. A higher value corresponds to better image quality (lesser noise).
 
 Model 1:
@@ -147,7 +147,7 @@ Model 3:
 | CDM (sub-halos) | 0.001684 | 0.809 | 28.636 |
 
 ### Performance on the model-2 dataset
-As seen above, the performance of the model on the model-2 dataset (limited to the SSIM) appears to be significantly worse. Model-2, mimicing Euclid, has a much lower PSF (point spread function) when compared to the other models. This causes broader and more blurred local features in the images, with which both the model. The worse performance can thus be associated for the most part with the quality issues imposed by the model-2 PSF.
+As seen above, the performance of the model on the Model 2 dataset, especially in terms of SSIM, appears to be significantly worse. Model 2, which mimics Euclid, has a much lower PSF (point spread function) than the other models. This leads to broader and blurrier local features in the images, making reconstruction harder for the model. Most of the performance gap can therefore be attributed to the image-quality limitations imposed by the Model 2 PSF.
 
 ## 7. Auxiliary studies
 
@@ -185,15 +185,15 @@ This direction tests the performance of the model when trained with a much small
 
 ![Performance with sparsity](Readme/sparse.jpg)
 
-The model trained on fewer samples again, show at most a 10% degradation in the SSIM and PSNR scores. Again, this could imply minute structural improvements, but overall similariy in performance.
+The model trained on fewer samples again shows at most a 10% degradation in the SSIM and PSNR scores. This suggests small structural differences, but broadly similar overall performance.
 
 This result also falls in line with several PINN studies, suggesting that a strength of PINNs is their ability to function effectively with sparse datasets.
 
 ### Quality verification
 
-This final direction aims at ensuring the quality of images produed by the SR architecture proposed. While the SSIM and PSNR scores can ensure perceptual quality, their true quality that one can see directly, must also be ensured.
+This final direction aims to ensure the quality of the images produced by the proposed SR architecture. While SSIM and PSNR help quantify perceptual quality, the visual and downstream usefulness of the outputs must also be checked directly.
 
-For this purpose, a downstream classification into the three DM sub-structure classes is performed by similar classification networks on the two sets of images: the LR images, and the SR architecture's outputs. There was initially a 10% worse perofrmance by the SR model in downsteam classification accuracy, and small adjustments to the architecture was made to preserve SR image quality.
+For this purpose, a downstream classification into the three DM sub-structure classes is performed using similar classification networks on two sets of images: the LR images and the SR model outputs. There was initially a roughly 10% drop in downstream classification accuracy for the SR outputs, so small adjustments were made to the architecture to preserve SR image quality.
 
 ![DC model adjustments](Readme/Alpha_2.png)
 
