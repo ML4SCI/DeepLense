@@ -1,0 +1,15 @@
+device: "cuda"
+dataset_name: "Model_II"
+num_classes: 3
+image_size: 224
+channels: 1
+batch_size: 512
+num_workers: 8
+labels_map:
+  0: "axion"
+  1: "cdm"
+  2: "no_sub"
+
+# REQUIRED - set these to your actual paths
+log_dir: ""
+finetune_model_path: ""
