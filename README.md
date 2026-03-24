@@ -35,6 +35,41 @@ All datasets are constructed using Lenstronomy, by Michael W. Toomey, as present
 |Model 3 dataset|Sheared Isothermal Elliptical lens | Sérsic light profile | HST's observation characteristics, Axion DM and CDM substructure appended to base halo to create 3 sub-structure classes
 |Model 4 dataset|Two Isothermal Elliptical lenses | Three-channel **real galaxy** images | Euclid's observation characteristics, Axion DM and CDM substructure appended to base halo to create 3 sub-structure classes
 
+### 2.1 Getting the simulated datasets locally
+
+The vision-transformer training and evaluation scripts expect the simulated data from [DeepLenseSim](https://github.com/mwt5345/DeepLenseSim/tree/main/) to live in this repository under `./data/<MODEL_NAME>/{train,test}/{axion,cdm,no_sub}` as `.npy` files. You can mirror that structure with the public DeepLenseSim repository:
+
+```bash
+# from the repo root
+git clone https://github.com/mwt5345/DeepLenseSim.git ../DeepLenseSim
+mkdir -p data
+cp -r ../DeepLenseSim/Model_I ../DeepLenseSim/Model_II ../DeepLenseSim/Model_III data/
+```
+
+Expected layout (replace `Model_I` with `Model_II` or `Model_III`):
+
+```
+data/
+  Model_I/
+    train/{axion,cdm,no_sub}/*.npy
+    test/{axion,cdm,no_sub}/*.npy
+```
+
+If you just want a smoke test without downloading the full datasets, miniature samples live under `DeepLense_Classification_Transformers_Archil_Srivastava/application_tests/`.
+
+Run training (Weights & Biases login required):
+
+```bash
+cd DeepLense_Classification_Transformers_Archil_Srivastava
+python3 train.py --dataset Model_I --model_name coatnet_nano_rw_224 --project ml4sci_deeplense_final
+```
+
+Evaluate a saved run (uses the `best_model.pt` artifact from the train run):
+
+```bash
+python3 eval.py --runid <wandb_run_id> --project ml4sci_deeplense_final
+```
+
 ## 3. Projects
 
 ![Project compositions](/Images_for_README/DeepLense%20project%20composition.jpeg)
