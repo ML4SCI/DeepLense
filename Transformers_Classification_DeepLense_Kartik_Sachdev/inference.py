@@ -12,15 +12,14 @@ import torchvision
 from torchsummary import summary
 
 
-def main():
+def main(log_dir,finetune_model_path):
     device = "cuda"
     num_classes = 3
     dataset_name = "Model_II"
     labels_map = {0: "axion", 1: "cdm", 2: "no_sub"}
     image_size = 224
     channels = 1
-    log_dir = "/home/kartik/git/DeepLense/Transformers_Classification_DeepLense_Kartik_Sachdev/logger/2023-07-23-13-30-24"
-    finetune_model_path = "/home/kartik/git/DeepLense/Transformers_Classification_DeepLense_Kartik_Sachdev/logger/2023-07-23-13-30-24/checkpoint/Resnet_finetune_Model_II.pt"
+
     batch_size = 512
     num_workers = 8
 
@@ -92,4 +91,27 @@ def main():
 
 
 if __name__ == "__main__":
-    main()
+    import argparse
+
+    parser = argparse.ArgumentParser()
+
+    parser.add_argument(
+        "--log_dir",
+        type=str,
+        required=True,
+        help="Path to log directory"
+    )
+
+    parser.add_argument(
+        "--finetune_model_path",
+        type=str,
+        required=True,
+        help="Path to finetuned model"
+    )
+
+    args = parser.parse_args()
+
+    main(
+        log_dir=args.log_dir,
+        finetune_model_path=args.finetune_model_path
+    )
