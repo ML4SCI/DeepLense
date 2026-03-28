@@ -29,7 +29,16 @@ def get_device(device):
         return xm.xla_device()
     if (device == "cuda" or device == "best") and torch.cuda.is_available():
         return "cuda"
-    if (device == "mps" or device == "best") and torch.has_mps:
+    mps_backend = getattr(torch.backends, "mps", None)
+    mps_available = False
+    if mps_backend is not None:
+        is_available = getattr(mps_backend, "is_available", None)
+        is_built = getattr(mps_backend, "is_built", None)
+        if callable(is_available):
+            mps_available = bool(is_available())
+        elif callable(is_built):
+            mps_available = bool(is_built())
+    if (device == "mps" or device == "best") and mps_available:
         return "mps"
     if device == "cpu" or device == "best":
         return "cpu"

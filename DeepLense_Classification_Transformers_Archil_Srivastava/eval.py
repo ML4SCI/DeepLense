@@ -2,10 +2,8 @@ import torch
 from torch.utils.data import DataLoader
 from torch.nn import CrossEntropyLoss
 from torchmetrics.functional import auroc as auroc_fn, accuracy as accuracy_fn
-from sklearn.metrics import ConfusionMatrixDisplay, roc_curve
 import wandb
 import numpy as np
-import matplotlib.pyplot as plt
 import argparse
 import os
 
@@ -55,24 +53,46 @@ def evaluate(model, data_loader, loss_fn, device):
 
     # Concatenate all results
     logits, y = torch.cat(logits), torch.cat(y)
-    loss.append(loss_fn(logits, y))
-    accuracy.append(accuracy_fn(logits, y, num_classes=NUM_CLASSES))
-    class_auroc.append(auroc_fn(logits, y, num_classes=NUM_CLASSES, average=None))
-    macro_auroc.append(auroc_fn(logits, y, num_classes=NUM_CLASSES, average="macro"))
+    probs = torch.nn.functional.softmax(logits, dim=-1)
+    loss.append(loss_fn(logits, y).item())
+    accuracy.append(
+        accuracy_fn(probs, y, task="multiclass", num_classes=NUM_CLASSES).item()
+    )
+    class_auroc.append(
+        auroc_fn(
+            probs, y, task="multiclass", num_classes=NUM_CLASSES, average=None
+        ).cpu()
+    )
+    # torchmetrics multiclass AUROC doesn't support micro-averaging directly.
+    # Compute micro-AUROC as binary AUROC over flattened one-vs-rest targets.
+    micro_auroc.append(
+        auroc_fn(
+            probs.reshape(-1),
+            torch.nn.functional.one_hot(y, num_classes=NUM_CLASSES)
+            .to(dtype=torch.int)
+            .reshape(-1),
+            task="binary",
+        ).item()
+    )
+    macro_auroc.append(
+        auroc_fn(
+            probs, y, task="multiclass", num_classes=NUM_CLASSES, average="macro"
+        ).item()
+    )
 
     result = {
         "ground_truth": y,
         "logits": logits,
-        "loss": np.mean(loss),
-        "accuracy": np.mean(accuracy),
-        "micro_auroc": np.mean(micro_auroc),
-        "macro_auroc": np.mean(macro_auroc),
+        "loss": float(np.mean(loss)),
+        "accuracy": float(np.mean(accuracy)),
+        "micro_auroc": float(np.mean(micro_auroc)),
+        "macro_auroc": float(np.mean(macro_auroc)),
     }
 
     # Class-wise AUROC
     class_auroc = class_auroc[0]
     for i, label in enumerate(LABELS):
-        result[f"{label}_auroc"] = class_auroc[i]
+        result[f"{label}_auroc"] = float(class_auroc[i].item())
 
     return result
 
@@ -82,8 +102,20 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser()
 
     # Wandb-specific params
-    parser.add_argument("--runid", type=str, help="ID of train run")
+    parser.add_argument(
+        "--runid",
+        "--run_id",
+        dest="runid",
+        type=str,
+        help="ID of train run",
+    )
     parser.add_argument("--project", type=str, default="ml4sci_deeplense_final")
+    parser.add_argument(
+        "--entity",
+        type=str,
+        default=os.environ.get("WANDB_ENTITY"),
+        help="W&B entity/org. Defaults to $WANDB_ENTITY when set.",
+    )
 
     # Device to run on
     parser.add_argument(
@@ -91,10 +123,19 @@ if __name__ == "__main__":
     )
     run_config = parser.parse_args()
 
+    from sklearn.metrics import ConfusionMatrixDisplay, roc_curve
+    import matplotlib.pyplot as plt
+
     # Start wandb run
-    with wandb.init(
-        entity="_archil", project=run_config.project, id=run_config.runid, resume="must"
-    ):
+    wandb_init_kwargs = dict(
+        project=run_config.project,
+        id=run_config.runid,
+        resume="must",
+    )
+    if run_config.entity:
+        wandb_init_kwargs["entity"] = run_config.entity
+
+    with wandb.init(**wandb_init_kwargs):
         # Get best device on machine
         device = get_device(run_config.device)
 
@@ -169,7 +210,7 @@ if __name__ == "__main__":
         roc_auc = dict()
         for idx, cls in enumerate(LABELS):
             class_truth = (metrics["ground_truth"].numpy() == idx).astype(int)
-            class_pred = torch.nn.functional.softmax(metrics["logits"]).numpy()[
+            class_pred = torch.nn.functional.softmax(metrics["logits"], dim=-1).numpy()[
                 ..., idx
             ]
             fpr[idx], tpr[idx], _ = roc_curve(class_truth, class_pred)
@@ -185,7 +226,7 @@ if __name__ == "__main__":
 
         disp = ConfusionMatrixDisplay.from_predictions(
             y_true=metrics["ground_truth"].numpy(),
-            y_pred=np.argmax(metrics["logits"], axis=-1),
+            y_pred=metrics["logits"].argmax(dim=-1).numpy(),
             display_labels=LABELS,
             cmap=plt.cm.Blues,
             colorbar=False,
