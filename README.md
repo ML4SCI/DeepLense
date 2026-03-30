@@ -102,7 +102,7 @@ Their work has been published as a [paper](https://iopscience.iop.org/article/10
 ### 3.2 Dark matter property estimation through regression
 
 Another means of dark matter study through strong lensing is through the approximation of their properties. **Yurii Halychanskyi** and **Zhongchao Guan** approximate the mass density of vortex substructure of dark matter condensates on the three datasets, Model 1, 2 and 3. 
-Yurii uses the ResNet18Hybrid and CmtTi architectures in their [GSoc 2021](https://summerofcode.withgoogle.com/archive/2021/projects/5719965138681856) and [2022](https://summerofcode.withgoogle.com/archive/2022/projects/58Y5QOU4) projects, while Zhongchao demonstres with ResNet18, ViT, CNN-T, MobileNet V2 and CvT-13, in their [GSoc 2022 project](https://summerofcode.withgoogle.com/archive/2022/projects/lnptRFqq).
+Yurii uses the ResNet18Hybrid and CmtTi architectures in their [GSoC 2021](https://summerofcode.withgoogle.com/archive/2021/projects/5719965138681856) and [2022](https://summerofcode.withgoogle.com/archive/2022/projects/58Y5QOU4) projects, while Zhongchao demonstres with ResNet18, ViT, CNN-T, MobileNet V2 and CvT-13, in their [GSoC 2022 project](https://summerofcode.withgoogle.com/archive/2022/projects/lnptRFqq).
 
 ### 3.3 Super-resolution of lensing images
 
