@@ -47,9 +47,8 @@ def evaluate(model, data_loader, loss_fn, device):
     # Iterate over batches and accumulate metrics
     for batch_X, batch_y in data_loader:
         # Send data to device
-        batch_X, batch_y = batch_X.to(device, dtype=torch.float), batch_y.type(
-            torch.LongTensor
-        )
+        batch_X = batch_X.to(device, dtype=torch.float)
+        batch_y = batch_y.to(dtype=torch.long)
         logits.append(model(batch_X).cpu())  # Append the logits
         y.append(batch_y)  # Append the predictions
 

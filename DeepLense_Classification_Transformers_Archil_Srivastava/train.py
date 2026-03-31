@@ -44,9 +44,8 @@ def train_step(model, images, labels, optimizer, scheduler, criterion, device="c
         Loss value from the forward pass
     """
     # Send to device
-    images, labels = images.to(device, dtype=torch.float), labels.type(
-        torch.LongTensor
-    ).to(device)
+    images = images.to(device, dtype=torch.float)
+    labels = labels.to(device, dtype=torch.long)
     model.train()  # Set train mode
     optimizer.zero_grad()  # Reset gradients
     logits = model(images)  # Forward pass
@@ -54,7 +53,7 @@ def train_step(model, images, labels, optimizer, scheduler, criterion, device="c
     loss.backward()  # Backward pass
     optimizer.step()  # Optimize weights step
     if scheduler is not None:
-        scheduler.step(loss)  # Modify learning rate if scheduler is set
+        scheduler.step()  # Modify learning rate if scheduler is set
     return loss
 
 
