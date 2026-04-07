@@ -1,5 +1,18 @@
 ![ML4Sci x DeepLense](/Images_for_README/DEEPLENSE.png)
 
+## 🚀 Quick Start
+
+Follow these steps to set up the project quickly:
+
+```bash
+git clone https://github.com/ML4SCI/DeepLense.git
+cd DeepLense
+
+python -m venv venv
+source venv/bin/activate   # Windows: venv\Scripts\activate
+
+pip install -r requirements.txt
+
 ## 1. Background
 
 We at DeepLense explore cutting-edge Machine Learning techniques for the study of Strong Gravitational Lensing and Dark Matter Sub-structure. We use both simulated and real lensing images, for a variety of tasks, using a variety of techniques.
@@ -26,6 +39,45 @@ In DeepLense, we’re mainly dealing with three kinds of simulated Dark Matter:
 
 ## 2. Datasets
 
+## 2.1 Dataset Setup
+
+To run the models in this repository, you need to download and
+properly organize the datasets.
+
+### 📥 Download
+
+Datasets can be generated or downloaded from:
+https://github.com/mwt5345/DeepLenseSim
+
+(Refer to the repository for instructions specific to each dataset.)
+
+### 📁 Directory Structure
+
+After downloading, organize the dataset as follows:
+DeepLense/
+│── data/
+│   ├── model_1/
+│   ├── model_2/
+│   ├── model_3/
+│   └── model_4/
+│
+│── scripts/
+│── models/
+│── README.md
+
+### ⚙️ Preprocessing
+
+- Ensure images are in the expected format (e.g., `.npy`, `.png`)
+- Normalize or preprocess data if required by specific scripts
+- Check individual project folders for custom preprocessing steps
+
+### ▶️ Running Training
+
+Example:
+
+```bash
+python train.py --data_path ./data/model_1
+
 All datasets are constructed using Lenstronomy, by Michael W. Toomey, as presented in their [repository](https://github.com/mwt5345/DeepLenseSim/tree/main/).
 
 | Dataset | Lens model | Light Profile | Modelling strategy |
@@ -35,10 +87,75 @@ All datasets are constructed using Lenstronomy, by Michael W. Toomey, as present
 |Model 3 dataset|Sheared Isothermal Elliptical lens | Sérsic light profile | HST's observation characteristics, Axion DM and CDM substructure appended to base halo to create 3 sub-structure classes
 |Model 4 dataset|Two Isothermal Elliptical lenses | Three-channel **real galaxy** images | Euclid's observation characteristics, Axion DM and CDM substructure appended to base halo to create 3 sub-structure classes
 
+---
+
+## 📦 Dataset Setup
+
+This project uses simulated gravitational lensing datasets generated using Lenstronomy.
+
+### 1. Download / Generate Dataset
+
+Datasets can be generated using the official simulation repository:
+
+https://github.com/mwt5345/DeepLenseSim/tree/main/
+
+Follow the instructions in that repository to generate datasets corresponding to:
+- Model 1
+- Model 2
+- Model 3
+- Model 4
+
+*(If pre-generated datasets are available, they can be linked here in the future.)*
+
+---
+
+### 2. Directory Structure
+
+After downloading or generating the dataset, organize it as follows:
+DeepLense/
+│── data/
+│   └── dataset_name/
+│       ├── train/
+│       ├── test/
+│       └── labels/
+
+---
+
+### 3. Configure Dataset Path
+
+Ensure the dataset path is correctly set in the training scripts. For example:
+
+```python
+data_dir = "./data/dataset_name/"
+
 ## 3. Projects
+
+This section contains various research and implementation projects developed under DeepLense, primarily through GSoC contributions. Each project focuses on different machine learning approaches applied to gravitational lensing datasets.
+
+👉 Navigate to individual project folders for code, training scripts, and detailed instructions.
+
 
 ![Project compositions](/Images_for_README/DeepLense%20project%20composition.jpeg)
 ![Techniques compositions](/Images_for_README/DeepLense%20ML%20Techniques.jpeg)
+
+---
+
+### 🧭 How to Use These Projects
+
+1. Choose a project from the table below  
+2. Navigate to its repository folder  
+3. Check for:
+   - `train.py` or `main.py`
+   - notebooks (`.ipynb`)
+   - specific README (if available)
+
+4. Run the project using:
+
+```bash
+python train.py
+```
+
+⚠️ Note: Each project may have different dependencies and dataset requirements.
 
 | Project Name | Contributor | Task | ML Techniques | Repository Link | Blog Post |
 |---|---|---|---|---|---|
@@ -46,7 +163,24 @@ All datasets are constructed using Lenstronomy, by Michael W. Toomey, as present
 |[Unsupervised Domain Adaptation](#312-unsupervised-domain-adaptation)|Mriganka Nath|Sub-structure classification|Unsupervised Domain Adaptation|[Click Here](https://github.com/ML4SCI/DeepLense/tree/main/DeepLense_Gravitational_Lensing_Mriganka_Nath)|[Click Here](https://mrinath.medium.com/domain-adaptation-for-gravitational-lens-finding-gsoc-22-ml4sci-7b70b2be6d6b)|
 |[Lensiformer: A Relativistic Physics-Informed Vision Transformer Architecture for Dark Matter Morphology in Gravitational Lensing](#313-lensiformer-a-relativistic-physics-informed-vision-transformer-architecture-for-dark-matter-morphology-in-gravitational-lensing)|Lucas Jose|Sub-structure classification|Physics-Informed Transformer|[Click Here](https://github.com/ML4SCI/DeepLense/tree/main/Physics_Informed_Transformers_For_Dark-Matter_Morphology_Lucas_Jose)|[Click Here](https://medium.com/@lucas.jose.veloso.de.souza/lensiformer-a-relativistic-physics-informed-vision-transformer-architecture-for-dark-matter-a119f6d0dc0d) |
 |[Physics Informed Neural Network for Dark Matter Morphology](#314-physics-informed-neural-network-for-dark-matter-morphology)|Ashutosh Ojha|Sub-structure classification|Physics-Informed Transformer|[Click Here](https://github.com/ML4SCI/DeepLense/tree/main/DeepLense_Physics_Informed_Neural_Network_for_Dark_Matter_Morphology_Ashutosh_Ojha)| [Click here](https://medium.com/@ojhaaashutosh1005/physics-informed-neural-network-for-dark-matter-morphology-f6187164e4c8) |
-|[Learning Representation Through Self-Supervised Learning on Real Gravitational Lensing Images](#315-learning-representation-through-self-supervised-learning-on-real-gravitational-lensing-images)|Sreehari Iyer|Sub-structure classification|Self-supervised Learning|[Click Here](https://github.com/ML4SCI/DeepLense/tree/main/DeepLense_SSL_from_real_dataset_Sreehari_Iyer)| [Click Here](https://iyersreehari.github.io/gsoc24-blog-deeplense-ssl/) |
+|[Learning Representation Through Self-Supervised Learning on Real Gravitational Lensing Images]
+
+## 🚀 Standardized Training Pipeline (GSoC 2026 Preview)
+
+I have refactored the training workflow to improve reproducibility and reduce setup errors.
+
+### Key Features:
+- **Dataset Validation:** The script now automatically verifies `.npy` file pairs before training starts.
+- **YAML Configuration:** No more editing Python code to change hyperparameters.
+- **Failure-Aware Loading:** Improved error handling for corrupted or missing data files.
+
+### How to Run:
+1. Update `configs/defaults.yaml` with your local data paths.
+2. Run training with a single command:
+   ```bash
+   python ssltrain.py configs/vit_dino_experiment.yaml
+   
+(#315-learning-representation-through-self-supervised-learning-on-real-gravitational-lensing-images)|Sreehari Iyer|Sub-structure classification|Self-supervised Learning|[Click Here](https://github.com/ML4SCI/DeepLense/tree/main/DeepLense_SSL_from_real_dataset_Sreehari_Iyer)| [Click Here](https://iyersreehari.github.io/gsoc24-blog-deeplense-ssl/) |
 |[Contrastive Learning vs BYOL](#316-contrastive-learning-vs-byol)|Yashwardhan Deshmukh|Sub-structure classification|Self-supervised Learning|[Click Here](https://github.com/ML4SCI/DeepLense/tree/main/Deeplens_Self_Supervised_Learning_Yashwardhan_Deshmukh)| [Click Here](https://yaashwardhan.medium.com/self-supervised-learning-for-strong-gravitational-lensing-part1-5a049e976b51) |
 |[Domain Adaptation for Simulation-Based Dark Matter Searches Using Strong Gravitational Lensing](#317-domain-adaptation-for-simulation-based-dark-matter-searches-using-strong-gravitational-lensing)|Marcos Tidball|Sub-structure classification|Unsupervised Domain Adaptation|[Click Here](https://github.com/ML4SCI/DeepLense/tree/main/Domain_Adaptation_for_DeepLense_Marcos_Tidball)| [Click Here](https://medium.com/@marcostidball/gsoc-2021-with-ml4sci-domain-adaptation-for-decoding-dark-matter-bf0380898aed) |
 |[Equivariant Neural Networks for Dark Matter Morphology with Strong Gravitational Lensing](#318-equivariant-neural-networks-for-dark-matter-morphology-with-strong-gravitational-lensing)|Apoorva Singh|Sub-structure classification|Equivariant Neural Networks|[Click Here](https://github.com/ML4SCI/DeepLense/tree/main/Equivariant_Neural_Networks_for_DeepLense_Apoorva_Singh)| [Click Here](https://medium.com/@singhapoorva388/gsoc-2021-with-ml4sci-equivariant-neural-networks-for-classification-of-dark-matter-substructure-64ef3877477a) |

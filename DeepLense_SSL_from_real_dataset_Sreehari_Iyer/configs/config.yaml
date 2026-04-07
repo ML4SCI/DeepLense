@@ -1,0 +1,17 @@
+# Configuration for SSL Training Reproducibility
+paths:
+  dataset_root: "./input"
+  hr_images: "HR"
+  lr_images: "LR"
+  save_dir: "./outputs"
+
+model_params:
+  name: "vit"
+  scale_factor: 4
+  img_size: 128
+
+training_params:
+  batch_size: 16
+  learning_rate: 0.0002
+  epochs: 50
+  num_workers: 4

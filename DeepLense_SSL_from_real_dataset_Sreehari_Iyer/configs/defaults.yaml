@@ -1,0 +1,44 @@
+# Global defaults for SSL Training
+experiment:
+  expt_name: "base_experiment"
+  output_dir: "./outputs"
+  seed: 42
+  device: "cuda"
+  use_mixed_precision: True
+  log_freq: 10
+
+input:
+  data path: "./data"  # Baseline path
+  indices: "./data/indices.pkl"
+  image size: 128
+  channels: 1
+  num classes: 2
+
+network:
+  backbone: "resnet18"
+  patch_size: 16
+  head_output_dim: 256
+  head_hidden_dim: 512
+  head_bottleneck_dim: 256
+  head_use_bn: True
+  head_norm_last_layer: True
+  head_nlayers: 3
+
+optimizer:
+  optimizer: "adamw"
+  init_lr: 0.0005
+  final_lr: 0.00001
+  init_wd: 0.04
+  final_wd: 0.4
+  scheduler_warmup_epochs: 10
+
+train args:
+  batch_size: 32
+  num_epochs: 100
+  train_val_split: [0.8, 0.2]
+  knn_neighbours: 20
+  freeze_last_layer: 1
+
+ssl augmentation kwargs:
+  center_crop: 100
+  num_local_crops: 8

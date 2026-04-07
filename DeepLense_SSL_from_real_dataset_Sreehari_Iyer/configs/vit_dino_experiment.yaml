@@ -1,0 +1,12 @@
+# Specific Experiment: ViT-Small with DINO
+experiment:
+  expt_name: "ViT_DINO_Model4"
+  ssl_training: "dino"
+
+network:
+  backbone: "vit_small"
+  patch_size: 8  # Specialized for ViT
+
+train args:
+  batch_size: 16
+  num_epochs: 50
