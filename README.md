@@ -115,4 +115,48 @@ Finally, DeepLense help combat the problem of noisy and low-resolution of real l
 **Pranath Reddy** performs a comparative study of the super-resolution of strong lensing images in their [GSoC 2023 project](https://summerofcode.withgoogle.com/archive/2023/projects/Rh8kJLr4), using Residual Models with Content Loss and Conditional Diffusion Models, on the Model 1 dataset.
 
 #### 3.3.3 Physics-Informed Unsupervised Super-Resolution of Strong Lensing Images
-**Anirudh Shankar** explores the unsupervised super-resolution of strong lensing images through a Physics-Informed approach in his [GSoC 2024 project](https://summerofcode.withgoogle.com/programs/2024/projects/AvlaMMJJ), built to handle sparse datasets. They use custom datasets using different lens models and light profiles. 
+**Anirudh Shankar** explores the unsupervised super-resolution of strong lensing images through a Physics-Informed approach in his [GSoC 2024 project](https://summerofcode.withgoogle.com/programs/2024/projects/AvlaMMJJ), built to handle sparse datasets. They use custom datasets using different lens models and light profiles.
+## 🆕 Loading `.npy` Dataset
+
+This repository now supports loading datasets stored in `.npy` format using a custom PyTorch Dataset class.
+
+### 📌 Usage
+
+```python
+from dataset.npy_loader import NPYDataset
+
+# Initialize dataset
+dataset = NPYDataset(data_dir="path/to/npy_files")
+
+# Get one sample
+image, label = dataset[0]
+
+print(image.shape, label)
+```
+
+### 📂 Supported Formats
+
+* `(H, W)` → Grayscale images
+* `(H, W, C)` → RGB / multi-channel images
+
+### ⚠️ Notes
+
+* Ensure all `.npy` files contain valid NumPy arrays
+* All files should have consistent shape
+* Labels can be:
+
+  * encoded in filenames (e.g., `cat_1.npy`, `dog_2.npy`)
+  * or handled separately in your dataset class
+
+### 💡 Example Directory Structure
+
+```
+data/
+├── cat_1.npy
+├── cat_2.npy
+├── dog_1.npy
+```
+
+### 🚀 Benefit
+
+This feature allows direct training on `.npy` datasets without converting them into image formats, improving efficiency and flexibility.
