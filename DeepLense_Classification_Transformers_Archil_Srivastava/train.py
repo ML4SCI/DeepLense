@@ -234,7 +234,6 @@ if __name__ == "__main__":
 
     # Start wandb run
     with wandb.init(
-        entity="_archil",
         project=run_config.project,
         config=run_config,
         group=group,
@@ -319,7 +318,7 @@ if __name__ == "__main__":
         # Scheduler
         if run_config.decay_lr:
             scheduler = CosineAnnealingWarmRestarts(
-                optimizer, T_0=15, T_mult=1, eta_min=1e-6, verbose=True
+                optimizer, T_0=15, T_mult=1, eta_min=1e-6
             )
         else:
             scheduler = None
