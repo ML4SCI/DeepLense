@@ -10,22 +10,30 @@ from constants import *
 class LensDataset(Dataset):
     """
     Dataset class to convert the raw lens data into pytorch dataset
-
-    Parameters
-    ----------
-    root_dir : str
-        Root directory of the data
-    transform : Function
-        The transformation pipeline. If None, no transformations are applied
     """
 
     def __init__(self, root_dir, *args, transform=None, **kwargs):
         super().__init__(*args, **kwargs)
+        
+        # --- NEW: Defensive programming check ---
+        if not os.path.exists(root_dir):
+            raise FileNotFoundError(f"The directory '{root_dir}' was not found. Please check your data path.")
+        
+        # Check if directory is empty (ignores hidden files like .DS_Store)
+        entries = [e for e in os.scandir(root_dir) if not e.name.startswith('.')]
+        if len(entries) == 0:
+            raise ValueError(f"The directory '{root_dir}' is empty! Please ensure you have category subfolders (e.g., Axion, CDM) inside.")
+        # ----------------------------------------
+
         self.image_paths, self.categories = [], []
-        for category_dir in os.scandir(root_dir):
-            for raw_image_file in os.scandir(category_dir.path):
-                self.image_paths.append(raw_image_file.path)
-                self.categories.append(category_dir.name)
+        for category_dir in entries:
+            # We only want to look inside subdirectories
+            if category_dir.is_dir():
+                for raw_image_file in os.scandir(category_dir.path):
+                    # Only add files that look like numpy arrays (or whatever your format is)
+                    if raw_image_file.name.endswith(('.npy', '.npz')): 
+                        self.image_paths.append(raw_image_file.path)
+                        self.categories.append(category_dir.name)
 
         self.transform = transform
 
@@ -35,28 +43,25 @@ class LensDataset(Dataset):
     def __getitem__(self, idx):
         image_path, category = self.image_paths[idx], self.categories[idx]
 
+        # Use allow_pickle=True carefully
         image = np.load(image_path, allow_pickle=True)
-        if category == "axion":
-            image = image[0]
+        
+        # Normalize category names to match LABEL_MAP keys
+        category_key = category.lower() 
+        
+        if category_key == "axion":
+            # Some datasets have a tuple/list format, ensuring we get the array
+            if isinstance(image, (list, tuple, np.ndarray)) and len(image) > 0:
+                image = image[0]
 
         if self.transform:
             image = self.transform(image)
 
-        return image, LABEL_MAP[category]
+        # Ensure category exists in your LABEL_MAP
+        return image, LABEL_MAP.get(category, 0)
 
 
 class WrapperDataset(Dataset):
-    """
-    Dataset to wrap train/test dataset and their transformations
-
-    Parameters
-    ----------
-    subset : torch.utils.data.Dataset
-        The dataset to use
-    transform : Function
-        The transformation pipeline. If None, no transformations are applied
-    """
-
     def __init__(self, subset, *args, transform=None, **kwargs):
         super().__init__(*args, **kwargs)
         self.subset = subset
@@ -73,40 +78,15 @@ class WrapperDataset(Dataset):
 
 
 def get_transforms(config, initial_size, final_size, mode="test"):
-    """
-    Get the preprocessing and augmentation pipeline based on the dataset used
-
-    Parameters
-    ----------
-    config : dict
-        Config params given to the script
-    initial_size : list
-        Dimensions of the original image
-    final_size : list
-        Dimensions of the augmented image
-    mode : str, optional
-        Whether the transformation is being done on train or test dataset, by default 'test'
-        We don't perform augmentations on the test dataset
-
-    Returns
-    -------
-    Function
-        The transformation pipeline
-    """
     transform_pipeline = [transforms.ToTensor()]
-    # if mode == 'train':
-    #     transform_pipeline.extend([transforms.RandomHorizontalFlip(), transforms.RandomVerticalFlip()])
-    #     if config.random_rotation > 0:
-    #         transform_pipeline.append(transforms.RandomRotation(config.random_rotation, interpolation=transforms.InterpolationMode.BILINEAR))
-    #     if config.random_zoom < 1: # 1 is when the random crop is the whole image
-    #         transform_pipeline.append(transforms.RandomResizedCrop(final_size, scale=(config.random_zoom**2, 1.), ratio=(1., 1.)))
 
-    if initial_size == 150:  # Model I
+    # Added check to prevent IndexErrors if sizes are None
+    if initial_size is not None and initial_size == 150:
         transform_pipeline.append(transforms.CenterCrop(100))
-    else:  # Model II and Model III
+    elif initial_size is not None:
         transform_pipeline.append(transforms.CenterCrop(50))
 
-    if initial_size != final_size:
+    if initial_size != final_size and final_size is not None:
         transform_pipeline.append(transforms.Resize(final_size))
 
     return transforms.Compose(transform_pipeline)
