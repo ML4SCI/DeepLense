@@ -80,45 +80,47 @@ Then follow that directory's README. There is intentionally no root-level `requi
 
 ## Project index
 
+Project names below follow the title recorded in each artifact's README. Where a folder directly underpins a named publication, the formal paper title is used.
+
 ### Representation learning, classification, and inference
 
 | Project | Contributor | Focus |
 |---|---|---|
-| [Classification with Vision Transformers](DeepLense_Classification_Transformers_Archil_Srivastava/) | Archil Srivastava · [@archilk](https://github.com/archilk) | Transformer families for dark-matter substructure classification |
-| [Unsupervised domain adaptation](DeepLense_Gravitational_Lensing_Mriganka_Nath/) | Mriganka Nath · [@mrinath123](https://github.com/mrinath123) | Adapting classifiers from simulated to observed lensing images |
+| [DeepLense Classification Using Vision Transformers](DeepLense_Classification_Transformers_Archil_Srivastava/) | Archil Srivastava · [@archilk](https://github.com/archilk) | Transformer families for dark-matter substructure classification |
+| [Unsupervised Domain Adaptation for Gravitational Lens Finding](DeepLense_Gravitational_Lensing_Mriganka_Nath/) | Mriganka Nath · [@mrinath123](https://github.com/mrinath123) | Adapting lens finders from simulated to observed lensing images |
 | [Lens-LeJEPA](DeepLense_Gravitational_FM_Arnesh_Batra/) | Arnesh Batra · [@arnesh2212](https://github.com/arnesh2212) | Physics-aware joint-embedding learning and task-dependent invariances |
-| [LensID / HEAL-PINN](DeepLense_Gravitational_Lens_Classification_Transformers_Dhruv_Srivastava/) | Dhruv Srivastava · [@suki-yaki-7](https://github.com/suki-yaki-7) | Sparse-data lens finding with CNNs and physics-informed Transformers |
-| [LensPINN](DeepLense_Physics_Informed_Neural_Network_for_Dark_Matter_Morphology_Ashutosh_Ojha/) | Ashutosh Ojha · [@ghatotkachhh](https://github.com/ghatotkachhh) | Physics-guided encoders, reconstruction, and interpretation |
-| [Self-supervision on real lenses](DeepLense_SSL_from_real_dataset_Sreehari_Iyer/) | Sreehari Iyer · [@iyersreehari](https://github.com/iyersreehari) | SimSiam, DINO, and iBOT on real-lensing imagery |
-| [Contrastive learning and BYOL](Deeplens_Self_Supervised_Learning_Yashwardhan_Deshmukh/) | Yashwardhan Deshmukh · [@yaashwardhan](https://github.com/yaashwardhan) | Reusable representations learned from unlabeled simulations |
-| [Domain adaptation for dark-matter searches](Domain_Adaptation_for_DeepLense_Marcos_Tidball/) | Marcos Tidball · [@zysymu](https://github.com/zysymu) | ADDA, self-ensembling, and related transfer methods |
-| [Equivariant neural networks](Equivariant_Neural_Networks_for_DeepLense_Apoorva_Singh/) | Apoorva Singh · [@Apoorva99](https://github.com/Apoorva99) | Rotation-aware models for dark-matter morphology |
-| [C8-equivariant networks](Equivariant_Neural_Networks_for_DeepLense_GEO/) | Geo Jolly Cheeramvelil · [@kingjuno](https://github.com/kingjuno) | Rotation- and reflection-aware lens classifiers |
-| [Physics-informed Transformers](Physics_Informed_Transformers_For_Dark-Matter_Morphology_Lucas_Jose/) | Lucas José Velôso de Souza · [@lucasjvds](https://github.com/lucasjvds) | Lens potential, source reconstruction, and morphology classification |
-| [Supervised and self-supervised Transformers](Transformers_Classification_DeepLense_Kartik_Sachdev/) | Kartik Sachdev · [@sachdevkartik](https://github.com/sachdevkartik) | Transformer benchmarking across learning regimes |
-| [DeepLense pipeline study](Updating_the_DeepLense_Pipeline__Saranga_K_Mahanta/) | Saranga K. Mahanta · [@Saranga7](https://github.com/Saranga7) | Classification, anomaly detection, and regression benchmarks |
-| [Dark-matter regression](DeepLense_Regression_Yurii_Halychanskyi/) | Yurii Halychanskyi · [@Claussss](https://github.com/Claussss) | Hybrid CNN–Transformer parameter estimation |
-| [Regression architecture study](DeepLense_Regression_Zhongchao_Guan/) | Zhongchao Guan · [@AllenWrong](https://github.com/AllenWrong) | CNN and Transformer models for dark-matter properties |
+| [LensID: Gravitational Lens Finding and Classification](DeepLense_Gravitational_Lens_Classification_Transformers_Dhruv_Srivastava/) | Dhruv Srivastava · [@suki-yaki-7](https://github.com/suki-yaki-7) | Lens finding and dark-matter classification with CNNs and Transformers |
+| [LensPINN: Physics-Informed Neural Network for Learning Dark Matter Morphology in Lensing](DeepLense_Physics_Informed_Neural_Network_for_Dark_Matter_Morphology_Ashutosh_Ojha/) | Ashutosh Ojha · [@ghatotkachhh](https://github.com/ghatotkachhh) | Physics-guided encoders, source reconstruction, and morphology classification |
+| [Learning Representation Through Self-Supervised Learning on Real Gravitational Lensing Images](DeepLense_SSL_from_real_dataset_Sreehari_Iyer/) | Sreehari Iyer · [@iyersreehari](https://github.com/iyersreehari) | SimSiam, DINO, and iBOT on real-lensing imagery |
+| [Self-Supervised Learning for Strong Gravitational Lensing](Deeplens_Self_Supervised_Learning_Yashwardhan_Deshmukh/) | Yashwardhan Deshmukh · [@yaashwardhan](https://github.com/yaashwardhan) | Contrastive learning and BYOL on simulated lensing data |
+| [Domain Adaptation for Simulation-Based Dark Matter Searches Using Strong Gravitational Lensing](Domain_Adaptation_for_DeepLense_Marcos_Tidball/) | Marcos Tidball · [@zysymu](https://github.com/zysymu) | ADDA, self-ensembling, and related transfer methods |
+| [Equivariant Neural Networks for Dark Matter Morphology with Strong Gravitational Lensing](Equivariant_Neural_Networks_for_DeepLense_Apoorva_Singh/) | Apoorva Singh · [@Apoorva99](https://github.com/Apoorva99) | Rotation-aware models for dark-matter morphology |
+| [Equivariant Neural Networks for Dark Matter Morphology with Strong Gravitational Lensing](Equivariant_Neural_Networks_for_DeepLense_GEO/) | Geo Jolly · [@kingjuno](https://github.com/kingjuno) | Rotation- and reflection-aware lens classifiers |
+| [Lensiformer: A Relativistic Physics-Informed Vision Transformer Architecture for Dark Matter Morphology in Gravitational Lensing](Physics_Informed_Transformers_For_Dark-Matter_Morphology_Lucas_Jose/) | Lucas José Velôso de Souza · [@lucasjvds](https://github.com/lucasjvds) | Lens-potential modeling, source reconstruction, and morphology classification |
+| [DeepLense Classification: Self-Supervised & Supervised Learning](Transformers_Classification_DeepLense_Kartik_Sachdev/) | Kartik Sachdev · [@sachdevkartik](https://github.com/sachdevkartik) | Transformer benchmarking across learning regimes |
+| [Updating the DeepLense Pipeline](Updating_the_DeepLense_Pipeline__Saranga_K_Mahanta/) | Saranga K. Mahanta · [@Saranga7](https://github.com/Saranga7) | Classification, anomaly detection, and regression benchmarks |
+| [DeepLense Regression](DeepLense_Regression_Yurii_Halychanskyi/) | Yurii Halychanskyi · [@Claussss](https://github.com/Claussss) | Regression of axion mass density from simulated lensing images |
+| [GSoC 2022 Deep Regression](DeepLense_Regression_Zhongchao_Guan/) | Zhongchao Guan · [@AllenWrong](https://github.com/AllenWrong) | ResNet, ViT, and CNN-Transformer regression experiments |
 
 ### Simulation, generation, and super-resolution
 
 | Project | Contributor | Focus |
 |---|---|---|
-| [Diffusion simulation](DeepLense_Diffusion_Hamees/) | Hamees Sayed · [@hamees-sayed](https://github.com/hamees-sayed) | Learned generation and evaluation of lensing images |
-| [Conditional diffusion simulation](DeepLense_Diffusion_Rishi/) | J Rishi · [@RishiPurna2000](https://github.com/RishiPurna2000) | Class- and parameter-conditioned lens generation |
-| [DiffLense](Difflense_Aleksandr_Duplinskii/) | Aleksandr Duplinskii · [@aduplins](https://github.com/aduplins) | Conditional diffusion and LSST-like super-resolution benchmarks |
-| [Physics-informed unsupervised super-resolution](DeepLense_Physics_Informed_Super_Resolution_Anirudh_Shankar/) | Anirudh Shankar · [@anirudhshankar99](https://github.com/anirudhshankar99) | Super-resolution without paired high-resolution targets |
-| [Grid-based differentiable lensing](Grid_based_strong_lensing_for_unsupervised_super_resolution_Anirudh_Shankar/) | Anirudh Shankar · [@anirudhshankar99](https://github.com/anirudhshankar99) | Fast lensing operators for unsupervised reconstruction |
-| [Single-image super-resolution with diffusion](Super_Resolution_Atal_Gupta/) | Atal Gupta · [@AtalGupta](https://github.com/AtalGupta) | Diffusion and baseline models for lens enhancement |
-| [DeepLense super-resolution](Super_Resolution_Pranath_Reddy/) | Pranath Reddy · [@pranath-reddy](https://github.com/pranath-reddy) | Residual networks and conditional diffusion models |
+| [Diffusion Model for Gravitational Lensing Simulation](DeepLense_Diffusion_Hamees/) | Hamees Sayed · [@hamees-sayed](https://github.com/hamees-sayed) | Learned generation and evaluation of lensing images |
+| [Diffusion Models for Gravitational Lensing Simulation](DeepLense_Diffusion_Rishi/) | J Rishi · [@RishiPurna2000](https://github.com/RishiPurna2000) | Class- and parameter-conditioned lens generation |
+| [From Simulation to Survey: Benchmarking Super-Resolution for LSST-like Lensing Data](Difflense_Aleksandr_Duplinskii/) | Alexander Duplinskii · [@aduplins](https://github.com/aduplins) | Mejiro-based benchmark generation and comparison of diffusion and baseline super-resolution methods |
+| [Physics-Informed Unsupervised Super-Resolution of Strong Lensing Images](DeepLense_Physics_Informed_Super_Resolution_Anirudh_Shankar/) | Anirudh Shankar · [@anirudhshankar99](https://github.com/anirudhshankar99) | Super-resolution without paired high-resolution targets |
+| [Grid-Based Strong Gravitational Lensing for Unsupervised Super-Resolution](Grid_based_strong_lensing_for_unsupervised_super_resolution_Anirudh_Shankar/) | Anirudh Shankar · [@anirudhshankar99](https://github.com/anirudhshankar99) | Fast differentiable lensing operators for unsupervised reconstruction |
+| [Single Image Super-Resolution with Diffusion Models](Super_Resolution_Atal_Gupta/) | Atal Gupta · [@AtalGupta](https://github.com/AtalGupta) | Diffusion models for enhancing gravitational-lensing images |
+| [DiffLense: A Conditional Diffusion Model for Super-Resolution of Gravitational Lensing Data](Super_Resolution_Pranath_Reddy/) | Pranath Reddy · [@pranath-reddy](https://github.com/pranath-reddy) | Residual baselines and conditional-diffusion super-resolution |
 
 ### Data systems, operators, and scientific agents
 
 | Project | Contributor | Focus |
 |---|---|---|
-| [RIPPLe](DeepLense_Data_Processing_Pipeline_for_the_LSST/) | Karthik Mandar · [@kartikmandar](https://github.com/kartikmandar) | Rubin LSST data access, preprocessing, and model interfaces |
-| [Neural operators for lensing and PDEs](Neural_operators_for_lensing_and_pde_benchmarks/) | Paras Balani · [@Metrex-Nova](https://github.com/Metrex-Nova) | Resolution transfer and operator-learning benchmarks |
-| [DeepLense AI Scientist](DeepLense_AI_Scientist_Aatmaj_Amol_Salunke/) | Aatmaj Amol Salunke · [@aatmaj28](https://github.com/aatmaj28) | Pointer to the closed-loop scientific-agent implementation |
+| [RIPPLe: Rubin Image Preparation and Processing Lensing Engine](DeepLense_Data_Processing_Pipeline_for_the_LSST/) | Karthik Mandar · [@kartikmandar](https://github.com/kartikmandar) | Rubin LSST data access, preprocessing, and model interfaces |
+| [Neural Operators for Lensing and PDE Benchmarks](Neural_operators_for_lensing_and_pde_benchmarks/) | Paras Balani · [@Metrex-Nova](https://github.com/Metrex-Nova) | Resolution transfer and operator-learning benchmarks |
+| [DeepLense AI Scientist](DeepLense_AI_Scientist_Aatmaj_Amol_Salunke/) | Aatmaj Amol Salunke · [@aatmaj28](https://github.com/aatmaj28) | Closed-loop architecture search and simulation code-generation agents |
 
 ## Dataset vocabulary
 
