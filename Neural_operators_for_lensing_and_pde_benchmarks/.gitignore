@@ -1,0 +1,16 @@
+__pycache__/
+*.pyc
+*.pt
+*.pth
+*.png
+*.npz
+*.tgz
+darcy_data/
+ns_data/
+.ipynb_checkpoints/
+
+# Working-directory outputs from running the scripts land in repo root by
+# default (matching the Kaggle-cell convention) -- ignore those, but NOT
+# curated CSVs placed under results/, which are meant to be committed.
+/*.csv
+!results/*.csv

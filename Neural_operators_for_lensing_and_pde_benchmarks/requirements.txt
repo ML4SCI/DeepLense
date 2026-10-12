@@ -1,0 +1,5 @@
+torch>=2.1,<2.5
+numpy>=1.24
+pandas>=2.0
+matplotlib>=3.7
+neuraloperator>=1.0  # Darcy/NS dataset loaders (DarcyDataset, NavierStokesDataset)
