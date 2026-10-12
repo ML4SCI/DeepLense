@@ -1,0 +1,24 @@
+# Substructure classification with a frozen encoder + rsLoRA (rank 32).
+# Few-shot: add  --set shots=100   (labels per class; 100/500/1000/5000 in the paper)
+# Model III:     --set train_dataset=Model_III test_dataset=Model_III_test
+task: classification
+data_root: ../datasets
+train_dataset: Model_II
+test_dataset: Model_II_test
+shots: null
+train_fraction: 0.8
+val_fraction: 0.25
+backbone: vit_small
+pretrained: runs/pretrain/lens_lejepa/lens_lejepa_model_i_seed42/last_pretrain.pt
+adaptation: rslora          # lora | rslora | dora | loraplus | gated | loha | layerwise | full | linear_probe
+rank: 32
+alpha: 64.0
+epochs: 50
+batch_size: 128
+lr: 3.0e-4
+weight_decay: 0.01
+label_smoothing: 0.1
+val_interval: 10
+seed: 42
+workers: 8
+output_dir: runs

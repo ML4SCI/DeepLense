@@ -1,0 +1,31 @@
+# Lens-LeJEPA pretraining (paper setting): ViT-S/16 at 160x160, 100 epochs on
+# the 87,525 unlabelled Model I images. ~6 GPU-hours on one RTX A4500.
+method: lens_lejepa
+data_root: ../datasets
+dataset: Model_I
+image_size: 160
+patch_size: 16
+encoder: vit_small
+projector_dim: 256
+epochs: 100
+batch_size: 128
+lr: 5.0e-4
+start_lr: 5.0e-5
+final_lr: 5.0e-7
+warmup_epochs: 10
+weight_decay: 0.05
+final_weight_decay: 0.05
+objective:
+  sigreg_weight: 0.02      # lambda in L_base
+  sigreg_slices: 256
+  d4_weight: 0.10          # Prior 1: exact D4 patch correspondence
+  ring_weight: 0.10        # Prior 2: arc-weighted ring consistency
+  rings: 3
+  arc_strength: 0.75
+  blur_probability: 0.5    # lens-safe views only: PSF blur + detector noise
+  blur_sigma_max: 1.0
+  noise_std_max: 0.03
+seed: 42
+workers: 8
+output_dir: runs
+run_name: lens_lejepa_model_i_seed42

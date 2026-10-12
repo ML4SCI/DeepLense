@@ -1,0 +1,30 @@
+[build-system]
+requires = ["setuptools>=64"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "lens-lejepa"
+version = "1.0.0"
+description = "Geometry-aware self-supervised pretraining for dark matter substructure in strong lensing images."
+readme = "README.md"
+requires-python = ">=3.10"
+dependencies = [
+    "torch>=2.1",
+    "torchvision>=0.16",
+    "numpy>=1.24",
+    "scikit-learn>=1.2",
+    "pyyaml>=6.0",
+    "tqdm>=4.60",
+]
+
+[project.optional-dependencies]
+dev = ["pytest>=7"]
+
+[project.scripts]
+lens-lejepa = "lens_lejepa.cli:main"
+
+[tool.setuptools.packages.find]
+include = ["lens_lejepa*"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]

@@ -1,0 +1,23 @@
+# Synthetic 2x super-resolution (bicubic 32x32 -> native 64x64).
+# The paper's Lens-LeJEPA SR row uses standard LoRA (adaptation: lora).
+# Baselines:  --set backbone=rcan   or   --set backbone=bicubic
+task: super_resolution
+data_root: ../datasets
+train_dataset: Model_II
+test_dataset: Model_II_test
+shots: null
+train_fraction: 0.8
+backbone: vit_small
+pretrained: runs/pretrain/lens_lejepa/lens_lejepa_model_i_seed42/last_pretrain.pt
+adaptation: lora
+rank: 32
+alpha: 64.0
+epochs: 50
+batch_size: 64
+grad_accum: 2
+lr: 3.0e-4
+weight_decay: 0.01
+val_interval: 10
+seed: 42
+workers: 8
+output_dir: runs

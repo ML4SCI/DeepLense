@@ -1,0 +1,33 @@
+# Reference encoder from the paper (ijepa), pretrained with masked latent
+# prediction and an EMA teacher: 300 epochs on Model I (the "3x budget" rows).
+method: ijepa
+data_root: ../datasets
+dataset: Model_I
+image_size: 160
+patch_size: 16
+encoder: vit_base_3blocks
+epochs: 300
+batch_size: 128
+lr: 1.0e-3
+start_lr: 2.0e-4
+final_lr: 1.0e-6
+warmup_epochs: 40
+weight_decay: 0.04
+final_weight_decay: 0.4
+masked:
+  predictor_dim: 384
+  predictor_depth: 6
+  ema_start: 0.996
+  ema_end: 1.0
+  npred: 4
+  pred_scale: [0.15, 0.2]
+  aspect_ratio: [0.75, 1.5]
+  enc_scale: [0.85, 1.0]
+  variance_weight: 10.0
+  variance_target_std: 0.1
+  symmetry_weight: 0.1      # used by lens_jepa_sym only
+  focus_strength: 1.0       # used by lens_jepa_focus only
+seed: 42
+workers: 8
+output_dir: runs
+run_name: ijepa_model_i_seed42

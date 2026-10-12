@@ -1,0 +1,27 @@
+# LeJEPA control: identical to lens_lejepa.yaml except the two lensing priors
+# (and the D4 transform they need) are switched off.
+method: lejepa
+data_root: ../datasets
+dataset: Model_I
+image_size: 160
+patch_size: 16
+encoder: vit_small
+projector_dim: 256
+epochs: 100
+batch_size: 128
+lr: 5.0e-4
+start_lr: 5.0e-5
+final_lr: 5.0e-7
+warmup_epochs: 10
+weight_decay: 0.05
+final_weight_decay: 0.05
+objective:
+  sigreg_weight: 0.02
+  sigreg_slices: 256
+  blur_probability: 0.5
+  blur_sigma_max: 1.0
+  noise_std_max: 0.03
+seed: 42
+workers: 8
+output_dir: runs
+run_name: lejepa_model_i_seed42
