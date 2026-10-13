@@ -1,0 +1,50 @@
+[tool.ruff]
+target-version = "py310"
+line-length = 88
+
+exclude = [
+    ".git",
+    ".venv",
+    "build",
+    "dist",
+]
+
+[tool.ruff.lint]
+select = [
+    "E",   # pycodestyle errors
+    "W",   # pycodestyle warnings
+    "F",   # Pyflakes
+    "UP",  # pyupgrade
+    "B",   # flake8-bugbear
+]
+
+ignore = [
+    "E501",   # Line too long
+    "F405",   # Undefined local with import star usage
+    "F403",   # Undefined local with import star
+    "B007",   # Unused loop control variable
+    "B905",   # zip() without explicit strict=
+    "E402",   # Module import not at top of file
+    "BLE001", # Blind except
+    "E722",   # Bare except
+    "B018",   # Useless expression
+    "LOG015", # Root logger call
+    "B008",   # Function call in argument defaults
+    "B904",   # Raise without from inside except
+    "E741",   # Ambiguous variable name
+    "F821",   # Undefined name
+    "UP031",  # printf string formatting
+    "F401",   # Unused import
+    "F822",   # Undefined export
+    "E721",   # Type comparison (use isinstance)
+    "F811",   # Redefined while unused
+    "B020",   # Loop variable overrides iterator
+    "B024",   # Abstract base class without abstract method
+    "B027",   # Empty method without abstract decorator
+]
+
+[tool.ruff.lint.per-file-ignores]
+"*.ipynb" = [
+    "F401", 
+    "F811",
+]
