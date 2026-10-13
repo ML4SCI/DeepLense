@@ -1,15 +1,12 @@
-from typing import Optional, Tuple, Union
-
 import PIL
 import torchvision.transforms as T
-from PIL.Image import Image
-from torch import Tensor
-
 from lightly.transforms.gaussian_blur import GaussianBlur
 from lightly.transforms.multi_view_transform import MultiViewTransform
 from lightly.transforms.rotation import random_rotation_transform
 from lightly.transforms.solarize import RandomSolarization
 from lightly.transforms.utils import IMAGENET_NORMALIZE
+from PIL.Image import Image
+from torch import Tensor
 
 
 class DINOTransform(MultiViewTransform):
@@ -97,14 +94,14 @@ class DINOTransform(MultiViewTransform):
     def __init__(
         self,
         global_crop_size: int = 224,
-        global_crop_scale: Tuple[float, float] = (0.4, 1.0),
+        global_crop_scale: tuple[float, float] = (0.4, 1.0),
         local_crop_size: int = 96,
-        local_crop_scale: Tuple[float, float] = (0.05, 0.4),
+        local_crop_scale: tuple[float, float] = (0.05, 0.4),
         n_local_views: int = 6,
         hf_prob: float = 0.5,
         vf_prob: float = 0,
         rr_prob: float = 0,
-        rr_degrees: Union[None, float, Tuple[float, float]] = None,
+        rr_degrees: None | float | tuple[float, float] = None,
         cj_prob: float = 0.8,
         cj_strength: float = 0.5,
         cj_bright: float = 0.8,
@@ -112,12 +109,12 @@ class DINOTransform(MultiViewTransform):
         cj_sat: float = 0.4,
         cj_hue: float = 0.2,
         random_gray_scale: float = 0.2,
-        gaussian_blur: Tuple[float, float, float] = (1.0, 0.1, 0.5),
-        kernel_size: Optional[float] = None,
-        kernel_scale: Optional[float] = None,
-        sigmas: Tuple[float, float] = (0.1, 2),
+        gaussian_blur: tuple[float, float, float] = (1.0, 0.1, 0.5),
+        kernel_size: float | None = None,
+        kernel_scale: float | None = None,
+        sigmas: tuple[float, float] = (0.1, 2),
         solarization_prob: float = 0.2,
-        normalize: Union[None, dict] = IMAGENET_NORMALIZE,
+        normalize: None | dict = IMAGENET_NORMALIZE,
     ):
         # first global crop
         global_transform_0 = DINOViewTransform(
@@ -196,11 +193,11 @@ class DINOViewTransform:
     def __init__(
         self,
         crop_size: int = 224,
-        crop_scale: Tuple[float, float] = (0.4, 1.0),
+        crop_scale: tuple[float, float] = (0.4, 1.0),
         hf_prob: float = 0.5,
         vf_prob: float = 0,
         rr_prob: float = 0,
-        rr_degrees: Union[None, float, Tuple[float, float]] = None,
+        rr_degrees: None | float | tuple[float, float] = None,
         cj_prob: float = 0.8,
         cj_strength: float = 0.5,
         cj_bright: float = 0.8,
@@ -209,11 +206,11 @@ class DINOViewTransform:
         cj_hue: float = 0.2,
         random_gray_scale: float = 0.2,
         gaussian_blur: float = 1.0,
-        kernel_size: Optional[float] = None,
-        kernel_scale: Optional[float] = None,
-        sigmas: Tuple[float, float] = (0.1, 2),
+        kernel_size: float | None = None,
+        kernel_scale: float | None = None,
+        sigmas: tuple[float, float] = (0.1, 2),
         solarization_prob: float = 0.2,
-        normalize: Union[None, dict] = IMAGENET_NORMALIZE,
+        normalize: None | dict = IMAGENET_NORMALIZE,
     ):
         transform = [
             T.RandomResizedCrop(
@@ -250,7 +247,7 @@ class DINOViewTransform:
             transform += [T.Normalize(mean=normalize["mean"], std=normalize["std"])]
         self.transform = T.Compose(transform)
 
-    def __call__(self, image: Union[Tensor, Image]) -> Tensor:
+    def __call__(self, image: Tensor | Image) -> Tensor:
         """
         Applies the transforms to the input image.
 
@@ -263,7 +260,6 @@ class DINOViewTransform:
 
         """
         return self.transform(image)
-
 
 
 def get_transforms_multiple(self, final_size):
@@ -290,4 +286,3 @@ def get_transforms_multiple(self, final_size):
     )
 
     return [transform_1, transform_2]
-    

@@ -36,7 +36,9 @@ class EppsPulley(nn.Module):
     def forward(self, x: torch.Tensor) -> torch.Tensor:
         """``x``: ``[N, S]`` projected samples; returns one statistic per slice."""
         x_t = x.unsqueeze(-1) * self.t
-        error = (torch.cos(x_t).mean(0) - self.phi).square() + torch.sin(x_t).mean(0).square()
+        error = (torch.cos(x_t).mean(0) - self.phi).square() + torch.sin(x_t).mean(
+            0
+        ).square()
         return (error @ self.weights) * x.shape[0]
 
 
@@ -56,8 +58,12 @@ class SIGReg(nn.Module):
     def forward(self, embeddings: torch.Tensor) -> torch.Tensor:
         flat = embeddings.reshape(-1, embeddings.shape[-1]).float()
         with torch.no_grad():
-            generator = torch.Generator(device=flat.device).manual_seed(int(self.step.item()))
-            directions = torch.randn(flat.shape[-1], self.num_slices, device=flat.device, generator=generator)
+            generator = torch.Generator(device=flat.device).manual_seed(
+                int(self.step.item())
+            )
+            directions = torch.randn(
+                flat.shape[-1], self.num_slices, device=flat.device, generator=generator
+            )
             directions = F.normalize(directions, dim=0)
             self.step.add_(1)
         return self.test(flat @ directions).mean()

@@ -1,4 +1,4 @@
-""" Symmetrized Negative Cosine Similarity Loss Functions """
+"""Symmetrized Negative Cosine Similarity Loss Functions"""
 
 # Copyright (c) 2020. Lightly AG and its affiliates.
 # All Rights Reserved
@@ -37,7 +37,7 @@ class SymNegCosineSimilarityLoss(torch.nn.Module):
                 "SymNegCosineSimiliarityLoss will be deprecated in favor of "
                 + "NegativeCosineSimilarity in the future."
             ),
-            DeprecationWarning,
+            DeprecationWarning, stacklevel=2,
         )
 
     def _neg_cosine_simililarity(self, x, y):

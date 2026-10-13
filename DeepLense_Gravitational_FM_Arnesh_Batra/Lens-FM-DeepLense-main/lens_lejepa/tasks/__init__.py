@@ -31,4 +31,12 @@ def build_task(config: FinetuneConfig) -> Task:
     return TASKS[config.task](config)
 
 
-__all__ = ["TASKS", "ClassificationTask", "RegressionTask", "SuperResolutionTask", "Task", "build_task", "register"]
+__all__ = [
+    "TASKS",
+    "ClassificationTask",
+    "RegressionTask",
+    "SuperResolutionTask",
+    "Task",
+    "build_task",
+    "register",
+]

@@ -20,12 +20,14 @@ def supervised_hyperparams(lr=1e-3, wd=5e-5, scheduler=True):
         Dictionary containing the hyperparameters. Can be passed to the `hyperparams` argument on Supervised.
     """
 
-    hyperparams = {'learning_rate': lr,
-                   'weight_decay': wd,
-                   'cyclic_scheduler': scheduler
-                   }
+    hyperparams = {
+        "learning_rate": lr,
+        "weight_decay": wd,
+        "cyclic_scheduler": scheduler,
+    }
 
     return hyperparams
+
 
 def adda_hyperparams(lr_target=1e-5, lr_discriminator=1e-4, wd=5e-5, scheduler=False):
     """
@@ -51,14 +53,16 @@ def adda_hyperparams(lr_target=1e-5, lr_discriminator=1e-4, wd=5e-5, scheduler=F
     hyperparams: dict
         Dictionary containing the hyperparameters. Can be passed to the `hyperparams` argument on ADDA.
     """
-    
-    hyperparams = {'learning_rate_target': lr_target,
-                   'learning_rate_discriminator': lr_discriminator,
-                   'weight_decay': wd,
-                   'cyclic_scheduler': scheduler
-                   }
+
+    hyperparams = {
+        "learning_rate_target": lr_target,
+        "learning_rate_discriminator": lr_discriminator,
+        "weight_decay": wd,
+        "cyclic_scheduler": scheduler,
+    }
 
     return hyperparams
+
 
 def adamatch_hyperparams(lr=1e-3, tau=0.9, wd=5e-5, scheduler=False):
     """
@@ -84,16 +88,20 @@ def adamatch_hyperparams(lr=1e-3, tau=0.9, wd=5e-5, scheduler=False):
     hyperparams: dict
         Dictionary containing the hyperparameters. Can be passed to the `hyperparams` argument on AdaMatch.
     """
-    
-    hyperparams = {'learning_rate': lr,
-                   'tau': tau,
-                   'weight_decay': wd,
-                   'cyclic_scheduler': scheduler
-                   }
+
+    hyperparams = {
+        "learning_rate": lr,
+        "tau": tau,
+        "weight_decay": wd,
+        "cyclic_scheduler": scheduler,
+    }
 
     return hyperparams
 
-def self_ensemble_hyperparams(lr=1e-3, unsupervised_weight=3.0, wd=5e-5, scheduler=False):
+
+def self_ensemble_hyperparams(
+    lr=1e-3, unsupervised_weight=3.0, wd=5e-5, scheduler=False
+):
     """
     Return a dictionary of hyperparameters for the Self-Ensemble algorithm.
     Default parameters are the best ones as found through a hyperparameter search.
@@ -117,11 +125,12 @@ def self_ensemble_hyperparams(lr=1e-3, unsupervised_weight=3.0, wd=5e-5, schedul
     hyperparams: dict
         Dictionary containing the hyperparameters. Can be passed to the `hyperparams` argument on ADDA.
     """
-    
-    hyperparams = {'learning_rate': lr,
-                   'unsupervised_weight': unsupervised_weight,
-                   'weight_decay': wd,
-                   'cyclic_scheduler': scheduler
-                   }
+
+    hyperparams = {
+        "learning_rate": lr,
+        "unsupervised_weight": unsupervised_weight,
+        "weight_decay": wd,
+        "cyclic_scheduler": scheduler,
+    }
 
     return hyperparams

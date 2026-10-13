@@ -1,15 +1,16 @@
 import os
-import torch
 import random
-import numpy as np
+
 import albumentations as A
+import numpy as np
+import torch
 from albumentations.pytorch import ToTensorV2
 
+device = "cuda" if torch.cuda.is_available() else "cpu"
 
-device ='cuda' if torch.cuda.is_available() else 'cpu'
 
 def set_seed(seed):
-    #Sets the seed for Reprocudibility
+    # Sets the seed for Reprocudibility
     random.seed(seed)
     os.environ["PYTHONHASHSEED"] = str(seed)
     np.random.seed(seed)
@@ -18,18 +19,14 @@ def set_seed(seed):
         torch.cuda.manual_seed_all(seed)
         torch.backends.cudnn.deterministic = True
 
-#pre-processing transformation
-train_transforms = A.Compose(
-            [
-                A.HorizontalFlip(p = 0.5),
-                A.VerticalFlip(p = 0.5),
-                A.Rotate(limit = 360, p = 0.4),
-                ToTensorV2()
-            ]
-        )
-test_transforms = A.Compose(
-            [
-                ToTensorV2()
-            ]
-        )
 
+# pre-processing transformation
+train_transforms = A.Compose(
+    [
+        A.HorizontalFlip(p=0.5),
+        A.VerticalFlip(p=0.5),
+        A.Rotate(limit=360, p=0.4),
+        ToTensorV2(),
+    ]
+)
+test_transforms = A.Compose([ToTensorV2()])

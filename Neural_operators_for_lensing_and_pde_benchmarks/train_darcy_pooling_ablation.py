@@ -12,16 +12,22 @@
 # download): all 7 architectures construct and produce correctly-shaped
 # output at both 16x16 and 32x32, confirming the zero-shot-resolution
 # forward pass works for every architecture including both no-pool variants.
-import subprocess, sys
-subprocess.run([sys.executable, "-m", "pip", "install", "-q", "neuraloperator"], check=True)
+import subprocess
+import sys
 
-import math, time
+subprocess.run(
+    [sys.executable, "-m", "pip", "install", "-q", "neuraloperator"], check=True
+)
+
+import math
+import time
+
 import numpy as np
 import torch
-import torch.nn as nn
 import torch.nn.functional as F
 from neuralop.data.datasets import load_darcy_flow_small
-from torch.utils.data import TensorDataset, DataLoader
+from torch import nn
+from torch.utils.data import DataLoader, TensorDataset
 
 DEVICE = "cuda" if torch.cuda.is_available() else "cpu"
 SEEDS = [7, 21, 42]
@@ -39,6 +45,7 @@ train_loader_raw, test_loaders_raw, data_processor = load_darcy_flow_small(
     test_batch_sizes=[BATCH_SIZE, BATCH_SIZE],
 )
 
+
 def collect_all(loader):
     xs, ys = [], []
     for batch in loader:
@@ -46,17 +53,20 @@ def collect_all(loader):
         ys.append(batch["y"])
     return torch.cat(xs), torch.cat(ys)
 
+
 X_train, Y_train = collect_all(train_loader_raw)
 X_test16, Y_test16 = collect_all(test_loaders_raw[16])
 X_test32, Y_test32 = collect_all(test_loaders_raw[32])
 
+
 def add_coord_grid(X):
-    B, C, H, W = X.shape
+    B, _C, H, W = X.shape
     ys = torch.linspace(0, 1, H)
     xs = torch.linspace(0, 1, W)
     grid_y, grid_x = torch.meshgrid(ys, xs, indexing="ij")
     grid = torch.stack([grid_y, grid_x], dim=0).unsqueeze(0).expand(B, -1, -1, -1)
     return torch.cat([X, grid], dim=1)
+
 
 X_train = add_coord_grid(X_train)
 X_test16 = add_coord_grid(X_test16)
@@ -64,8 +74,16 @@ X_test32 = add_coord_grid(X_test32)
 
 IN_CH = X_train.shape[1]
 OUT_CH = Y_train.shape[1]
-print("Darcy shapes -- train:", X_train.shape, "| test@16:", X_test16.shape,
-      "| test@32(zero-shot res):", X_test32.shape, f"| in_ch={IN_CH} out_ch={OUT_CH}")
+print(
+    "Darcy shapes -- train:",
+    X_train.shape,
+    "| test@16:",
+    X_test16.shape,
+    "| test@32(zero-shot res):",
+    X_test32.shape,
+    f"| in_ch={IN_CH} out_ch={OUT_CH}",
+)
+
 
 def make_darcy_loaders(bs=BATCH_SIZE):
     train_ds = TensorDataset(X_train, Y_train)
@@ -102,7 +120,9 @@ def build_anisotropic_gaussian_bank_absfreq(cx, cy, bw, theta, H, W, device):
     dx_rot = dx * torch.cos(th_) + dy * torch.sin(th_)
     dy_rot = -dx * torch.sin(th_) + dy * torch.cos(th_)
     aniso_ratio = 3.0
-    return torch.exp(-((dx_rot / (bw_ + 1e-6)) ** 2 + (dy_rot / (bw_ / aniso_ratio + 1e-6)) ** 2))
+    return torch.exp(
+        -((dx_rot / (bw_ + 1e-6)) ** 2 + (dy_rot / (bw_ / aniso_ratio + 1e-6)) ** 2)
+    )
 
 
 class SharedFilterHyperNet(nn.Module):
@@ -112,9 +132,12 @@ class SharedFilterHyperNet(nn.Module):
         self.fmax = fmax
         self.net = nn.Sequential(
             nn.AdaptiveAvgPool2d(8),
-            nn.Conv2d(in_ch, hidden, 3, padding=1), nn.GELU(),
-            nn.Conv2d(hidden, hidden, 3, padding=1), nn.GELU(),
-            nn.AdaptiveAvgPool2d(1), nn.Flatten(),
+            nn.Conv2d(in_ch, hidden, 3, padding=1),
+            nn.GELU(),
+            nn.Conv2d(hidden, hidden, 3, padding=1),
+            nn.GELU(),
+            nn.AdaptiveAvgPool2d(1),
+            nn.Flatten(),
             nn.Linear(hidden, n_filters * 4),
         )
 
@@ -153,7 +176,7 @@ class HyperSpectralConv2d(nn.Module):
         self.channel_mix_im = nn.Parameter(0.02 * torch.randn(n_filters, in_ch, out_ch))
 
     def forward(self, x, filter_bank):
-        B, C, H, W = x.shape
+        _B, _C, H, W = x.shape
         x_ft = torch.fft.rfft2(x, norm="ortho")
         filtered = x_ft.unsqueeze(1) * filter_bank.unsqueeze(2)
         w = torch.complex(self.channel_mix_re, self.channel_mix_im)
@@ -177,12 +200,20 @@ class SpectralConv2d(nn.Module):
         return torch.einsum("bixy,ioxy->boxy", x_ft, w)
 
     def forward(self, x):
-        B, C, H, W = x.shape
+        B, _C, H, W = x.shape
         x_ft = torch.fft.rfft2(x, norm="ortho")
-        out_ft = torch.zeros(B, self.out_ch, H, W // 2 + 1, dtype=torch.cfloat, device=x.device)
+        out_ft = torch.zeros(
+            B, self.out_ch, H, W // 2 + 1, dtype=torch.cfloat, device=x.device
+        )
         m1, m2 = min(self.modes1, H), min(self.modes2, W // 2 + 1)
-        out_ft[:, :, :m1, :m2] = self.compl_mul(x_ft[:, :, :m1, :m2], self.w1_re[:, :, :m1, :m2], self.w1_im[:, :, :m1, :m2])
-        out_ft[:, :, -m1:, :m2] = self.compl_mul(x_ft[:, :, -m1:, :m2], self.w2_re[:, :, :m1, :m2], self.w2_im[:, :, :m1, :m2])
+        out_ft[:, :, :m1, :m2] = self.compl_mul(
+            x_ft[:, :, :m1, :m2], self.w1_re[:, :, :m1, :m2], self.w1_im[:, :, :m1, :m2]
+        )
+        out_ft[:, :, -m1:, :m2] = self.compl_mul(
+            x_ft[:, :, -m1:, :m2],
+            self.w2_re[:, :, :m1, :m2],
+            self.w2_im[:, :, :m1, :m2],
+        )
         return torch.fft.irfft2(out_ft, s=(H, W), norm="ortho")
 
 
@@ -213,13 +244,19 @@ class CNNBaseline(nn.Module):
         super().__init__()
         self.n_levels = n_levels
         self.lift = nn.Conv2d(in_ch, width, 1)
-        self.down_blocks = nn.ModuleList([CNNBlock(width, width) for _ in range(n_levels)])
-        self.up_blocks = nn.ModuleList([CNNBlock(width, width) for _ in range(n_levels)])
+        self.down_blocks = nn.ModuleList(
+            [CNNBlock(width, width) for _ in range(n_levels)]
+        )
+        self.up_blocks = nn.ModuleList(
+            [CNNBlock(width, width) for _ in range(n_levels)]
+        )
         self.pools = nn.ModuleList([nn.AvgPool2d(2) for _ in range(n_levels)])
-        self.project = nn.Sequential(nn.Conv2d(width, width, 1), nn.GELU(), nn.Conv2d(width, out_ch, 1))
+        self.project = nn.Sequential(
+            nn.Conv2d(width, width, 1), nn.GELU(), nn.Conv2d(width, out_ch, 1)
+        )
 
     def forward(self, x):
-        B, C, H, W = x.shape
+        _B, _C, H, W = x.shape
         h = self.lift(x)
         skips = []
         cur_h, cur_w = H, W
@@ -255,8 +292,12 @@ class FNO2d(nn.Module):
     def __init__(self, in_ch, out_ch, width=16, modes1=4, modes2=4, n_layers=3):
         super().__init__()
         self.lift = nn.Conv2d(in_ch, width, 1)
-        self.blocks = nn.ModuleList([FNOBlock(width, modes1, modes2) for _ in range(n_layers)])
-        self.project = nn.Sequential(nn.Conv2d(width, width, 1), nn.GELU(), nn.Conv2d(width, out_ch, 1))
+        self.blocks = nn.ModuleList(
+            [FNOBlock(width, modes1, modes2) for _ in range(n_layers)]
+        )
+        self.project = nn.Sequential(
+            nn.Conv2d(width, width, 1), nn.GELU(), nn.Conv2d(width, out_ch, 1)
+        )
 
     def forward(self, x):
         h = self.lift(x)
@@ -283,13 +324,19 @@ class UFNO2d(nn.Module):
         super().__init__()
         self.n_levels = n_levels
         self.lift = nn.Conv2d(in_ch, width, 1)
-        self.down_blocks = nn.ModuleList([UFNOBlock(width, modes1, modes2) for _ in range(n_levels)])
-        self.up_blocks = nn.ModuleList([UFNOBlock(width, modes1, modes2) for _ in range(n_levels)])
+        self.down_blocks = nn.ModuleList(
+            [UFNOBlock(width, modes1, modes2) for _ in range(n_levels)]
+        )
+        self.up_blocks = nn.ModuleList(
+            [UFNOBlock(width, modes1, modes2) for _ in range(n_levels)]
+        )
         self.pools = nn.ModuleList([nn.AvgPool2d(2) for _ in range(n_levels)])
-        self.project = nn.Sequential(nn.Conv2d(width, width, 1), nn.GELU(), nn.Conv2d(width, out_ch, 1))
+        self.project = nn.Sequential(
+            nn.Conv2d(width, width, 1), nn.GELU(), nn.Conv2d(width, out_ch, 1)
+        )
 
     def forward(self, x):
-        B, C, H, W = x.shape
+        _B, _C, H, W = x.shape
         h = self.lift(x)
         skips = []
         cur_h, cur_w = H, W
@@ -322,30 +369,42 @@ class UNOBlock(nn.Module):
 
 
 class UNO(nn.Module):
-    def __init__(self, in_ch, out_ch, width=16, n_filters=12, n_levels=3, n_blocks=None):
+    def __init__(
+        self, in_ch, out_ch, width=16, n_filters=12, n_levels=3, n_blocks=None
+    ):
         super().__init__()
         self.width, self.n_filters, self.n_levels = width, n_filters, n_levels
         self.lift = nn.Conv2d(in_ch, width, 1)
         self.filter_bank_gen = FixedFilterBank(n_filters)
         if n_levels > 0:
-            self.down_blocks = nn.ModuleList([UNOBlock(width, n_filters) for _ in range(n_levels)])
-            self.up_blocks = nn.ModuleList([UNOBlock(width, n_filters) for _ in range(n_levels)])
+            self.down_blocks = nn.ModuleList(
+                [UNOBlock(width, n_filters) for _ in range(n_levels)]
+            )
+            self.up_blocks = nn.ModuleList(
+                [UNOBlock(width, n_filters) for _ in range(n_levels)]
+            )
             self.pools = nn.ModuleList([nn.AvgPool2d(2) for _ in range(n_levels)])
             self.blocks = None
         else:
             self.n_blocks = n_blocks if n_blocks is not None else 6
-            self.blocks = nn.ModuleList([UNOBlock(width, n_filters) for _ in range(self.n_blocks)])
+            self.blocks = nn.ModuleList(
+                [UNOBlock(width, n_filters) for _ in range(self.n_blocks)]
+            )
             self.down_blocks = self.up_blocks = self.pools = None
-        self.project = nn.Sequential(nn.Conv2d(width, width, 1), nn.GELU(), nn.Conv2d(width, out_ch, 1))
+        self.project = nn.Sequential(
+            nn.Conv2d(width, width, 1), nn.GELU(), nn.Conv2d(width, out_ch, 1)
+        )
 
     def _resize_bank(self, bank, H, W):
         Wf = W // 2 + 1
         return F.interpolate(bank, size=(H, Wf), mode="bilinear", align_corners=False)
 
     def forward(self, x):
-        B, C, H, W = x.shape
+        B, _C, H, W = x.shape
         cx, cy, bw, theta = self.filter_bank_gen(B)
-        base_bank = build_anisotropic_gaussian_bank_absfreq(cx, cy, bw, theta, H, W, x.device)
+        base_bank = build_anisotropic_gaussian_bank_absfreq(
+            cx, cy, bw, theta, H, W, x.device
+        )
         h = self.lift(x)
         if self.n_levels == 0:
             bank = self._resize_bank(base_bank, H, W)
@@ -385,30 +444,42 @@ class HCUNOBlock(nn.Module):
 
 
 class HCUNOv2(nn.Module):
-    def __init__(self, in_ch, out_ch, width=16, n_filters=12, n_levels=3, n_blocks=None):
+    def __init__(
+        self, in_ch, out_ch, width=16, n_filters=12, n_levels=3, n_blocks=None
+    ):
         super().__init__()
         self.width, self.n_filters, self.n_levels = width, n_filters, n_levels
         self.lift = nn.Conv2d(in_ch, width, 1)
         self.hypernet = SharedFilterHyperNet(in_ch, n_filters)
         if n_levels > 0:
-            self.down_blocks = nn.ModuleList([HCUNOBlock(width, n_filters) for _ in range(n_levels)])
-            self.up_blocks = nn.ModuleList([HCUNOBlock(width, n_filters) for _ in range(n_levels)])
+            self.down_blocks = nn.ModuleList(
+                [HCUNOBlock(width, n_filters) for _ in range(n_levels)]
+            )
+            self.up_blocks = nn.ModuleList(
+                [HCUNOBlock(width, n_filters) for _ in range(n_levels)]
+            )
             self.pools = nn.ModuleList([nn.AvgPool2d(2) for _ in range(n_levels)])
             self.blocks = None
         else:
             self.n_blocks = n_blocks if n_blocks is not None else 6
-            self.blocks = nn.ModuleList([HCUNOBlock(width, n_filters) for _ in range(self.n_blocks)])
+            self.blocks = nn.ModuleList(
+                [HCUNOBlock(width, n_filters) for _ in range(self.n_blocks)]
+            )
             self.down_blocks = self.up_blocks = self.pools = None
-        self.project = nn.Sequential(nn.Conv2d(width, width, 1), nn.GELU(), nn.Conv2d(width, out_ch, 1))
+        self.project = nn.Sequential(
+            nn.Conv2d(width, width, 1), nn.GELU(), nn.Conv2d(width, out_ch, 1)
+        )
 
     def _resize_bank(self, bank, H, W):
         Wf = W // 2 + 1
         return F.interpolate(bank, size=(H, Wf), mode="bilinear", align_corners=False)
 
     def forward(self, x):
-        B, C, H, W = x.shape
+        _B, _C, H, W = x.shape
         cx, cy, bw, theta = self.hypernet(x)
-        base_bank = build_anisotropic_gaussian_bank_absfreq(cx, cy, bw, theta, H, W, x.device)
+        base_bank = build_anisotropic_gaussian_bank_absfreq(
+            cx, cy, bw, theta, H, W, x.device
+        )
         h = self.lift(x)
         if self.n_levels == 0:
             bank = self._resize_bank(base_bank, H, W)
@@ -442,6 +513,7 @@ def rel_l2(pred, target, eps=1e-8):
     den = torch.norm(target.reshape(target.shape[0], -1), dim=1) + eps
     return (num / den).mean().item()
 
+
 def evaluate(model, loader, device=DEVICE):
     model.eval()
     total, n = 0.0, 0
@@ -452,7 +524,16 @@ def evaluate(model, loader, device=DEVICE):
             n += 1
     return total / max(n, 1)
 
-def train_model(model, train_loader, test_loader, epochs=60, lr=1e-3, device=DEVICE, model_name="model"):
+
+def train_model(
+    model,
+    train_loader,
+    test_loader,
+    epochs=60,
+    lr=1e-3,
+    device=DEVICE,
+    model_name="model",
+):
     model.to(device)
     opt = torch.optim.AdamW(model.parameters(), lr=lr, weight_decay=1e-5)
     sched = torch.optim.lr_scheduler.CosineAnnealingLR(opt, T_max=epochs)
@@ -474,15 +555,22 @@ def train_model(model, train_loader, test_loader, epochs=60, lr=1e-3, device=DEV
         val_relL2 = evaluate(model, test_loader, device)
         if val_relL2 < best_val:
             best_val = val_relL2
-            best_state = {k: v.detach().cpu().clone() for k, v in model.state_dict().items()}
-        print(f"[{model_name}] ep {ep:02d}  train_loss {total_loss/len(train_loader):.5f}  "
-              f"val_relL2 {val_relL2:.4f}  (best {best_val:.4f})  ({time.time()-t0:.1f}s)")
+            best_state = {
+                k: v.detach().cpu().clone() for k, v in model.state_dict().items()
+            }
+        print(
+            f"[{model_name}] ep {ep:02d}  train_loss {total_loss / len(train_loader):.5f}  "
+            f"val_relL2 {val_relL2:.4f}  (best {best_val:.4f})  ({time.time() - t0:.1f}s)"
+        )
     model.load_state_dict(best_state)
     print(f"[{model_name}] FINAL best val_relL2 = {best_val:.4f}")
     return best_val, best_state
 
+
 def full_eval_report(model, loaders_dict, device=DEVICE):
-    return {name: evaluate(model, loader, device) for name, loader in loaders_dict.items()}
+    return {
+        name: evaluate(model, loader, device) for name, loader in loaders_dict.items()
+    }
 
 
 # ===========================================================================
@@ -496,16 +584,24 @@ def run_seeded_darcy(model_ctor, model_label):
         train_loader, test16_loader, test32_loader = make_darcy_loaders(BATCH_SIZE)
         model = model_ctor()
         model_name = f"{model_label} (darcy) seed={seed}"
-        best_val, best_state = train_model(model, train_loader, test16_loader, EPOCHS, model_name=model_name)
+        _best_val, best_state = train_model(
+            model, train_loader, test16_loader, EPOCHS, model_name=model_name
+        )
         model.load_state_dict(best_state)
-        report = full_eval_report(model, {
-            "Darcy@16 (test)": test16_loader,
-            "Darcy@32 (zero-shot res)": test32_loader,
-        })
-        print(f"  seed={seed}  test16={report['Darcy@16 (test)']:.4f}  "
-              f"test32={report['Darcy@32 (zero-shot res)']:.4f}")
+        report = full_eval_report(
+            model,
+            {
+                "Darcy@16 (test)": test16_loader,
+                "Darcy@32 (zero-shot res)": test32_loader,
+            },
+        )
+        print(
+            f"  seed={seed}  test16={report['Darcy@16 (test)']:.4f}  "
+            f"test32={report['Darcy@32 (zero-shot res)']:.4f}"
+        )
         reports.append(report)
     return reports
+
 
 def summarize(reports, label):
     print(f"\n=== {label} (mean ± std over {len(reports)} seeds) ===")
@@ -513,13 +609,34 @@ def summarize(reports, label):
         vals = np.array([r[split] for r in reports])
         print(f"  {split:24s} {vals.mean():.4f} ± {vals.std():.4f}")
 
-def make_cnn(): return CNNBaseline(IN_CH, OUT_CH, width=22, n_levels=3)
-def make_fno(): return FNO2d(IN_CH, OUT_CH, width=16, modes1=4, modes2=4, n_layers=3)
-def make_ufno(): return UFNO2d(IN_CH, OUT_CH, width=12, modes1=4, modes2=4, n_levels=3)
-def make_uno(): return UNO(IN_CH, OUT_CH, width=18, n_filters=12, n_levels=3)
-def make_hcuno(): return HCUNOv2(IN_CH, OUT_CH, width=16, n_filters=12, n_levels=3)
-def make_uno_nopool(): return UNO(IN_CH, OUT_CH, width=18, n_filters=12, n_levels=0, n_blocks=6)
-def make_hcuno_nopool(): return HCUNOv2(IN_CH, OUT_CH, width=16, n_filters=12, n_levels=0, n_blocks=6)
+
+def make_cnn():
+    return CNNBaseline(IN_CH, OUT_CH, width=22, n_levels=3)
+
+
+def make_fno():
+    return FNO2d(IN_CH, OUT_CH, width=16, modes1=4, modes2=4, n_layers=3)
+
+
+def make_ufno():
+    return UFNO2d(IN_CH, OUT_CH, width=12, modes1=4, modes2=4, n_levels=3)
+
+
+def make_uno():
+    return UNO(IN_CH, OUT_CH, width=18, n_filters=12, n_levels=3)
+
+
+def make_hcuno():
+    return HCUNOv2(IN_CH, OUT_CH, width=16, n_filters=12, n_levels=3)
+
+
+def make_uno_nopool():
+    return UNO(IN_CH, OUT_CH, width=18, n_filters=12, n_levels=0, n_blocks=6)
+
+
+def make_hcuno_nopool():
+    return HCUNOv2(IN_CH, OUT_CH, width=16, n_filters=12, n_levels=0, n_blocks=6)
+
 
 MODEL_ZOO = [
     ("CNN", make_cnn),
@@ -532,7 +649,9 @@ MODEL_ZOO = [
 ]
 
 print("\n" + "=" * 70)
-print(f"DARCY: a(x) -> u(x)  [absolute-freq filter bank, FMAX={FMAX}, original bw formula]")
+print(
+    f"DARCY: a(x) -> u(x)  [absolute-freq filter bank, FMAX={FMAX}, original bw formula]"
+)
 print("=" * 70)
 for label, ctor in MODEL_ZOO:
     print(f"{label:20s} params: {count_params(ctor())}")

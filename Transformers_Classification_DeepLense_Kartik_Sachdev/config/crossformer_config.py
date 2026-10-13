@@ -1,5 +1,5 @@
-from ray import tune
 import numpy as np
+from ray import tune
 
 CROSSFORMER_CONFIG = {
     "network_type": "CrossFormer",
@@ -9,16 +9,16 @@ CROSSFORMER_CONFIG = {
     "num_epochs": 15,
     "optimizer_config": {
         "name": "AdamW",
-        "weight_decay": 1e-4, #0.01
+        "weight_decay": 1e-4,  # 0.01
         "lr": 0.001,
         "momentum": 0.9,
         "betas": (0.9, 0.999),
         "warmup_epoch": 3,
     },
-    "out_features": 128, 
+    "out_features": 128,
     "optimizer_finetune_config": {
         "name": "AdamW",
-        "weight_decay": 0.01, #0.01
+        "weight_decay": 0.01,  # 0.01
         "lr": 3e-4,
         "momentum": 0.9,
         "betas": (0.9, 0.999),
@@ -26,7 +26,10 @@ CROSSFORMER_CONFIG = {
     },
     "lr_schedule_config": {
         "use_lr_schedule": True,
-        "step_lr": {"gamma": 0.5, "step_size": 20,},
+        "step_lr": {
+            "gamma": 0.5,
+            "step_size": 20,
+        },
         "reduce_on_plateau": {
             "factor": 0.1,
             "patience": 4,
@@ -35,7 +38,6 @@ CROSSFORMER_CONFIG = {
         },
     },
     "channels": 1,
-    "out_features": 128, 
     "network_config": {
         "dim": (64, 128, 256, 128),  # dimension at each stage
         "depth": (3, 5, 6, 7),  # depth of transformer at each stage
@@ -61,7 +63,10 @@ CROSSFORMER_RAY_CONFIG = {
     },
     "lr_schedule_config": {
         "use_lr_schedule": True,
-        "step_lr": {"gamma": 0.5, "step_size": 20,},
+        "step_lr": {
+            "gamma": 0.5,
+            "step_size": 20,
+        },
         "reduce_on_plateau": {
             "factor": 0.1,
             "patience": 4,
@@ -77,4 +82,3 @@ CROSSFORMER_RAY_CONFIG = {
         "local_window_size": 7,  # local window size (can be customized for each stage, but in paper, held constant at 7 for all stages)
     },
 }
-

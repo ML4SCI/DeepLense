@@ -38,29 +38,44 @@ class MaskedJEPAConfig:
     min_keep: int = 1
     variance_weight: float = 10.0
     variance_target_std: float = 0.1
-    symmetry_weight: float = 0.1        # lens_jepa_sym only
-    focus_strength: float = 1.0         # lens_jepa_focus only
+    symmetry_weight: float = 0.1  # lens_jepa_sym only
+    focus_strength: float = 1.0  # lens_jepa_focus only
 
     def __post_init__(self) -> None:
-        self.pred_scale, self.aspect_ratio, self.enc_scale = map(tuple, (self.pred_scale, self.aspect_ratio, self.enc_scale))
+        self.pred_scale, self.aspect_ratio, self.enc_scale = map(
+            tuple, (self.pred_scale, self.aspect_ratio, self.enc_scale)
+        )
 
 
 def variance_floor(tokens: torch.Tensor, target_std: float) -> torch.Tensor:
     """Hinge on the per-dimension std of image-pooled features."""
     pooled = tokens.float().mean(dim=1)
-    return F.relu(target_std - torch.sqrt(pooled.var(dim=0, unbiased=False) + 1e-4)).mean()
+    return F.relu(
+        target_std - torch.sqrt(pooled.var(dim=0, unbiased=False) + 1e-4)
+    ).mean()
 
 
-def focus_weighted_loss(pred, target, images, masks_pred, batch, nenc, patch_size, strength) -> torch.Tensor:
+def focus_weighted_loss(
+    pred, target, images, masks_pred, batch, nenc, patch_size, strength
+) -> torch.Tensor:
     weights = arc_weights(images, patch_size, strength).unsqueeze(-1)
-    weights = repeat_interleave_batch(apply_masks(weights, masks_pred), batch, repeat=nenc)
-    per_token = F.smooth_l1_loss(pred.float(), target.float(), reduction="none").mean(dim=-1, keepdim=True)
+    weights = repeat_interleave_batch(
+        apply_masks(weights, masks_pred), batch, repeat=nenc
+    )
+    per_token = F.smooth_l1_loss(pred.float(), target.float(), reduction="none").mean(
+        dim=-1, keepdim=True
+    )
     return (per_token * weights).sum() / weights.sum().clamp_min(1e-6)
 
 
-def global_symmetry_loss(student_tokens: torch.Tensor, teacher_tokens: torch.Tensor) -> torch.Tensor:
+def global_symmetry_loss(
+    student_tokens: torch.Tensor, teacher_tokens: torch.Tensor
+) -> torch.Tensor:
     dim = student_tokens.shape[-1]
-    return F.smooth_l1_loss(F.layer_norm(student_tokens.float().mean(1), (dim,)), F.layer_norm(teacher_tokens.float().mean(1), (dim,)))
+    return F.smooth_l1_loss(
+        F.layer_norm(student_tokens.float().mean(1), (dim,)),
+        F.layer_norm(teacher_tokens.float().mean(1), (dim,)),
+    )
 
 
 class MaskedJEPAObjective(nn.Module):
@@ -75,17 +90,34 @@ class MaskedJEPAObjective(nn.Module):
         c, batch = self.config, images.shape[0]
         with torch.no_grad():
             teacher_full = F.layer_norm(teacher(images), (teacher.embed_dim,))
-            target = repeat_interleave_batch(apply_masks(teacher_full, masks_pred), batch, repeat=len(masks_enc))
+            target = repeat_interleave_batch(
+                apply_masks(teacher_full, masks_pred), batch, repeat=len(masks_enc)
+            )
         context = encoder(images, masks_enc)
         predicted = predictor(context, masks_enc, masks_pred)
         if self.method == "lens_jepa_focus":
-            prediction = focus_weighted_loss(predicted, target, images, masks_pred, batch, len(masks_enc), self.patch_size, c.focus_strength)
+            prediction = focus_weighted_loss(
+                predicted,
+                target,
+                images,
+                masks_pred,
+                batch,
+                len(masks_enc),
+                self.patch_size,
+                c.focus_strength,
+            )
         else:
             prediction = F.smooth_l1_loss(predicted, target)
         loss = prediction
-        parts = {"prediction": prediction, "symmetry": prediction.new_zeros(()), "variance": prediction.new_zeros(())}
+        parts = {
+            "prediction": prediction,
+            "symmetry": prediction.new_zeros(()),
+            "variance": prediction.new_zeros(()),
+        }
         if self.method == "lens_jepa_sym":
-            rotated = encoder(d4_transform(images, int(torch.randint(0, D4_SIZE, ()).item())))
+            rotated = encoder(
+                d4_transform(images, int(torch.randint(0, D4_SIZE, ()).item()))
+            )
             parts["symmetry"] = global_symmetry_loss(rotated, teacher_full)
             loss = loss + c.symmetry_weight * parts["symmetry"]
         if c.variance_weight > 0:
@@ -97,5 +129,5 @@ class MaskedJEPAObjective(nn.Module):
 
 @torch.no_grad()
 def ema_update(teacher: nn.Module, student: nn.Module, momentum: float) -> None:
-    for t, s in zip(teacher.parameters(), student.parameters()):
+    for t, s in zip(teacher.parameters(), student.parameters(), strict=False):
         t.mul_(momentum).add_(s.detach(), alpha=1.0 - momentum)

@@ -1,8 +1,5 @@
-from typing import Any
-import torch.nn as nn
-from utils.util import activate_requires_grad, deactivate_requires_grad
-from models.byol import BYOLSingleChannel
-import copy
+from torch import nn
+
 
 class FinetuneModel(nn.Module):
     def __init__(self, backbone: nn.Module, head: nn.Module):
@@ -14,6 +11,3 @@ class FinetuneModel(nn.Module):
     def forward(self, x):
         x = self.model(x)
         return x
-
-
-

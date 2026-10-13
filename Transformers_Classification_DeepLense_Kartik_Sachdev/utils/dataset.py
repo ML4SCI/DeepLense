@@ -1,16 +1,4 @@
 import os
-import gdown
-import splitfolders
-from torch.utils.data import DataLoader, Dataset
-import numpy as np
-from PIL import Image
-from config.data_config import DATASET
-import matplotlib.pyplot as plt
-import torch
-from torchvision.transforms import ToPILImage
-import torchvision.transforms as T
-from typing import List, Optional, Tuple
-import os
 
 import gdown
 import matplotlib.pyplot as plt
@@ -18,11 +6,11 @@ import numpy as np
 import splitfolders
 import torch
 import torch.distributed as dist
+import torchvision.transforms as T
+from config.data_config import DATASET
 from PIL import Image
-from torch.utils.data import DataLoader, Dataset
-from torchvision.transforms import ToPILImage
-
-from utils.augmentation import DefaultTransformations, TransformationsSLL
+from torch.utils.data import Dataset
+from utils.augmentation import TransformationsSLL
 from utils.util import make_directories
 
 
@@ -115,12 +103,7 @@ class DeepLenseDataset(Dataset):
         """
         assert mode in ["train", "test", "val"]
 
-        if mode == "train":
-            filename = f"{destination_dir}/{dataset_name}.tgz"
-            foldername = f"{destination_dir}/{dataset_name}"
-            # self.root_dir = foldername + "/train"
-
-        elif mode == "val":
+        if mode == "train" or mode == "val":
             filename = f"{destination_dir}/{dataset_name}.tgz"
             foldername = f"{destination_dir}/{dataset_name}"
             # self.root_dir = foldername + "/val"
@@ -132,7 +115,7 @@ class DeepLenseDataset(Dataset):
 
         url = DATASET[f"{dataset_name}"][f"{mode}_url"]
 
-        if download and not os.path.isdir(foldername) is True:
+        if download and os.path.isdir(foldername) is not True:
             if not os.path.isfile(filename):
                 download_dataset(
                     filename,
@@ -140,9 +123,9 @@ class DeepLenseDataset(Dataset):
                 )
             extract_split_dataset(filename, destination_dir)
         else:
-            assert (
-                os.path.isdir(foldername) is True
-            ), "Dataset doesn't exists, set arg download to True!"
+            assert os.path.isdir(foldername) is True, (
+                "Dataset doesn't exists, set arg download to True!"
+            )
 
             print(f"{dataset_name} dataset already exists")
 
@@ -247,8 +230,8 @@ def visualize_samples_ssl(
 
     # Generate the outer subplots
     outer_subplot_index = 1
-    for row in range(num_rows_outer):
-        for col in range(num_cols_outer):
+    for _row in range(num_rows_outer):
+        for _col in range(num_cols_outer):
             outer_subplot = fig.add_subplot(
                 num_rows_outer, num_cols_outer, outer_subplot_index
             )
@@ -307,12 +290,7 @@ class DeepLenseDataset_dataeff(Dataset):
     ):
         assert mode in ["train", "test", "val"]
 
-        if mode == "train":
-            filename = f"{destination_dir}/{dataset_name}.tgz"
-            foldername = f"{destination_dir}/{dataset_name}"
-            # self.root_dir = foldername + "/train"
-
-        elif mode == "val":
+        if mode == "train" or mode == "val":
             filename = f"{destination_dir}/{dataset_name}.tgz"
             foldername = f"{destination_dir}/{dataset_name}"
             # self.root_dir = foldername + "/val"
@@ -324,7 +302,7 @@ class DeepLenseDataset_dataeff(Dataset):
 
         url = DATASET[f"{dataset_name}"][f"{mode}_url"]
 
-        if download and not os.path.isdir(foldername) is True:
+        if download and os.path.isdir(foldername) is not True:
             if not os.path.isfile(filename):
                 download_dataset(
                     filename,
@@ -332,9 +310,9 @@ class DeepLenseDataset_dataeff(Dataset):
                 )
             extract_split_dataset(filename, destination_dir)
         else:
-            assert (
-                os.path.isdir(foldername) is True
-            ), "Dataset doesn't exists, set arg download to True!"
+            assert os.path.isdir(foldername) is True, (
+                "Dataset doesn't exists, set arg download to True!"
+            )
 
             print("Dataset already exists")
 
@@ -496,12 +474,7 @@ class DeepLenseDatasetSSL(Dataset):
     ):
         assert mode in ["train", "test", "val"]
 
-        if mode == "train":
-            filename = f"{destination_dir}/{dataset_name}.tgz"
-            foldername = f"{destination_dir}/{dataset_name}"
-            # self.root_dir = foldername + "/train"
-
-        elif mode == "val":
+        if mode == "train" or mode == "val":
             filename = f"{destination_dir}/{dataset_name}.tgz"
             foldername = f"{destination_dir}/{dataset_name}"
             # self.root_dir = foldername + "/val"
@@ -513,7 +486,7 @@ class DeepLenseDatasetSSL(Dataset):
 
         url = DATASET[f"{dataset_name}"][f"{mode}_url"]
 
-        if download and not os.path.isdir(foldername) is True:
+        if download and os.path.isdir(foldername) is not True:
             if not os.path.isfile(filename):
                 download_dataset(
                     filename,
@@ -521,9 +494,9 @@ class DeepLenseDatasetSSL(Dataset):
                 )
             extract_split_dataset(filename, destination_dir)
         else:
-            assert (
-                os.path.isdir(foldername) is True
-            ), "Dataset doesn't exists, set arg download to True!"
+            assert os.path.isdir(foldername) is True, (
+                "Dataset doesn't exists, set arg download to True!"
+            )
 
             print(f"{dataset_name} dataset already exists")
 
@@ -598,7 +571,7 @@ class DeepLenseDatasetSSLRegression(DeepLenseDatasetSSL):
         )
 
     def __getitem__(self, index):
-        image, label = self.imagefilename[index], self.labels[index]
+        image, _label = self.imagefilename[index], self.labels[index]
 
         # this assumes that classes have mass in second dim
         data = np.load(image, allow_pickle=True)

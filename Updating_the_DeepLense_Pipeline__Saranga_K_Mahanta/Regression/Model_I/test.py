@@ -1,12 +1,12 @@
-import torch
-import torch.nn as nn
 import matplotlib.pyplot as plt
-
-from model import Regressor
+import torch
+from config import BATCH_SIZE, MODEL_PATH, TEST_DATA_PATH, TRAIN_DATA_PATH
 from dataloader import create_dataloaders
+from model import Regressor
+from torch import nn
 from train import test_epoch
-from config import  MODEL_PATH, BATCH_SIZE, TRAIN_DATA_PATH, TEST_DATA_PATH
-from utils import device, set_seed, train_transforms, test_transforms
+from utils import device, set_seed, test_transforms, train_transforms
+
 
 def flatten_list(x):
     flattened_list = []
@@ -16,20 +16,19 @@ def flatten_list(x):
 
     return flattened_list
 
+
 if __name__ == "__main__":
     set_seed(7)
     criterion = nn.HuberLoss()
     model = Regressor().to(device)
-    if device != 'cpu':
+    if device != "cpu":
         model.load_state_dict(torch.load(MODEL_PATH))
     else:
-        model.load_state_dict(torch.load(MODEL_PATH, map_location = torch.device('cpu')))
+        model.load_state_dict(torch.load(MODEL_PATH, map_location=torch.device("cpu")))
 
     train_loader, val_loader, test_loader = create_dataloaders(
-        TRAIN_DATA_PATH, TEST_DATA_PATH, 
-        train_transforms, test_transforms, 
-        BATCH_SIZE
-        )
+        TRAIN_DATA_PATH, TEST_DATA_PATH, train_transforms, test_transforms, BATCH_SIZE
+    )
 
     _, _, train_loss = test_epoch(model, train_loader, criterion)
     print("Train set Huber loss:" + str(train_loss))
@@ -41,9 +40,9 @@ if __name__ == "__main__":
     y_pred_list_flattened = flatten_list(y_pred_list)
     y_truth_list_flattened = flatten_list(y_truth_list)
 
-    plt.figure(figsize=(12,9))
+    plt.figure(figsize=(12, 9))
     plt.scatter(y_truth_list_flattened, y_pred_list_flattened)
-    plt.xlabel('Observed mass')
-    plt.ylabel('Predicted mass')
-    plt.savefig("test_plot.png", dpi=80)  
+    plt.xlabel("Observed mass")
+    plt.ylabel("Predicted mass")
+    plt.savefig("test_plot.png", dpi=80)
     plt.show()

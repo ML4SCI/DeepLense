@@ -1,6 +1,4 @@
-import os
 import torch
-
 from tqdm import tqdm
 
 
@@ -13,9 +11,9 @@ class Trainer:
     ):
         self.model = model
         self.n_epochs = config.opt.epochs
-        #self.use_distributed = config.use_distributed
+        # self.use_distributed = config.use_distributed
         self.device = config.device
-        #self.wandb_log = config.wandb_log
+        # self.wandb_log = config.wandb_log
         self.data_processor = data_processor
 
     def train(
@@ -42,26 +40,24 @@ class Trainer:
         self.model.train()
         train_loss = 0.0
         total_samples = 0
-        best_val_loss = float('inf')
+        best_val_loss = float("inf")
 
         for epoch in range(self.n_epochs):
-
             print(f"Starting epoch {epoch}:")
             pbar = tqdm(train_data_loader)
-            for i, (images, mass) in enumerate(pbar):
-                
+            for _i, (images, mass) in enumerate(pbar):
                 images = images.to(self.device)
                 images = images.to(torch.float)
                 mass = mass.to(self.device)
                 mass = mass.to(torch.float)
                 output = self.model(images)
                 loss = mse(mass, output)
-                train_loss += loss.item()*len(images)
+                train_loss += loss.item() * len(images)
                 total_samples += len(images)
                 optimizer.zero_grad()
                 loss.backward()
                 optimizer.step()
-                #scheduler.step()
+                # scheduler.step()
 
             train_loss /= total_samples
 
@@ -71,25 +67,24 @@ class Trainer:
                 test_loss = 0.0
                 test_samples = 0
                 pbar = tqdm(test_data_loader)
-                for i, (images, mass) in enumerate(pbar):
-                    
+                for _i, (images, mass) in enumerate(pbar):
                     images = images.to(self.device)
                     mass = mass.to(self.device)
                     output = self.model(images)
                     loss_test = mse(mass, output)
-                    test_loss += loss_test.item()*len(images)
+                    test_loss += loss_test.item() * len(images)
                     test_samples += len(images)
 
                 test_loss /= test_samples
             scheduler.step(test_loss)
 
+            print(
+                f"Epoch [{epoch + 1}/{self.n_epochs}], Train Loss: {train_loss:.4f}, Test Loss: {test_loss:.4f}"
+            )
 
-            print(f'Epoch [{epoch+1}/{self.n_epochs}], Train Loss: {train_loss:.4f}, Test Loss: {test_loss:.4f}')
-
-            if test_loss < best_val_loss :
+            if test_loss < best_val_loss:
                 best_val_loss = test_loss
-                torch.save(self.model.state_dict(), "saved_models/resnet_new_v4_bestmodel.pt")
-                print(f'Epoch [{epoch+1}/{self.n_epochs}] saved best model')
-            
-
-
+                torch.save(
+                    self.model.state_dict(), "saved_models/resnet_new_v4_bestmodel.pt"
+                )
+                print(f"Epoch [{epoch + 1}/{self.n_epochs}] saved best model")

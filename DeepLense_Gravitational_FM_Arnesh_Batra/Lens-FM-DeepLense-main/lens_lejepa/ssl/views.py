@@ -21,7 +21,7 @@ from ..data.io import standardise
 
 def gaussian_blur(images: torch.Tensor, sigma: float) -> torch.Tensor:
     """Blur ``[B, C, H, W]`` images with an isotropic Gaussian kernel."""
-    radius = max(1, int(round(3 * sigma)))
+    radius = max(1, round(3 * sigma))
     axis = torch.arange(-radius, radius + 1, device=images.device, dtype=images.dtype)
     kernel = torch.exp(-0.5 * (axis / sigma).square())
     kernel = kernel / kernel.sum()

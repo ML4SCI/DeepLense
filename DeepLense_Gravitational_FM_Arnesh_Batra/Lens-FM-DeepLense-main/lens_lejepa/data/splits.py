@@ -9,7 +9,9 @@ from __future__ import annotations
 import numpy as np
 
 
-def stratified_split(labels: np.ndarray, train_fraction: float, seed: int) -> tuple[np.ndarray, np.ndarray]:
+def stratified_split(
+    labels: np.ndarray, train_fraction: float, seed: int
+) -> tuple[np.ndarray, np.ndarray]:
     """Split every class into ``train_fraction`` train and the rest validation."""
     if not 0.0 < train_fraction < 1.0:
         raise ValueError("train_fraction must be in (0, 1).")
@@ -56,13 +58,17 @@ def quantile_groups(values: np.ndarray, bins: int = 10) -> np.ndarray:
     values = np.asarray(values)
     if len(values) < 2:
         return np.zeros(len(values), dtype=np.int64)
-    edges = np.unique(np.quantile(values, np.linspace(0, 1, min(bins, len(values)) + 1)))
+    edges = np.unique(
+        np.quantile(values, np.linspace(0, 1, min(bins, len(values)) + 1))
+    )
     if len(edges) <= 2:
         return np.zeros(len(values), dtype=np.int64)
     return np.digitize(values, edges[1:-1], right=True)
 
 
-def quantile_split(values: np.ndarray, train_fraction: float, seed: int, bins: int = 10) -> tuple[np.ndarray, np.ndarray]:
+def quantile_split(
+    values: np.ndarray, train_fraction: float, seed: int, bins: int = 10
+) -> tuple[np.ndarray, np.ndarray]:
     """Train/validation split of a continuous target, stratified by quantile.
 
     Every quantile group contributes to both sides, so the full target range
@@ -81,7 +87,7 @@ def quantile_split(values: np.ndarray, train_fraction: float, seed: int, bins: i
         if len(indices) == 1:
             train.extend(indices)
             continue
-        cut = min(len(indices) - 1, max(1, int(round(len(indices) * train_fraction))))
+        cut = min(len(indices) - 1, max(1, round(len(indices) * train_fraction)))
         train.extend(indices[:cut])
         val.extend(indices[cut:])
     if not val:
@@ -89,7 +95,9 @@ def quantile_split(values: np.ndarray, train_fraction: float, seed: int, bins: i
     return np.asarray(train, dtype=np.int64), np.asarray(val, dtype=np.int64)
 
 
-def quantile_subsample(values: np.ndarray, count: int, seed: int, bins: int = 10) -> np.ndarray:
+def quantile_subsample(
+    values: np.ndarray, count: int, seed: int, bins: int = 10
+) -> np.ndarray:
     """Pick ``count`` items whose targets cover every quantile proportionally."""
     values = np.asarray(values)
     if count >= len(values):

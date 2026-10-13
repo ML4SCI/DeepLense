@@ -1,13 +1,10 @@
 import torch
-import numpy as np
 from torch import nn
-from torch import Tensor
-from typing import Tuple, Union, List
-import torchvision.transforms as transforms
+
 from models import FeedForward
 
-class TransformerLSABlock(nn.Module):
 
+class TransformerLSABlock(nn.Module):
     """
     Implements a TransformerLSABlock, a building block for transformer models designed
     to work on image patches. This block contains multi-locally self-attention,
@@ -23,14 +20,16 @@ class TransformerLSABlock(nn.Module):
         temperature (nn.Parameter): Temperature parameter for attention mechanism.
     """
 
-    def __init__(self,
-                 embed_dim: int,
-                 num_heads: int,
-                 num_patches: int,
-                 num_hidden_neurons: int,
-                 activation_function: nn.Module,
-                 device: torch.device,
-                 dropout: float = 0.1):
+    def __init__(
+        self,
+        embed_dim: int,
+        num_heads: int,
+        num_patches: int,
+        num_hidden_neurons: int,
+        activation_function: nn.Module,
+        device: torch.device,
+        dropout: float = 0.1,
+    ):
         """
         Initializes the TransformerLSABlock layer.
 
@@ -47,14 +46,23 @@ class TransformerLSABlock(nn.Module):
         super().__init__()
 
         # initialize the multi-locally self-attention layer
-        self.mlsa = MultiLocallySelfAttention(embed_dim, num_heads, num_patches, device, dropout)
+        self.mlsa = MultiLocallySelfAttention(
+            embed_dim, num_heads, num_patches, device, dropout
+        )
 
         # initialize the first layer normalization
         self.first_norm = nn.LayerNorm(embed_dim)
 
         # initialize the feedforward network
-        self.feedforward = FeedForward(embed_dim, embed_dim, activation_function, num_hidden_neurons, num_hidden_layers=1,
-                                       task_type='regression', dropout=dropout)
+        self.feedforward = FeedForward(
+            embed_dim,
+            embed_dim,
+            activation_function,
+            num_hidden_neurons,
+            num_hidden_layers=1,
+            task_type="regression",
+            dropout=dropout,
+        )
 
         # initialize the second layer normalization
         self.second_norm = nn.LayerNorm(embed_dim)
@@ -68,7 +76,12 @@ class TransformerLSABlock(nn.Module):
         # initialize temperature parameter (a scalar used to divide the queries)
         self.temperature = nn.Parameter(torch.ones(1))
 
-    def forward(self, key: torch.Tensor, query: Union[torch.Tensor, None] = None, value: Union[torch.Tensor, None] = None) -> torch.Tensor:
+    def forward(
+        self,
+        key: torch.Tensor,
+        query: torch.Tensor | None = None,
+        value: torch.Tensor | None = None,
+    ) -> torch.Tensor:
         """
         Performs the forward pass through the TransformerLSABlock layer.
 

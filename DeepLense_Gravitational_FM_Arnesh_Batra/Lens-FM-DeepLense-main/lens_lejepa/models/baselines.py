@@ -65,8 +65,14 @@ class RCAN(nn.Module):
     def __init__(self, channels: int = 64, blocks: int = 8) -> None:
         super().__init__()
         self.head = nn.Conv2d(1, channels, 3, padding=1)
-        self.body = nn.Sequential(*[_ChannelAttentionBlock(channels) for _ in range(blocks)])
-        self.tail = nn.Sequential(nn.Conv2d(channels, channels * 4, 3, padding=1), nn.PixelShuffle(2), nn.Conv2d(channels, 1, 3, padding=1))
+        self.body = nn.Sequential(
+            *[_ChannelAttentionBlock(channels) for _ in range(blocks)]
+        )
+        self.tail = nn.Sequential(
+            nn.Conv2d(channels, channels * 4, 3, padding=1),
+            nn.PixelShuffle(2),
+            nn.Conv2d(channels, 1, 3, padding=1),
+        )
 
     def forward(self, low_res: torch.Tensor) -> torch.Tensor:
         features = self.head(low_res)
@@ -83,7 +89,9 @@ class Bicubic(nn.Module):
 
     def forward(self, low_res: torch.Tensor) -> torch.Tensor:
         size = (self.output_size, self.output_size)
-        return F.interpolate(low_res, size=size, mode="bicubic", align_corners=False, antialias=True)
+        return F.interpolate(
+            low_res, size=size, mode="bicubic", align_corners=False, antialias=True
+        )
 
 
 # --------------------------------------------------------------------------------------
@@ -100,7 +108,12 @@ class FSRCNN(_ClampAtEval):
 
     def __init__(self, d: int = 56, s: int = 12, m: int = 4) -> None:
         super().__init__()
-        layers = [nn.Conv2d(1, d, 5, padding=2), nn.PReLU(d), nn.Conv2d(d, s, 1), nn.PReLU(s)]
+        layers = [
+            nn.Conv2d(1, d, 5, padding=2),
+            nn.PReLU(d),
+            nn.Conv2d(d, s, 1),
+            nn.PReLU(s),
+        ]
         for _ in range(m):
             layers += [nn.Conv2d(s, s, 3, padding=1), nn.PReLU(s)]
         layers += [nn.Conv2d(s, d, 1), nn.PReLU(d)]
@@ -115,8 +128,13 @@ class _ResBlock(nn.Module):
     def __init__(self, channels: int, batch_norm: bool, activation: nn.Module) -> None:
         super().__init__()
         norm = (lambda: nn.BatchNorm2d(channels)) if batch_norm else nn.Identity
-        self.body = nn.Sequential(nn.Conv2d(channels, channels, 3, padding=1), norm(), activation,
-                                  nn.Conv2d(channels, channels, 3, padding=1), norm())
+        self.body = nn.Sequential(
+            nn.Conv2d(channels, channels, 3, padding=1),
+            norm(),
+            activation,
+            nn.Conv2d(channels, channels, 3, padding=1),
+            norm(),
+        )
 
     def forward(self, x: torch.Tensor) -> torch.Tensor:
         return x + self.body(x)
@@ -127,11 +145,20 @@ class SRResNet(_ClampAtEval):
 
     def __init__(self, channels: int = 64, blocks: int = 16) -> None:
         super().__init__()
-        self.head = nn.Sequential(nn.Conv2d(1, channels, 9, padding=4), nn.PReLU(channels))
-        self.body = nn.Sequential(*[_ResBlock(channels, True, nn.PReLU(channels)) for _ in range(blocks)],
-                                  nn.Conv2d(channels, channels, 3, padding=1), nn.BatchNorm2d(channels))
-        self.tail = nn.Sequential(nn.Conv2d(channels, channels * 4, 3, padding=1), nn.PixelShuffle(2), nn.PReLU(channels),
-                                  nn.Conv2d(channels, 1, 9, padding=4))
+        self.head = nn.Sequential(
+            nn.Conv2d(1, channels, 9, padding=4), nn.PReLU(channels)
+        )
+        self.body = nn.Sequential(
+            *[_ResBlock(channels, True, nn.PReLU(channels)) for _ in range(blocks)],
+            nn.Conv2d(channels, channels, 3, padding=1),
+            nn.BatchNorm2d(channels),
+        )
+        self.tail = nn.Sequential(
+            nn.Conv2d(channels, channels * 4, 3, padding=1),
+            nn.PixelShuffle(2),
+            nn.PReLU(channels),
+            nn.Conv2d(channels, 1, 9, padding=4),
+        )
 
     def forward(self, low_res: torch.Tensor) -> torch.Tensor:
         features = self.head(low_res)
@@ -144,9 +171,15 @@ class EDSR(_ClampAtEval):
     def __init__(self, channels: int = 64, blocks: int = 16) -> None:
         super().__init__()
         self.head = nn.Conv2d(1, channels, 3, padding=1)
-        self.body = nn.Sequential(*[_ResBlock(channels, False, nn.ReLU(inplace=True)) for _ in range(blocks)],
-                                  nn.Conv2d(channels, channels, 3, padding=1))
-        self.tail = nn.Sequential(nn.Conv2d(channels, channels * 4, 3, padding=1), nn.PixelShuffle(2), nn.Conv2d(channels, 1, 3, padding=1))
+        self.body = nn.Sequential(
+            *[_ResBlock(channels, False, nn.ReLU(inplace=True)) for _ in range(blocks)],
+            nn.Conv2d(channels, channels, 3, padding=1),
+        )
+        self.tail = nn.Sequential(
+            nn.Conv2d(channels, channels * 4, 3, padding=1),
+            nn.PixelShuffle(2),
+            nn.Conv2d(channels, 1, 3, padding=1),
+        )
 
     def forward(self, low_res: torch.Tensor) -> torch.Tensor:
         features = self.head(low_res)
@@ -159,7 +192,11 @@ class _DenseBlock(nn.Module):
     def __init__(self, channels: int, growth: int, layers: int) -> None:
         super().__init__()
         self.convs = nn.ModuleList(
-            nn.Sequential(nn.Conv2d(channels + i * growth, growth, 3, padding=1), nn.ReLU(inplace=True)) for i in range(layers)
+            nn.Sequential(
+                nn.Conv2d(channels + i * growth, growth, 3, padding=1),
+                nn.ReLU(inplace=True),
+            )
+            for i in range(layers)
         )
         self.fuse = nn.Conv2d(channels + layers * growth, channels, 1)
 
@@ -173,13 +210,24 @@ class _DenseBlock(nn.Module):
 class RDN(_ClampAtEval):
     """RDN (Zhang et al., 2018): D=16 residual dense blocks, C=8 layers, G=64, global fusion."""
 
-    def __init__(self, channels: int = 64, blocks: int = 16, layers: int = 8, growth: int = 64) -> None:
+    def __init__(
+        self, channels: int = 64, blocks: int = 16, layers: int = 8, growth: int = 64
+    ) -> None:
         super().__init__()
         self.shallow1 = nn.Conv2d(1, channels, 3, padding=1)
         self.shallow2 = nn.Conv2d(channels, channels, 3, padding=1)
-        self.blocks = nn.ModuleList(_DenseBlock(channels, growth, layers) for _ in range(blocks))
-        self.global_fusion = nn.Sequential(nn.Conv2d(channels * blocks, channels, 1), nn.Conv2d(channels, channels, 3, padding=1))
-        self.tail = nn.Sequential(nn.Conv2d(channels, channels * 4, 3, padding=1), nn.PixelShuffle(2), nn.Conv2d(channels, 1, 3, padding=1))
+        self.blocks = nn.ModuleList(
+            _DenseBlock(channels, growth, layers) for _ in range(blocks)
+        )
+        self.global_fusion = nn.Sequential(
+            nn.Conv2d(channels * blocks, channels, 1),
+            nn.Conv2d(channels, channels, 3, padding=1),
+        )
+        self.tail = nn.Sequential(
+            nn.Conv2d(channels, channels * 4, 3, padding=1),
+            nn.PixelShuffle(2),
+            nn.Conv2d(channels, 1, 3, padding=1),
+        )
 
     def forward(self, low_res: torch.Tensor) -> torch.Tensor:
         first = self.shallow1(low_res)
@@ -188,4 +236,6 @@ class RDN(_ClampAtEval):
         for block in self.blocks:
             x = block(x)
             outputs.append(x)
-        return self.output(self.tail(self.global_fusion(torch.cat(outputs, dim=1)) + first))
+        return self.output(
+            self.tail(self.global_fusion(torch.cat(outputs, dim=1)) + first)
+        )

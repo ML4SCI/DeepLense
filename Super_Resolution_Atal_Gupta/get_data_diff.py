@@ -1,10 +1,11 @@
 import os
-import numpy as np
 from collections import defaultdict
-import matplotlib.pyplot as plt
-import cv2
 
-mypath = './pairs'
+import cv2
+import matplotlib.pyplot as plt
+import numpy as np
+
+mypath = "./pairs"
 files = [os.path.join(mypath, f) for f in os.listdir(mypath) if f.endswith(".npy")]
 
 HR = defaultdict()
@@ -16,7 +17,7 @@ null_list = []
 for file in files:
     split = file.split("_")
     label = split[1]
-    #print(label)
+    # print(label)
     if len(split) == 2:
         continue
     source = split[2].split(".")[0]
@@ -28,16 +29,16 @@ for file in files:
         c = 1e-7
         sample = (sample - np.amin(sample)) / (np.amax(sample) - np.amin(sample) + c)
         sample = cv2.resize(sample, (128, 128), interpolation=cv2.INTER_CUBIC)
-        sample = 2*sample-1
-        HR[index] = sample.reshape(1,128,128)
+        sample = 2 * sample - 1
+        HR[index] = sample.reshape(1, 128, 128)
         HRlabels[index] = label
     elif source == "hst":
         sample = np.load(file, allow_pickle=True)
         c = 1e-7
-        sample = (sample - np.amin(sample))/(np.amax(sample) - np.amin(sample)+c)
+        sample = (sample - np.amin(sample)) / (np.amax(sample) - np.amin(sample) + c)
         sample = cv2.resize(sample, (64, 64), interpolation=cv2.INTER_CUBIC)
-        sample = 2*sample-1
-        LR[index] = sample.reshape(1,64,64)
+        sample = 2 * sample - 1
+        LR[index] = sample.reshape(1, 64, 64)
         LRlabels[index] = label
 
 HR = np.asarray(list(dict(sorted(HR.items())).values()))
@@ -67,13 +68,13 @@ idx = 30
 plt.figure(figsize=(10, 5))
 plt.subplot(1, 2, 2)
 plt.imshow(HR[idx].squeeze())  # .squeeze() in case the array is 4D
-plt.title(f'High Resolution Sample')
+plt.title("High Resolution Sample")
 plt.colorbar()
 
 # Plot corresponding LR sample
 plt.subplot(1, 2, 1)
 plt.imshow(LR[idx].squeeze())  # .squeeze() in case the array is 4D
-plt.title(f'Low Resolution Sample')
+plt.title("Low Resolution Sample")
 plt.colorbar()
 plt.show()
 
@@ -84,4 +85,3 @@ plt.show()
 # np.save('./data_diff/test_LR.npy', LR[2880:])
 #
 # print(LRlabels[2880:])
-

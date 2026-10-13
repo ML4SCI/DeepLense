@@ -1,7 +1,8 @@
-from .hnet_modules import Conv2d, HNonlin, BatchNorm, mean_pool, sum_magnitudes
+import torch
 import torch.nn.functional as F
 from torch import nn
-import torch
+
+from .hnet_modules import BatchNorm, Conv2d, HNonlin, mean_pool, sum_magnitudes
 
 # import sys
 # [TODO] sys.path.append('../')
@@ -90,7 +91,7 @@ class HNet(nn.Module):
         x = x.view(x.shape[0], x.shape[2], x.shape[3], 1, 1, 1)
         # defining block 1
         cv1 = self.conv2d_1_nf(x)
-        cv1_bcc = cv1.detach().clone()
+        cv1.detach().clone()
         cv1 = self.nonlin1(cv1)
 
         cv2 = self.conv2d_nf_nf(cv1)

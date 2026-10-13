@@ -1,20 +1,13 @@
 import torch
-import torch.nn as nn
-import torch.optim as optim
-from torch.utils.data import DataLoader
-from utils.dataset import DefaultDatasetSetupSSL
-from torch.utils.data import DataLoader, random_split
-
-from models.cnn_zoo import CustomResNet
-from utils.train import train_simplistic
-
-from torchsummary import summary
-from models.byol import BYOLSingleChannel, FinetuneModelByol
-from models.byol import BYOL, BYOLSingleChannel, BYOLTransformer
 import torchvision
-
-from self_supervised.config.crossformer_network import CROSSFORMER_CONFIG
+from models.byol import BYOLSingleChannel, BYOLTransformer, FinetuneModelByol
 from models.transformer_zoo import TransformerModels
+from self_supervised.config.crossformer_network import CROSSFORMER_CONFIG
+from torch import nn, optim
+from torch.utils.data import DataLoader, random_split
+from torchsummary import summary
+from utils.dataset import DefaultDatasetSetupSSL
+from utils.train import train_simplistic
 
 
 def get_resnet_finetuned(saved_model_path, device, num_classes) -> nn.Module:
@@ -114,9 +107,6 @@ def main():
     epochs = 10
     learning_rate = 0.0001
     weight_decay = 0.01
-    margin = 1.0
-    num_channels = 1
-    temperature = 0.5
     num_classes = 3
 
     # Load dataset
@@ -144,7 +134,7 @@ def main():
 
     # Define optimizer and loss function
     optimizer_adam = optim.Adam(finetune_model.parameters(), lr=learning_rate)
-    optimizer_adamw = optim.AdamW(
+    optim.AdamW(
         finetune_model.parameters(), lr=learning_rate, weight_decay=weight_decay
     )
 
