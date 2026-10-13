@@ -71,6 +71,24 @@ Activate virtual environment and install the necessary packages from the provide
 pip install -r requirements.txt
 ```
 
+##  Dependency Compatibility Notice (2026 Update)
+
+The original `requirements.txt` pinned several outdated package versions 
+(e.g. `numpy==1.21.6`, `pandas==1.3.5`, `torch==1.12.0`) which are 
+incompatible with Python 3.11+ and modern environments.
+
+The dependency list has been modernized to:
+
+- Remove strict version pinning
+- Improve compatibility with Python 3.11+
+- Remove CUDA-specific wheel constraints
+- Improve cross-platform installation reliability
+
+If you encounter installation issues, ensure you are using:
+
+Python >= 3.10
+
+
 ### Model weights
 
 Download all model weights from [here](https://mega.nz/folder/SHZ0CLKQ#gQtyY9Yx9CuwWUEH_pbu8w).
