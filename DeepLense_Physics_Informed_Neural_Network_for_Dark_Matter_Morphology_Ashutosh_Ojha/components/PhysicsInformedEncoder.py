@@ -1,18 +1,29 @@
-import numpy as np 
-import pandas as pd 
-import os
-import matplotlib.pyplot as plt
+import numpy as np
 import torch
-import torch.nn as nn
-import torchvision.transforms.functional as F
-from typing import Tuple, Union, List
-import time
+from torch import nn
+
 
 class PhysicsInformedEncoder(nn.Module):
-    def __init__(self, image_size, patch_size, embedding_dim, num_patches, num_heads,
-                 hidden_dim, transformer_block_activation_function, num_transformer_block,
-                 device: torch.device, k_max, k_min, num_hidden_layer=1, dropout=0.1, pixel_scale=0.101,
-                 min_angle=-3.323, max_angle=3.232, mag=1):
+    def __init__(
+        self,
+        image_size,
+        patch_size,
+        embedding_dim,
+        num_patches,
+        num_heads,
+        hidden_dim,
+        transformer_block_activation_function,
+        num_transformer_block,
+        device: torch.device,
+        k_max,
+        k_min,
+        num_hidden_layer=1,
+        dropout=0.1,
+        pixel_scale=0.101,
+        min_angle=-3.323,
+        max_angle=3.232,
+        mag=1,
+    ):
         super().__init__()
 
         self.image_size = image_size
@@ -23,7 +34,9 @@ class PhysicsInformedEncoder(nn.Module):
         self.hidden_dim = hidden_dim
         self.k_max = k_max
         self.k_min = k_min
-        self.transformer_block_activation_function = transformer_block_activation_function
+        self.transformer_block_activation_function = (
+            transformer_block_activation_function
+        )
         self.num_transformer_block = num_transformer_block
         self.device = device
         self.dropout = dropout
@@ -36,28 +49,34 @@ class PhysicsInformedEncoder(nn.Module):
 
         for _ in range(self.num_transformer_block):
             self.transformer.append(
-                TransformerLSABlock(embedding_dim=self.embedding_dim,
-                                    num_head=self.num_heads,
-                                    num_patches=self.num_patches,
-                                    num_hidden_neurons=self.hidden_dim,
-                                    num_hidden_layers=num_hidden_layer,
-                                    activation_function=self.transformer_block_activation_function,
-                                    device=self.device,
-                                    dropout=dropout)
+                TransformerLSABlock(
+                    embedding_dim=self.embedding_dim,
+                    num_head=self.num_heads,
+                    num_patches=self.num_patches,
+                    num_hidden_neurons=self.hidden_dim,
+                    num_hidden_layers=num_hidden_layer,
+                    activation_function=self.transformer_block_activation_function,
+                    device=self.device,
+                    dropout=dropout,
+                )
             )
 
         # Adding a compressor to give us the deflection angle for each pixel
         self.transformer.append(nn.Flatten())
         self.total_features = (self.num_patches + 1) * self.embedding_dim
-        self.transformer.append(nn.Linear(self.total_features, self.image_size*self.image_size))
+        self.transformer.append(
+            nn.Linear(self.total_features, self.image_size * self.image_size)
+        )
         self.physics = Physics(mag=1)
-        self.imones = torch.ones((self.image_size,self.image_size)).to(self.device)
-        self.imones_1d = torch.ones((self.image_size*self.image_size)).to(self.device)
+        self.imones = torch.ones((self.image_size, self.image_size)).to(self.device)
+        self.imones_1d = torch.ones(self.image_size * self.image_size).to(self.device)
         # Create a grid for image coordinates
         self.profile_size = self.image_size
         self.half_profile_size = self.profile_size // 2
 
-    def image_to_source(self, image, centre=None, E_r=None, deflection=None, gradient=None):
+    def image_to_source(
+        self, image, centre=None, E_r=None, deflection=None, gradient=None
+    ):
         length, width = image.shape
         pixel_width = (self.max_angle - self.min_angle) / length
         if centre is None:
@@ -66,20 +85,26 @@ class PhysicsInformedEncoder(nn.Module):
         if False:
             centre_x = centre_x.item()
             centre_y = centre_y.item()
-        
-        range_indices_x = torch.arange(-(centre_x - 1), length - (centre_x - 1), device=self.device)
-        range_indices_y = torch.arange(-(centre_y - 1), width - (centre_y - 1), device=self.device)
 
-        x, y = torch.meshgrid(range_indices_x, range_indices_y, indexing='ij')
+        range_indices_x = torch.arange(
+            -(centre_x - 1), length - (centre_x - 1), device=self.device
+        )
+        range_indices_y = torch.arange(
+            -(centre_y - 1), width - (centre_y - 1), device=self.device
+        )
+
+        x, y = torch.meshgrid(range_indices_x, range_indices_y, indexing="ij")
         x, y = x * pixel_width, y * pixel_width
 
         r = torch.sqrt(x**2 + y**2)
-        mask = (r == 0)
+        mask = r == 0
         r[mask] = 1
 
         if deflection is not None:
             if deflection.shape != (length, width):
-                raise ValueError(f"The deflection should be of shape (2, {length}, {width}) but got {deflection.shape}")
+                raise ValueError(
+                    f"The deflection should be of shape (2, {length}, {width}) but got {deflection.shape}"
+                )
             xdef = (deflection * x) / r
             ydef = (deflection * y) / r
         elif gradient is not None:
@@ -99,12 +124,20 @@ class PhysicsInformedEncoder(nn.Module):
 
         bx, by = bx / pixel_width, by / pixel_width
 
-        bx = torch.clamp(bx + centre_x * self.source_mag, 0, length * self.source_mag - 1).long()
-        by = torch.clamp(by + centre_y * self.source_mag, 0, width * self.source_mag - 1).long()
+        bx = torch.clamp(
+            bx + centre_x * self.source_mag, 0, length * self.source_mag - 1
+        ).long()
+        by = torch.clamp(
+            by + centre_y * self.source_mag, 0, width * self.source_mag - 1
+        ).long()
 
         # Initialize the output image tensor
-        sourceimage = torch.zeros((length * self.source_mag, width * self.source_mag), dtype=torch.float, device=self.device)
-        
+        sourceimage = torch.zeros(
+            (length * self.source_mag, width * self.source_mag),
+            dtype=torch.float,
+            device=self.device,
+        )
+
         # Flatten the image and coordinates
         flat_image = image.view(-1)
         flat_bx = bx.view(-1)
@@ -115,17 +148,16 @@ class PhysicsInformedEncoder(nn.Module):
 
         # Scatter add the values to sourceimage
         sourceimage_flat = sourceimage.view(-1)
-        count  = torch.zeros_like(sourceimage_flat)
+        count = torch.zeros_like(sourceimage_flat)
         sourceimage_flat = sourceimage_flat.scatter_add(0, one_d_indices, flat_image)
         count = count.scatter_add(0, one_d_indices, self.imones_1d)
-        mask = count!=0
-        sourceimage_flat[mask]/=count[mask]
+        mask = count != 0
+        sourceimage_flat[mask] /= count[mask]
         sourceimage = sourceimage_flat.view(sourceimage.shape)
 
         return sourceimage
 
-
-    def forward(self, input_images, patches,distortion):
+    def forward(self, input_images, patches, distortion):
         # Move tensors to the appropriate device
         input_images = input_images.to(self.device)
         distortion = distortion.to(self.device)
@@ -139,9 +171,9 @@ class PhysicsInformedEncoder(nn.Module):
             k_sigmoid = layer(k_sigmoid)
 
         # Extract output components from k_sigmoid
-        k_sigmoid = k_sigmoid.view(batch_size,64,64)
-        distortion = distortion.view(batch_size,64,64)
-        einstein_angle = k_sigmoid*distortion
+        k_sigmoid = k_sigmoid.view(batch_size, 64, 64)
+        distortion = distortion.view(batch_size, 64, 64)
+        einstein_angle = k_sigmoid * distortion
 
         # Reshape input images
         input_images = input_images.view(batch_size, self.image_size, self.image_size)
@@ -151,7 +183,9 @@ class PhysicsInformedEncoder(nn.Module):
 
         # Transform each image in the batch
         for i in range(batch_size):
-            source_image_np = self.image_to_source(image=input_images[i], E_r=einstein_angle[i])
+            source_image_np = self.image_to_source(
+                image=input_images[i], E_r=einstein_angle[i]
+            )
             source_image[i] = source_image_np
 
-        return k_sigmoid,source_image
+        return k_sigmoid, source_image

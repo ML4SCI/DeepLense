@@ -1,5 +1,6 @@
 from torch import nn
 
+
 class Discriminator(nn.Module):
     def __init__(self, features_size=256, hidden_features=256):
         """
@@ -14,14 +15,14 @@ class Discriminator(nn.Module):
             Size of the hidden layers.
         """
 
-        super(Discriminator, self).__init__()
+        super().__init__()
 
         self.discrim = nn.Sequential(
             nn.Linear(features_size, hidden_features),
             nn.ReLU(),
             nn.Linear(hidden_features, hidden_features),
             nn.ReLU(),
-            nn.Linear(hidden_features, 2)
+            nn.Linear(hidden_features, 2),
         )
 
     def forward(self, x):

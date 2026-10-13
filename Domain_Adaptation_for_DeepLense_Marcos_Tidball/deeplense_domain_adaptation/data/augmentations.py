@@ -1,5 +1,7 @@
-from torchvision import transforms
 import random
+
+from torchvision import transforms
+
 
 def supervised_augmentations():
     """
@@ -14,15 +16,22 @@ def supervised_augmentations():
         Augmentations for the test set.
     """
 
-    train_transform = transforms.Compose([transforms.Resize(150),
-                                          transforms.RandomHorizontalFlip(),
-                                          transforms.RandomVerticalFlip(),
-                                          ])
+    train_transform = transforms.Compose(
+        [
+            transforms.Resize(150),
+            transforms.RandomHorizontalFlip(),
+            transforms.RandomVerticalFlip(),
+        ]
+    )
 
-    test_transform = transforms.Compose([transforms.Resize(150),
-                                        ])
+    test_transform = transforms.Compose(
+        [
+            transforms.Resize(150),
+        ]
+    )
 
     return train_transform, test_transform
+
 
 def adda_augmentations():
     """
@@ -39,21 +48,31 @@ def adda_augmentations():
     test_transform: Torchvision transforms
         Augmentations for the test set.
     """
-    
-    train_transform_source = transforms.Compose([transforms.Resize(150),
-                                                 transforms.RandomHorizontalFlip(),
-                                                 transforms.RandomVerticalFlip(),
-                                                 ])
 
-    train_transform_target = transforms.Compose([transforms.Resize(150),
-                                                 transforms.RandomHorizontalFlip(),
-                                                 transforms.RandomVerticalFlip(),
-                                                 ])
+    train_transform_source = transforms.Compose(
+        [
+            transforms.Resize(150),
+            transforms.RandomHorizontalFlip(),
+            transforms.RandomVerticalFlip(),
+        ]
+    )
 
-    test_transform = transforms.Compose([transforms.Resize(150),
-                                         ])
+    train_transform_target = transforms.Compose(
+        [
+            transforms.Resize(150),
+            transforms.RandomHorizontalFlip(),
+            transforms.RandomVerticalFlip(),
+        ]
+    )
+
+    test_transform = transforms.Compose(
+        [
+            transforms.Resize(150),
+        ]
+    )
 
     return train_transform_source, train_transform_target, test_transform
+
 
 def adamatch_augmentations():
     """
@@ -76,50 +95,75 @@ def adamatch_augmentations():
     test_transform: Torchvision transforms
         Augmentations for the test set.
     """
-    
-    train_transform_source_weak = transforms.Compose([transforms.Resize(150),
-                                                      transforms.RandomHorizontalFlip(),
-                                                      transforms.RandomVerticalFlip(),
-                                                      ])
 
-    train_transform_target_weak = transforms.Compose([transforms.Resize(150),
-                                                      transforms.RandomHorizontalFlip(),
-                                                      transforms.RandomVerticalFlip(),
-                                                      ])
-    
-    train_transform_source_strong = transforms.Compose([transforms.Resize(150),
-                                                        transforms.RandomHorizontalFlip(),
-                                                        transforms.RandomVerticalFlip(),
-                                                        transforms.RandomAutocontrast(),
-                                                        transforms.GaussianBlur(kernel_size=(5, 9), sigma=(0.1, 1.)),
-                                                        #transforms.RandomEqualize(), # only on PIL images
-                                                        transforms.RandomInvert(),
-                                                        #transforms.RandomPosterize(random.randint(1, 8)), # only on PIL images
-                                                        transforms.RandomAdjustSharpness(random.uniform(0, 1)),
-                                                        transforms.RandomSolarize(random.uniform(0, 1)),
-                                                        transforms.RandomAffine(45, translate=(0.3, 0.3), scale=(0.8, 1.2), shear=(-0.3, 0.3, -0.3, 0.3)),
-                                                        #transforms.RandomErasing()
-                                                        ])
+    train_transform_source_weak = transforms.Compose(
+        [
+            transforms.Resize(150),
+            transforms.RandomHorizontalFlip(),
+            transforms.RandomVerticalFlip(),
+        ]
+    )
 
+    train_transform_target_weak = transforms.Compose(
+        [
+            transforms.Resize(150),
+            transforms.RandomHorizontalFlip(),
+            transforms.RandomVerticalFlip(),
+        ]
+    )
 
-    train_transform_target_strong = transforms.Compose([transforms.Resize(150),
-                                                        transforms.RandomHorizontalFlip(),
-                                                        transforms.RandomVerticalFlip(),
-                                                        transforms.RandomAutocontrast(),
-                                                        transforms.GaussianBlur(kernel_size=(5, 9), sigma=(0.1, 1.)),
-                                                        #transforms.RandomEqualize(), # only on PIL images
-                                                        transforms.RandomInvert(),
-                                                        #transforms.RandomPosterize(random.randint(1, 8)), # only on PIL images
-                                                        transforms.RandomAdjustSharpness(random.uniform(0, 1)),
-                                                        transforms.RandomSolarize(random.uniform(0, 1)),
-                                                        transforms.RandomAffine(45, translate=(0.3, 0.3), scale=(0.8, 1.2), shear=(-0.3, 0.3, -0.3, 0.3)),
-                                                        #transforms.RandomErasing()
-                                                        ])
+    train_transform_source_strong = transforms.Compose(
+        [
+            transforms.Resize(150),
+            transforms.RandomHorizontalFlip(),
+            transforms.RandomVerticalFlip(),
+            transforms.RandomAutocontrast(),
+            transforms.GaussianBlur(kernel_size=(5, 9), sigma=(0.1, 1.0)),
+            # transforms.RandomEqualize(), # only on PIL images
+            transforms.RandomInvert(),
+            # transforms.RandomPosterize(random.randint(1, 8)), # only on PIL images
+            transforms.RandomAdjustSharpness(random.uniform(0, 1)),
+            transforms.RandomSolarize(random.uniform(0, 1)),
+            transforms.RandomAffine(
+                45, translate=(0.3, 0.3), scale=(0.8, 1.2), shear=(-0.3, 0.3, -0.3, 0.3)
+            ),
+            # transforms.RandomErasing()
+        ]
+    )
 
-    test_transform = transforms.Compose([transforms.Resize(150),
-                                         ])
+    train_transform_target_strong = transforms.Compose(
+        [
+            transforms.Resize(150),
+            transforms.RandomHorizontalFlip(),
+            transforms.RandomVerticalFlip(),
+            transforms.RandomAutocontrast(),
+            transforms.GaussianBlur(kernel_size=(5, 9), sigma=(0.1, 1.0)),
+            # transforms.RandomEqualize(), # only on PIL images
+            transforms.RandomInvert(),
+            # transforms.RandomPosterize(random.randint(1, 8)), # only on PIL images
+            transforms.RandomAdjustSharpness(random.uniform(0, 1)),
+            transforms.RandomSolarize(random.uniform(0, 1)),
+            transforms.RandomAffine(
+                45, translate=(0.3, 0.3), scale=(0.8, 1.2), shear=(-0.3, 0.3, -0.3, 0.3)
+            ),
+            # transforms.RandomErasing()
+        ]
+    )
 
-    return train_transform_source_weak, train_transform_target_weak, train_transform_source_strong, train_transform_target_strong, test_transform
+    test_transform = transforms.Compose(
+        [
+            transforms.Resize(150),
+        ]
+    )
+
+    return (
+        train_transform_source_weak,
+        train_transform_target_weak,
+        train_transform_source_strong,
+        train_transform_target_strong,
+        test_transform,
+    )
+
 
 def self_ensemble_augmentations():
     """
@@ -136,19 +180,28 @@ def self_ensemble_augmentations():
     test_transform: Torchvision transforms
         Augmentations for the test set.
     """
-    
-    train_transform_source = transforms.Compose([transforms.Resize(150),
-                                                 transforms.RandomHorizontalFlip(),
-                                                 transforms.RandomVerticalFlip(),
-                                                 transforms.GaussianBlur(kernel_size=(5, 9), sigma=(0.1, 1.)),
-                                                 ])
 
-    train_transform_target = transforms.Compose([transforms.Resize(150),
-                                                 transforms.RandomHorizontalFlip(),
-                                                 transforms.RandomVerticalFlip(),
-                                                 ])
+    train_transform_source = transforms.Compose(
+        [
+            transforms.Resize(150),
+            transforms.RandomHorizontalFlip(),
+            transforms.RandomVerticalFlip(),
+            transforms.GaussianBlur(kernel_size=(5, 9), sigma=(0.1, 1.0)),
+        ]
+    )
 
-    test_transform = transforms.Compose([transforms.Resize(150),
-                                         ])
+    train_transform_target = transforms.Compose(
+        [
+            transforms.Resize(150),
+            transforms.RandomHorizontalFlip(),
+            transforms.RandomVerticalFlip(),
+        ]
+    )
+
+    test_transform = transforms.Compose(
+        [
+            transforms.Resize(150),
+        ]
+    )
 
     return train_transform_source, train_transform_target, test_transform

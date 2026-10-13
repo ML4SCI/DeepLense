@@ -1,15 +1,14 @@
 import torch
+import torch.nn.functional as F
 from torch.nn import (
-    Linear,
-    Dropout,
-    ReLU,
-    Embedding,
     GELU,
+    Dropout,
+    Embedding,
     LayerNorm,
+    Linear,
     MultiheadAttention,
     Sequential,
 )
-import torch.nn.functional as F
 
 
 class FFN(torch.nn.Module):
@@ -89,7 +88,7 @@ class Transformer(torch.nn.Module):
         projection_dim,
         epsilon=1e-6,
         dropout_rate=0.1,
-        **kwargs
+        **kwargs,
     ):
         super().__init__(**kwargs)
         input_shape = (num_patches, projection_dim)

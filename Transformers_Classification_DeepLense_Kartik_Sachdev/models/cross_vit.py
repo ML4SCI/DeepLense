@@ -1,9 +1,7 @@
 import torch
-from torch import nn, einsum
-import torch.nn.functional as F
-
 from einops import rearrange, repeat
 from einops.layers.torch import Rearrange
+from torch import einsum, nn
 
 # file adapted from: https://github.com/lucidrains/vit-pytorch/blob/main/vit_pytorch/cross_vit.py
 # helpers
@@ -56,7 +54,7 @@ class Attention(nn.Module):
         super().__init__()
         inner_dim = dim_head * heads
         self.heads = heads
-        self.scale = dim_head ** -0.5
+        self.scale = dim_head**-0.5
 
         self.attend = nn.Softmax(dim=-1)
         self.to_q = nn.Linear(dim, inner_dim, bias=False)
@@ -65,7 +63,7 @@ class Attention(nn.Module):
         self.to_out = nn.Sequential(nn.Linear(inner_dim, dim), nn.Dropout(dropout))
 
     def forward(self, x, context=None, kv_include_self=False):
-        b, n, _, h = *x.shape, self.heads
+        _b, _n, _, h = *x.shape, self.heads
         context = default(context, x)
 
         if kv_include_self:
@@ -74,7 +72,7 @@ class Attention(nn.Module):
             )  # cross attention requires CLS token includes itself as key / value
 
         qkv = (self.to_q(x), *self.to_kv(context).chunk(2, dim=-1))
-        q, k, v = map(lambda t: rearrange(t, "b n (h d) -> b h n d", h=h), qkv)
+        q, k, v = (rearrange(t, "b n (h d) -> b h n d", h=h) for t in qkv)
 
         dots = einsum("b h i d, b h j d -> b h i j", q, k) * self.scale
 
@@ -180,8 +178,8 @@ class CrossTransformer(nn.Module):
             )
 
     def forward(self, sm_tokens, lg_tokens):
-        (sm_cls, sm_patch_tokens), (lg_cls, lg_patch_tokens) = map(
-            lambda t: (t[:, :1], t[:, 1:]), (sm_tokens, lg_tokens)
+        (sm_cls, sm_patch_tokens), (lg_cls, lg_patch_tokens) = (
+            (t[:, :1], t[:, 1:]) for t in (sm_tokens, lg_tokens)
         )
 
         for sm_attend_lg, lg_attend_sm in self.layers:
@@ -214,7 +212,7 @@ class MultiScaleEncoder(nn.Module):
         cross_attn_heads,
         cross_attn_depth,
         cross_attn_dim_head=64,
-        dropout=0.0
+        dropout=0.0,
     ):
         super().__init__()
         self.layers = nn.ModuleList([])
@@ -250,11 +248,11 @@ class MultiScaleEncoder(nn.Module):
 class ImageEmbedder(nn.Module):
     def __init__(self, *, dim, image_size, patch_size, dropout=0.0, channels=3):
         super().__init__()
-        assert (
-            image_size % patch_size == 0
-        ), "Image dimensions must be divisible by the patch size."
+        assert image_size % patch_size == 0, (
+            "Image dimensions must be divisible by the patch size."
+        )
         num_patches = (image_size // patch_size) ** 2
-        patch_dim = channels * patch_size ** 2
+        patch_dim = channels * patch_size**2
 
         self.to_patch_embedding = nn.Sequential(
             Rearrange(
@@ -305,7 +303,7 @@ class CrossViT(nn.Module):
         depth=3,
         dropout=0.1,
         emb_dropout=0.1,
-        channels=3
+        channels=3,
     ):
         super().__init__()
         self.sm_image_embedder = ImageEmbedder(
@@ -330,18 +328,18 @@ class CrossViT(nn.Module):
             cross_attn_heads=cross_attn_heads,
             cross_attn_dim_head=cross_attn_dim_head,
             cross_attn_depth=cross_attn_depth,
-            sm_enc_params=dict(
-                depth=sm_enc_depth,
-                heads=sm_enc_heads,
-                mlp_dim=sm_enc_mlp_dim,
-                dim_head=sm_enc_dim_head,
-            ),
-            lg_enc_params=dict(
-                depth=lg_enc_depth,
-                heads=lg_enc_heads,
-                mlp_dim=lg_enc_mlp_dim,
-                dim_head=lg_enc_dim_head,
-            ),
+            sm_enc_params={
+                "depth": sm_enc_depth,
+                "heads": sm_enc_heads,
+                "mlp_dim": sm_enc_mlp_dim,
+                "dim_head": sm_enc_dim_head,
+            },
+            lg_enc_params={
+                "depth": lg_enc_depth,
+                "heads": lg_enc_heads,
+                "mlp_dim": lg_enc_mlp_dim,
+                "dim_head": lg_enc_dim_head,
+            },
             dropout=dropout,
         )
 
@@ -358,7 +356,7 @@ class CrossViT(nn.Module):
 
         sm_tokens, lg_tokens = self.multi_scale_encoder(sm_tokens, lg_tokens)
 
-        sm_cls, lg_cls = map(lambda t: t[:, 0], (sm_tokens, lg_tokens))
+        sm_cls, lg_cls = (t[:, 0] for t in (sm_tokens, lg_tokens))
 
         sm_logits = self.sm_mlp_head(sm_cls)
         lg_logits = self.lg_mlp_head(lg_cls)

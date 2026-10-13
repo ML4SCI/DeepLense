@@ -20,13 +20,17 @@ import torch.nn.functional as F
 from torchvision.transforms.functional import resize
 
 
-def _unwrap_object_array(array: np.ndarray, path: Path) -> tuple[np.ndarray, list[float]]:
+def _unwrap_object_array(
+    array: np.ndarray, path: Path
+) -> tuple[np.ndarray, list[float]]:
     """Split an object array into its single image payload and any scalars."""
     values = array.reshape(-1)
     images = [np.asarray(value) for value in values if np.asarray(value).ndim >= 2]
     scalars = [float(value) for value in values if np.asarray(value).ndim == 0]
     if len(images) != 1:
-        raise ValueError(f"Expected exactly one image inside {path}, found {len(images)}.")
+        raise ValueError(
+            f"Expected exactly one image inside {path}, found {len(images)}."
+        )
     return images[0], scalars
 
 
@@ -57,7 +61,9 @@ def load_axion_image_and_log_mass(path: str | Path) -> tuple[np.ndarray, float]:
         raise ValueError(f"Expected one scalar mass in {path}, found {len(scalars)}.")
     mass = scalars[0]
     if not np.isfinite(mass) or mass <= 0:
-        raise ValueError(f"Axion mass must be finite and positive in {path}, got {mass!r}.")
+        raise ValueError(
+            f"Axion mass must be finite and positive in {path}, got {mass!r}."
+        )
     image = np.asarray(image, dtype=np.float32)
     return (image[None] if image.ndim == 2 else image), float(np.log10(mass))
 
@@ -66,8 +72,16 @@ def shift_image(image: np.ndarray, dy: int, dx: int) -> np.ndarray:
     """Translate ``[C, H, W]`` by whole pixels; uncovered pixels get the image minimum."""
     out = np.full_like(image, image.min())
     h, w = image.shape[-2:]
-    ys, yd = (slice(0, h - dy), slice(dy, h)) if dy >= 0 else (slice(-dy, h), slice(0, h + dy))
-    xs, xd = (slice(0, w - dx), slice(dx, w)) if dx >= 0 else (slice(-dx, w), slice(0, w + dx))
+    ys, yd = (
+        (slice(0, h - dy), slice(dy, h))
+        if dy >= 0
+        else (slice(-dy, h), slice(0, h + dy))
+    )
+    xs, xd = (
+        (slice(0, w - dx), slice(dx, w))
+        if dx >= 0
+        else (slice(-dx, w), slice(0, w + dx))
+    )
     out[..., yd, xd] = image[..., ys, xs]
     return out
 
@@ -95,7 +109,9 @@ def standardise(images: torch.Tensor) -> torch.Tensor:
     return (images - mean) / std
 
 
-def to_model_tensor(image: np.ndarray, size: int, standardize: bool = True) -> torch.Tensor:
+def to_model_tensor(
+    image: np.ndarray, size: int, standardize: bool = True
+) -> torch.Tensor:
     """Min-max normalise, resize to ``size x size`` and optionally standardise.
 
     This is the preprocessing used for pretraining (with ``standardize=False``,
@@ -111,7 +127,13 @@ def to_model_tensor(image: np.ndarray, size: int, standardize: bool = True) -> t
 def bicubic(images: torch.Tensor, size: int, antialias: bool = False) -> torch.Tensor:
     """Bicubic resize of a ``[C, H, W]`` or ``[B, C, H, W]`` tensor."""
     batched = images if images.ndim == 4 else images.unsqueeze(0)
-    out = F.interpolate(batched, size=(size, size), mode="bicubic", align_corners=False, antialias=antialias)
+    out = F.interpolate(
+        batched,
+        size=(size, size),
+        mode="bicubic",
+        align_corners=False,
+        antialias=antialias,
+    )
     return out if images.ndim == 4 else out.squeeze(0)
 
 

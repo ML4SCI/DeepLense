@@ -1,13 +1,9 @@
-import sys
 import torch
-
-from torch import nn
-from torch.utils.data import DataLoader 
-
-from configmypy import ConfigPipeline, YamlConfig, ArgparseConfig
+from configmypy import ArgparseConfig, ConfigPipeline, YamlConfig
 from dataset.preprocessing_md_model2 import CustomDataset_AE_Conditional
-from models.autoencoder import Autoencoder
 from models.unet_sa import UNet_mass_em_conditional
+from torch import nn
+from torch.utils.data import DataLoader
 from train.train_ae_ddpm import Trainer
 
 # Set seed for PyTorch
@@ -19,19 +15,23 @@ config_name = "default"
 pipe = ConfigPipeline(
     [
         YamlConfig(
-            "./ae_md_cond_ddpm_config.yaml", config_name='default', config_folder='cfg/'
+            "./ae_md_cond_ddpm_config.yaml", config_name="default", config_folder="cfg/"
         ),
         ArgparseConfig(infer_types=True, config_name=None, config_file=None),
-        YamlConfig(config_folder='cfg/')
+        YamlConfig(config_folder="cfg/"),
     ]
 )
 config = pipe.read_conf()
-#pipe.log()
-#print(config.unet.input_channels)
+# pipe.log()
+# print(config.unet.input_channels)
 
 # Load the Dataset
-dataset = CustomDataset_AE_Conditional(root_dir=config.data.folder, max_samples=config.data.max_samples, config=config)
-data_loader = DataLoader(dataset=dataset, batch_size=config.data.batch_size, shuffle=config.data.shuffle)
+dataset = CustomDataset_AE_Conditional(
+    root_dir=config.data.folder, max_samples=config.data.max_samples, config=config
+)
+data_loader = DataLoader(
+    dataset=dataset, batch_size=config.data.batch_size, shuffle=config.data.shuffle
+)
 
 ## Load model
 # Auto encoder
@@ -52,10 +52,10 @@ optimizer = torch.optim.AdamW(
 if config.opt.scheduler == "OneCycleLR":
     scheduler = torch.optim.lr_scheduler.OneCycleLR(
         optimizer,
-        max_lr = config.opt.lr,
-        steps_per_epoch = len(data_loader),
-        epochs = config.opt.epochs,
-    ) 
+        max_lr=config.opt.lr,
+        steps_per_epoch=len(data_loader),
+        epochs=config.opt.epochs,
+    )
 elif config.opt.scheduler == "ReduceLROnPlateau":
     scheduler = torch.optim.lr_scheduler.ReduceLROnPlateau(
         optimizer,
@@ -89,4 +89,6 @@ if config.verbose:
 
 
 # Train
-trainer.train(data_loader=data_loader, mse=mse, optimizer=optimizer, scheduler=scheduler)
+trainer.train(
+    data_loader=data_loader, mse=mse, optimizer=optimizer, scheduler=scheduler
+)

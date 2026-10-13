@@ -11,24 +11,29 @@ from .lens_priors import (
     ring_descriptor,
     ring_masks,
 )
-from .masked_jepa import MASKED_METHODS, MaskedJEPAConfig, MaskedJEPAObjective, ema_update
+from .masked_jepa import (
+    MASKED_METHODS,
+    MaskedJEPAConfig,
+    MaskedJEPAObjective,
+    ema_update,
+)
 from .objective import LensLeJEPAObjective, ObjectiveConfig, lejepa_loss
 from .sigreg import SIGReg
 from .views import gaussian_blur, lens_safe_view
 
 __all__ = [
     "D4_SIZE",
-    "LensLeJEPAObjective",
     "MASKED_METHODS",
+    "LensLeJEPAObjective",
     "MaskedJEPAConfig",
     "MaskedJEPAObjective",
-    "ema_update",
     "ObjectiveConfig",
     "SIGReg",
     "arc_weights",
     "d4_patch_permutation",
     "d4_token_loss",
     "d4_transform",
+    "ema_update",
     "gaussian_blur",
     "lejepa_loss",
     "lens_safe_view",

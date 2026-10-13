@@ -1,16 +1,14 @@
+import timm
 import torch
 from torch.nn import (
-    Sequential,
-    ModuleList,
-    Linear,
-    PReLU,
     BatchNorm1d,
     Dropout,
-    Identity,
-    LazyLinear,
     Flatten,
+    LazyLinear,
+    Linear,
+    PReLU,
+    Sequential,
 )
-import timm
 
 
 class TimmModelSimple(torch.nn.Module):
@@ -39,7 +37,7 @@ class TimmModelSimple(torch.nn.Module):
         num_classes=3,
         pretrained=True,
         tune=True,
-        **kwargs
+        **kwargs,
     ):
         super().__init__(*args, **kwargs)
         self.backbone = timm.create_model(

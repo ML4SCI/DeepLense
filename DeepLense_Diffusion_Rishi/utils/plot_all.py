@@ -1,32 +1,31 @@
-import sys
 import os
-import torch
-import numpy as np
-
-from torch import nn
-from torch.utils.data import DataLoader 
-from torchvision import models 
-
-from configmypy import ConfigPipeline, YamlConfig, ArgparseConfig
-from dataset.preprocessing_all_model2 import CustomDataset, CustomDataset_1
-from models.ddpm_all import Diffusion
-from models.autoencoder import Autoencoder
-from models.unet_all import UNet_all_conditional
-from train.train_ae_ddpm import Trainer
 
 import matplotlib
 import matplotlib.pyplot as plt
+import torch
+from configmypy import ArgparseConfig, ConfigPipeline, YamlConfig
+from dataset.preprocessing_all_model2 import CustomDataset, CustomDataset_1
+from models.ddpm_all import Diffusion
+from models.unet_all import UNet_all_conditional
+from torch import nn
+from torch.utils.data import DataLoader
+from torchvision import models
 
 matplotlib.rcParams["text.usetex"] = True
 from matplotlib import rc
-rc('font', **{'family':'serif', 'serif':['Computer Modern Roman'],
-                                'monospace': ['Computer Modern Typewriter']})
 
-matplotlib.rcParams['axes.linewidth'] = 2
-matplotlib.rcParams['axes.labelsize'] = 20
-matplotlib.rcParams['xtick.labelsize'] = 15
-matplotlib.rcParams['ytick.labelsize'] = 15
-matplotlib.rcParams['legend.fontsize'] = 15
+rc(
+    "font",
+    family="serif",
+    serif=["Computer Modern Roman"],
+    monospace=["Computer Modern Typewriter"],
+)
+
+matplotlib.rcParams["axes.linewidth"] = 2
+matplotlib.rcParams["axes.labelsize"] = 20
+matplotlib.rcParams["xtick.labelsize"] = 15
+matplotlib.rcParams["ytick.labelsize"] = 15
+matplotlib.rcParams["legend.fontsize"] = 15
 # Set seed for PyTorch
 torch.manual_seed(42)
 
@@ -36,15 +35,17 @@ config_name = "default"
 pipe = ConfigPipeline(
     [
         YamlConfig(
-            "./conditional_ddpm_config.yaml", config_name='default', config_folder='cfg/'
+            "./conditional_ddpm_config.yaml",
+            config_name="default",
+            config_folder="cfg/",
         ),
         ArgparseConfig(infer_types=True, config_name=None, config_file=None),
-        YamlConfig(config_folder='cfg/')
+        YamlConfig(config_folder="cfg/"),
     ]
 )
 config = pipe.read_conf()
-#pipe.log()
-#print(config.unet.input_channels)
+# pipe.log()
+# print(config.unet.input_channels)
 
 
 ## Load model
@@ -55,28 +56,40 @@ config = pipe.read_conf()
 # model_latent.eval()
 # Conditional DDPM
 model = UNet_all_conditional(config)
-model.load_state_dict(torch.load('saved_models/all_conditional_ckpt_model2.pt'))
+model.load_state_dict(torch.load("saved_models/all_conditional_ckpt_model2.pt"))
 model = model.to(device=config.device)
 # Load resnet
-# Model 
+# Model
 model_res = models.resnet18(pretrained=False)
-model_res.conv1 = torch.nn.Conv2d(1, 64, kernel_size=(7, 7), stride=(2, 2), padding=(3, 3), bias=False)
+model_res.conv1 = torch.nn.Conv2d(
+    1, 64, kernel_size=(7, 7), stride=(2, 2), padding=(3, 3), bias=False
+)
 num_ftrs = model_res.fc.in_features
 model_res.fc = nn.Sequential(nn.Dropout(0.5), nn.Linear(num_ftrs, 1))
-model_res.load_state_dict(torch.load('saved_models/resnet_v3_bestmodel.pt'))
+model_res.load_state_dict(torch.load("saved_models/resnet_v3_bestmodel.pt"))
 model_res.to(config.device)
 model_res.eval()
 
-# Load diffusion 
-diffusion = Diffusion(noise_steps=config.diff.noise_steps, beta_start=config.diff.beta_start, beta_end=config.diff.beta_end, img_size=config.data.image_size, device=config.device)
+# Load diffusion
+diffusion = Diffusion(
+    noise_steps=config.diff.noise_steps,
+    beta_start=config.diff.beta_start,
+    beta_end=config.diff.beta_end,
+    img_size=config.data.image_size,
+    device=config.device,
+)
 
 # Load Data
 # Load the Dataset
-dataset = CustomDataset(root_dir=config.data.folder, config=config)#, max_samples=config.data.max_samples, config=config)
+dataset = CustomDataset(
+    root_dir=config.data.folder, config=config
+)  # , max_samples=config.data.max_samples, config=config)
 data_loader = DataLoader(dataset=dataset, batch_size=100, shuffle=config.data.shuffle)
-#print(data_loader)
+# print(data_loader)
 dataset_1 = CustomDataset_1(root_dir=config.data.folder, config=config)
-data_loader_1 = DataLoader(dataset=dataset_1, batch_size=100, shuffle=config.data.shuffle)
+data_loader_1 = DataLoader(
+    dataset=dataset_1, batch_size=100, shuffle=config.data.shuffle
+)
 
 for batch_1 in data_loader_1:
     data, v1, v2, v3, v4 = batch_1
@@ -91,11 +104,13 @@ for batch in data_loader:
     v3 = v3.to(config.device).float()
     v4 = v4.to(config.device).float()
     data = data.to(config.device).float()
-    #print(v4)
-    #print(mass)
+    # print(v4)
+    # print(mass)
     # observed_values = model_latent.encode(mass)
     # print(observed_values)
-    sample_images = diffusion.sample_conditional(model, 100, v1, v2, v3, v4, cfg_scale=0)
+    sample_images = diffusion.sample_conditional(
+        model, 100, v1, v2, v3, v4, cfg_scale=0
+    )
     observed_values = model_res(sample_images)
 
     ## Plot for true and predicted
@@ -109,18 +124,25 @@ for batch in data_loader:
     # # plt.imshow(ndarr)
     # plt.savefig(os.path.join("plots", f"all_variables.jpg"))
     # plt.figure(figsize=(6,6), dpi=100)
-    # Renormalise 
-    #mass = mass.to('cpu').numpy()
-    #observed_values = observed_values.to('cpu').detach().numpy()
-    #mass = mass*(config.data.max_value-config.data.min_value) + config.data.min_value
-    #observed_values = observed_values*(config.data.max_value-config.data.min_value) + config.data.min_value
-    plt.scatter(v3.to('cpu').numpy(), observed_values.to('cpu').detach().numpy(), color='black')
-    #plt.scatter(, observed_values, color='black')
-    plt.xlabel('Actual y location')
-    plt.ylabel('Predicted y location')
-    plt.savefig(os.path.join("plots", f"new_final_variables_3.pdf"), format="pdf", dpi=300, bbox_inches='tight')
+    # Renormalise
+    # mass = mass.to('cpu').numpy()
+    # observed_values = observed_values.to('cpu').detach().numpy()
+    # mass = mass*(config.data.max_value-config.data.min_value) + config.data.min_value
+    # observed_values = observed_values*(config.data.max_value-config.data.min_value) + config.data.min_value
+    plt.scatter(
+        v3.to("cpu").numpy(), observed_values.to("cpu").detach().numpy(), color="black"
+    )
+    # plt.scatter(, observed_values, color='black')
+    plt.xlabel("Actual y location")
+    plt.ylabel("Predicted y location")
+    plt.savefig(
+        os.path.join("plots", "new_final_variables_3.pdf"),
+        format="pdf",
+        dpi=300,
+        bbox_inches="tight",
+    )
     break
-# Load mass and axion 
+# Load mass and axion
 # dir = '../Data/Model_II/axion/axion_sim_356113875435765399182650162198846.npy'
 # #dir = '../Data/Model_II/axion/axion_sim_76051909974444833968539282987196377.npy'
 # data = np.load(dir, allow_pickle=True)
@@ -129,11 +151,11 @@ for batch in data_loader:
 # print(labels.unsqueeze(0).unsqueeze(0))
 # sample_images = diffusion.sample_conditional(model, 1, labels)
 # print(sample_images)
-#print(model_latent(labels))
+# print(model_latent(labels))
 
 
 # Load resnet
-# Model 
+# Model
 # model_res = models.resnet18(pretrained=False)
 # model_res.conv1 = torch.nn.Conv2d(1, 64, kernel_size=(7, 7), stride=(2, 2), padding=(3, 3), bias=False)
 # num_ftrs = model_res.fc.in_features

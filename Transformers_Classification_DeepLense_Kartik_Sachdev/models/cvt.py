@@ -1,18 +1,16 @@
 import torch
-from torch import nn, einsum
-import torch.nn.functional as F
-
-from einops import rearrange, repeat
+from einops import rearrange
 from einops.layers.torch import Rearrange
 from PIL import Image
+from torch import einsum, nn
 
 # file adapted from: https://github.com/lucidrains/vit-pytorch/blob/main/vit_pytorch/cvt.py
 # helper methods
 
 
 def group_dict_by_key(cond, d):
-    return_val = [dict(), dict()]
-    for key in d.keys():
+    return_val = [{}, {}]
+    for key in d:
         match = bool(cond(key))
         ind = int(not match)
         return_val[ind][key] = d[key]
@@ -21,9 +19,9 @@ def group_dict_by_key(cond, d):
 
 def group_by_key_prefix_and_remove_prefix(prefix, d):
     kwargs_with_prefix, kwargs = group_dict_by_key(lambda x: x.startswith(prefix), d)
-    kwargs_without_prefix = dict(
-        map(lambda x: (x[0][len(prefix) :], x[1]), tuple(kwargs_with_prefix.items()))
-    )
+    kwargs_without_prefix = {
+        x[0][len(prefix) :]: x[1] for x in tuple(kwargs_with_prefix.items())
+    }
     return kwargs_without_prefix, kwargs
 
 
@@ -98,7 +96,7 @@ class Attention(nn.Module):
         inner_dim = dim_head * heads
         padding = proj_kernel // 2
         self.heads = heads
-        self.scale = dim_head ** -0.5
+        self.scale = dim_head**-0.5
 
         self.attend = nn.Softmax(dim=-1)
 
@@ -118,11 +116,9 @@ class Attention(nn.Module):
 
     def forward(self, x):
         shape = x.shape
-        b, n, _, y, h = *shape, self.heads
+        _b, _n, _, y, h = *shape, self.heads
         q, k, v = (self.to_q(x), *self.to_kv(x).chunk(2, dim=1))
-        q, k, v = map(
-            lambda t: rearrange(t, "b (h d) x y -> (b h) (x y) d", h=h), (q, k, v)
-        )
+        q, k, v = (rearrange(t, "b (h d) x y -> (b h) (x y) d", h=h) for t in (q, k, v))
 
         dots = einsum("b i d, b j d -> b i j", q, k) * self.scale
 
@@ -196,18 +192,20 @@ class CvT(nn.Module):
         s2_heads=3,
         s2_depth=2,
         s2_mlp_mult=4,
-        s3_emb_dim = 384,  
-        s3_emb_kernel = 3,
-        s3_emb_stride = 2,
-        s3_proj_kernel = 3,
-        s3_kv_proj_stride = 2,
-        s3_heads = 4,
-        s3_depth = 10,
-        s3_mlp_mult = 4,
-        stages= ["s1", "s2"],
+        s3_emb_dim=384,
+        s3_emb_kernel=3,
+        s3_emb_stride=2,
+        s3_proj_kernel=3,
+        s3_kv_proj_stride=2,
+        s3_heads=4,
+        s3_depth=10,
+        s3_mlp_mult=4,
+        stages=None,
         mlp_last=192,
         dropout=0.0,
     ):
+        if stages is None:
+            stages = ["s1", "s2"]
         super().__init__()
         kwargs = dict(locals())
 
@@ -277,9 +275,7 @@ def test_equivariance(
     x = resize1(pad(x))
 
     print("###########################")
-    header = "angle |  " + "  ".join(
-        ["{}".format(value) for key, value in labels_map.items()]
-    )
+    header = "angle |  " + "  ".join([f"{value}" for key, value in labels_map.items()])
     print(header)
     with torch.no_grad():
         for r in range(8):
@@ -292,6 +288,5 @@ def test_equivariance(
             y = y.to("cpu").numpy().squeeze()
 
             angle = r * 45
-            print("{:5d} : {}".format(angle, y))
+            print(f"{angle:5d} : {y}")
     print("###########################")
-

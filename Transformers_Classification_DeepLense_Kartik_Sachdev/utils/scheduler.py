@@ -1,7 +1,7 @@
 import warnings
 
 import numpy as np
-import torch
+
 
 def cosine_schedule(
     step: float, max_steps: float, start_value: float, end_value: float
@@ -30,7 +30,7 @@ def cosine_schedule(
     if step > max_steps:
         warnings.warn(
             f"Current step number {step} exceeds max_steps {max_steps}.",
-            category=RuntimeWarning,
+            stacklevel=2, category=RuntimeWarning,
         )
 
     if max_steps == 1:

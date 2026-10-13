@@ -1,12 +1,6 @@
-import numpy as np 
-import pandas as pd 
-import os
-import matplotlib.pyplot as plt
 import torch
-import torch.nn as nn
-import torchvision.transforms.functional as F
-from typing import Tuple, Union, List
-import time
+from torch import nn
+
 
 class Flatten(nn.Module):
     """
@@ -25,7 +19,7 @@ class Flatten(nn.Module):
 
     def __init__(self, num_neurons_flatten: int):
         # Initialize the superclass
-        super(Flatten, self).__init__()
+        super().__init__()
         self.num_neurons_flatten = num_neurons_flatten
 
     def forward(self, x: torch.Tensor) -> torch.Tensor:

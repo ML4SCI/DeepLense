@@ -6,7 +6,9 @@ import torch
 
 
 @torch.no_grad()
-def representation_stats(features: torch.Tensor, max_dims: int = 128) -> dict[str, float]:
+def representation_stats(
+    features: torch.Tensor, max_dims: int = 128
+) -> dict[str, float]:
     """Feature standard deviation and effective-rank fraction of ``[N, D]`` features.
 
     Effective rank is ``exp(entropy)`` of the normalised covariance spectrum

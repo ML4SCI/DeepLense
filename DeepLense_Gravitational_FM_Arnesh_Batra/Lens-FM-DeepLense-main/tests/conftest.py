@@ -19,4 +19,3 @@ def fake_root(tmp_path):
             else:
                 np.save(tmp_path / name / f"{i}.npy", image)
     return tmp_path
-

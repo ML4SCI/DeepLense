@@ -1,13 +1,14 @@
-import torch
-import torch.nn as nn
-from typing import Any, Union
 import logging
+from typing import Any
+
+import torch
+from torch import nn
 
 
 def finetune(
     epochs: int,
     model: nn.Module,
-    device: Union[int, str],
+    device: int | str,
     train_loader: Any,
     criterion: nn.Module,
     optimizer: nn.Module,
@@ -16,7 +17,7 @@ def finetune(
     scheduler=None,
     ci=False,
 ):
-    best_loss = float("inf")
+    float("inf")
     best_accuracy = float("-inf")
     all_val_loss = []
     all_val_accuracy = []
@@ -83,14 +84,14 @@ def finetune(
         all_val_accuracy.append(epoch_val_accuracy.item() * 100)
 
         logging.debug(
-            f"Epoch : {epoch+1} - loss : {epoch_loss:.4f} - val_loss : {epoch_val_loss:.4f} - val_acc: {epoch_val_accuracy:.4f} \n"
+            f"Epoch : {epoch + 1} - loss : {epoch_loss:.4f} - val_loss : {epoch_val_loss:.4f} - val_acc: {epoch_val_accuracy:.4f} \n"
         )
 
 
 def finetune_regression(
     epochs: int,
     model: nn.Module,
-    device: Union[int, str],
+    device: int | str,
     train_loader: Any,
     criterion: nn.Module,
     optimizer: nn.Module,
@@ -100,9 +101,8 @@ def finetune_regression(
     ci=False,
 ):
     best_loss = float("inf")
-    best_accuracy = float("-inf")
+    float("-inf")
     all_val_loss = []
-    all_val_accuracy = []
 
     # Training loop
     for epoch in range(epochs):
@@ -155,5 +155,5 @@ def finetune_regression(
             all_val_loss.append(epoch_val_loss)
 
         logging.debug(
-            f"Epoch : {epoch+1} - loss : {epoch_loss} - val_loss : {epoch_val_loss} \n"
+            f"Epoch : {epoch + 1} - loss : {epoch_loss} - val_loss : {epoch_val_loss} \n"
         )

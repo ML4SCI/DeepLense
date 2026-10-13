@@ -1,5 +1,5 @@
-from ray import tune
 import numpy as np
+from ray import tune
 
 SWIN_CONFIG = {
     "network_type": "Swin",
@@ -17,7 +17,10 @@ SWIN_CONFIG = {
     },
     "lr_schedule_config": {
         "use_lr_schedule": True,
-        "step_lr": {"gamma": 0.5, "step_size": 20,},
+        "step_lr": {
+            "gamma": 0.5,
+            "step_size": 20,
+        },
         "reduce_on_plateau": {
             "factor": 0.1,
             "patience": 4,
@@ -55,7 +58,10 @@ SWIN_RAY_CONFIG = {
     },
     "lr_schedule_config": {
         "use_lr_schedule": True,
-        "step_lr": {"gamma": 0.5, "step_size": 20,},
+        "step_lr": {
+            "gamma": 0.5,
+            "step_size": 20,
+        },
         "reduce_on_plateau": {
             "factor": 0.1,
             "patience": 4,

@@ -1,15 +1,11 @@
-from __future__ import print_function
-
-from turtle import down
-
+import torch
+import torchvision
+from models.byol import BYOLSingleChannel, FinetuneModelByol
+from torch import nn
+from torch.utils.data import DataLoader, random_split
+from torchsummary import summary
 from utils.dataset import DefaultDatasetSetupSSL
 from utils.inference import InferenceSSL
-from torch.utils.data import DataLoader, random_split
-import torch.nn as nn
-import torch
-from models.byol import BYOLSingleChannel, FinetuneModelByol
-import torchvision
-from torchsummary import summary
 
 
 def main():
@@ -62,7 +58,7 @@ def main():
 
     train_dataset, val_set = random_split(train_dataset, [train_len, valid_len])
 
-    train_loader = DataLoader(
+    DataLoader(
         dataset=train_dataset,
         batch_size=batch_size,
         shuffle=True,

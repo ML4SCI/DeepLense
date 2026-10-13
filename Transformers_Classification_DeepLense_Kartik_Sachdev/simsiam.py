@@ -1,34 +1,30 @@
-from __future__ import print_function
-
 import json
 import logging
 import math
 import os
 import time
-from typing import *
 from argparse import ArgumentParser
-import math
+from typing import *
 
-import torch.nn as nn
-import torch.optim as optim
+from config import *
 from config.cvt_config import CvT_CONFIG
 from config.data_config import DATASET
 from lightly.loss import NegativeCosineSimilarity
 from lightly.transforms import SimSiamTransform
 from models.finetune_classifier_transformer import FinetuneClassifierTransformer
+from models.self_supervised.simsiam import SimSiamTransformer
 from models.transformer_zoo import TransformerModels
 from self_supervised.losses.contrastive_loss import NegativeCosineSimilarity
+from torch import nn, optim
 from torch.utils.data import DataLoader, random_split
 from torchinfo import summary
 from transformers import get_cosine_schedule_with_warmup
+from utils.dataset import DeepLenseDatasetSSL, visualize_samples_ssl
 from utils.inference import InferenceSSL
-from utils.util import *
-from config import *
-from utils.transforms.simsiam_transform import SimSiamTransform
-from utils.dataset import visualize_samples_ssl, DeepLenseDatasetSSL
-from models.self_supervised.simsiam import SimSiamTransformer
-from utils.trainer.simsiam_train import simsiam_train
 from utils.trainer.finetune import finetune
+from utils.trainer.simsiam_train import simsiam_train
+from utils.transforms.simsiam_transform import SimSiamTransform
+from utils.util import *
 
 
 def main(args):
@@ -68,7 +64,7 @@ def main(args):
     image_size = train_config["image_size"]
     optimizer_config = train_config["optimizer_config"]
     optimizer_finetune_config = train_config["optimizer_finetune_config"]
-    lr_schedule_config = train_config["lr_schedule_config"]
+    train_config["lr_schedule_config"]
 
     log_dir_base = "logger"
     classes = DATASET[f"{dataset_name}"]["classes"]
@@ -223,7 +219,9 @@ def main(args):
     warmup_epochs = optimizer_finetune_config["warmup_epoch"]
 
     # optimizer
-    optimizer_finetune = optim.AdamW(model.parameters(), lr=lr, weight_decay=weight_decay)
+    optimizer_finetune = optim.AdamW(
+        model.parameters(), lr=lr, weight_decay=weight_decay
+    )
 
     num_train_steps = math.ceil(len(train_loader))
     num_warmup_steps = num_train_steps * warmup_epochs
