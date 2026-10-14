@@ -1,10 +1,9 @@
-import torch
-from torch.utils.data import Dataset
-from torchvision import transforms
-import numpy as np
 import os
 
+import numpy as np
 from constants import *
+from torch.utils.data import Dataset
+from torchvision import transforms
 
 
 class LensDataset(Dataset):

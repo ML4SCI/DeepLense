@@ -1,5 +1,5 @@
-from ray import tune
 import numpy as np
+from ray import tune
 
 CCT_CONFIG = {
     "network_type": "CCT",
@@ -17,7 +17,10 @@ CCT_CONFIG = {
     },
     "lr_schedule_config": {
         "use_lr_schedule": True,
-        "step_lr": {"gamma": 0.5, "step_size": 20,},
+        "step_lr": {
+            "gamma": 0.5,
+            "step_size": 20,
+        },
         "reduce_on_plateau": {
             "factor": 0.1,
             "patience": 4,
@@ -58,7 +61,10 @@ CCT_RAY_CONFIG = {
     },
     "lr_schedule_config": {
         "use_lr_schedule": True,
-        "step_lr": {"gamma": 0.5, "step_size": 20,},
+        "step_lr": {
+            "gamma": 0.5,
+            "step_size": 20,
+        },
         "reduce_on_plateau": {
             "factor": 0.1,
             "patience": 4,
@@ -82,4 +88,3 @@ CCT_RAY_CONFIG = {
         "positional_embedding": tune.choice(["learnable", "sine", "none"]),
     },
 }
-

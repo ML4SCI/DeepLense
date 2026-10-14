@@ -1,21 +1,13 @@
-from __future__ import print_function
-
-from turtle import down
-
+import torch
+import torchvision
+from models.byol import BYOLSingleChannel, BYOLTransformer, FinetuneModelByol
+from models.transformer_zoo import TransformerModels
+from self_supervised.config.crossformer_network import CROSSFORMER_CONFIG
+from torch import nn
+from torch.utils.data import DataLoader, random_split
+from torchsummary import summary
 from utils.dataset import DefaultDatasetSetupSSL
 from utils.inference import InferenceSSL
-from torch.utils.data import DataLoader, random_split
-import torch.nn as nn
-import torch
-from models.byol import BYOLSingleChannel, FinetuneModelByol
-from models.byol import BYOL, BYOLSingleChannel, BYOLTransformer
-import torchvision
-
-from self_supervised.config.crossformer_network import CROSSFORMER_CONFIG
-from models.transformer_zoo import TransformerModels
-
-import torchvision
-from torchsummary import summary
 
 
 def get_resnet_finetuned(finetune_model_path, num_classes, device):
@@ -76,7 +68,6 @@ def get_transfomer_finetuned(saved_model_path, device, num_classes) -> nn.Module
         torch.randn(10, 1, 224, 224).to(device), torch.randn(10, 1, 224, 224).to(device)
     )
 
-
     model.to(device)
 
     in_features_projection = 256
@@ -135,7 +126,6 @@ def main():
 
     # finetune_model = get_resnet_finetuned(finetune_model_path, num_classes, device)
     finetune_model = get_transfomer_finetuned(finetune_model_path, device, num_classes)
-
 
     infer_obj = InferenceSSL(
         finetune_model,

@@ -1,11 +1,9 @@
 import timm
-import torch.nn as nn
-import torch.nn as nn
-from torchvision.models import resnet18, resnet
-from utils.util import check_trainable_layers, get_second_last_layer
-from torchsummary import summary
-from typing import Optional
 import torch
+from torch import nn
+from torchsummary import summary
+from torchvision.models import resnet, resnet18
+from utils.util import check_trainable_layers, get_second_last_layer
 
 
 class Model(nn.Module):
@@ -66,9 +64,9 @@ class CustomResNet(nn.Module):
     def __init__(
         self,
         num_channels,
-        device: Optional[str] = "cuda",
+        device: str | None = "cuda",
     ):
-        super(CustomResNet, self).__init__()
+        super().__init__()
         self.model = resnet18(pretrained=False)
         self.device = device
         self.num_channels = num_channels
@@ -79,7 +77,7 @@ class CustomResNet(nn.Module):
         )
         self.model.to(device)
 
-    def add_head(self, head: Optional[nn.Module] = None, freeze_backbone=False):
+    def add_head(self, head: nn.Module | None = None, freeze_backbone=False):
         requires_grad = not freeze_backbone
         for param in self.model.parameters():
             param.requires_grad = requires_grad
@@ -133,12 +131,11 @@ class CustomResNet(nn.Module):
 
     def get_fc_in_features(self):
         return self.model.fc.in_features
-    
+
     def get_second_last_in_features(self):
         layer = get_second_last_layer(self.model)
         return layer
 
-    
 
 if __name__ == "__main__":
     resnet = CustomResNet(num_channels=1)

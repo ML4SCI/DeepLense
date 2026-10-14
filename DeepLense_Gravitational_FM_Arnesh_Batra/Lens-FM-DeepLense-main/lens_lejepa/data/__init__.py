@@ -16,7 +16,13 @@ from .datasets import (
 from .splits import few_shot_split, quantile_split, quantile_subsample, stratified_split
 
 
-def make_loader(dataset: Dataset, batch_size: int, shuffle: bool, workers: int, drop_last: bool = False) -> DataLoader:
+def make_loader(
+    dataset: Dataset,
+    batch_size: int,
+    shuffle: bool,
+    workers: int,
+    drop_last: bool = False,
+) -> DataLoader:
     """A ``DataLoader`` with sensible defaults for GPU training."""
     return DataLoader(
         dataset,

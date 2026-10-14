@@ -1,13 +1,10 @@
-import torch
-import torch.nn as nn
-import torch.optim as optim
-from torch.utils.data import DataLoader
-from utils.dataset import DefaultDatasetSetup
 from models.cnn_zoo import CustomResNet
-from utils.losses.contrastive_loss import ContrastiveLossEuclidean
+from torch import nn, optim
+from torch.utils.data import DataLoader
+from torchsummary import summary
+from utils.dataset import DefaultDatasetSetup
 from utils.train import train_simplistic
 from utils.util import load_model_add_head
-from torchsummary import summary
 
 # Set device
 device = "cuda"  # torch.device("cuda" if torch.cuda.is_available() else "cpu")

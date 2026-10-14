@@ -10,23 +10,43 @@ import torch
 
 def apply_masks(x: torch.Tensor, masks: list[torch.Tensor]) -> torch.Tensor:
     """Gather the tokens listed in each ``[B, K]`` mask and stack masks along the batch."""
-    return torch.cat([torch.gather(x, 1, m.unsqueeze(-1).expand(-1, -1, x.shape[-1])) for m in masks], dim=0)
+    return torch.cat(
+        [
+            torch.gather(x, 1, m.unsqueeze(-1).expand(-1, -1, x.shape[-1]))
+            for m in masks
+        ],
+        dim=0,
+    )
 
 
-def repeat_interleave_batch(x: torch.Tensor, batch_size: int, repeat: int) -> torch.Tensor:
+def repeat_interleave_batch(
+    x: torch.Tensor, batch_size: int, repeat: int
+) -> torch.Tensor:
     """Repeat each of the ``len(x) // batch_size`` chunks of ``x`` ``repeat`` times."""
     chunks = len(x) // batch_size
-    return torch.cat([torch.cat([x[i * batch_size : (i + 1) * batch_size]] * repeat, dim=0) for i in range(chunks)], dim=0)
+    return torch.cat(
+        [
+            torch.cat([x[i * batch_size : (i + 1) * batch_size]] * repeat, dim=0)
+            for i in range(chunks)
+        ],
+        dim=0,
+    )
 
 
 @dataclass
 class MaskConfig:
     grid_size: int = 10
-    npred: int = 4                                   # target blocks per image
-    pred_scale: tuple[float, float] = (0.15, 0.2)    # fraction of the grid per target block
+    npred: int = 4  # target blocks per image
+    pred_scale: tuple[float, float] = (
+        0.15,
+        0.2,
+    )  # fraction of the grid per target block
     aspect_ratio: tuple[float, float] = (0.75, 1.5)
-    nenc: int = 1                                    # context masks per image
-    enc_scale: tuple[float, float] = (0.85, 1.0)     # fraction of the free patches kept as context
+    nenc: int = 1  # context masks per image
+    enc_scale: tuple[float, float] = (
+        0.85,
+        1.0,
+    )  # fraction of the free patches kept as context
     min_keep: int = 1
 
 
@@ -48,14 +68,22 @@ class BlockMaskCollator:
         self.iteration += 1
         info = torch.utils.data.get_worker_info()
         worker = info.id if info is not None else 0
-        return torch.Generator().manual_seed(self.seed + worker * 1_000_003 + self.iteration)
+        return torch.Generator().manual_seed(
+            self.seed + worker * 1_000_003 + self.iteration
+        )
 
     def _block_size(self, g: torch.Generator) -> tuple[int, int]:
         c, n = self.config, self.config.grid_size
-        scale = c.pred_scale[0] + torch.rand(1, generator=g).item() * (c.pred_scale[1] - c.pred_scale[0])
-        ratio = c.aspect_ratio[0] + torch.rand(1, generator=g).item() * (c.aspect_ratio[1] - c.aspect_ratio[0])
+        scale = c.pred_scale[0] + torch.rand(1, generator=g).item() * (
+            c.pred_scale[1] - c.pred_scale[0]
+        )
+        ratio = c.aspect_ratio[0] + torch.rand(1, generator=g).item() * (
+            c.aspect_ratio[1] - c.aspect_ratio[0]
+        )
         keep = int(n * n * scale)
-        return min(n, max(1, round(sqrt(keep * ratio)))), min(n, max(1, round(sqrt(keep / ratio))))
+        return min(n, max(1, round(sqrt(keep * ratio)))), min(
+            n, max(1, round(sqrt(keep / ratio)))
+        )
 
     def _block(self, size: tuple[int, int], g: torch.Generator) -> torch.Tensor:
         n = self.config.grid_size
@@ -79,13 +107,17 @@ class BlockMaskCollator:
             if total - covered.numel() >= c.min_keep:
                 break
         else:
-            raise RuntimeError("Target blocks leave too little context; reduce pred_scale or npred.")
+            raise RuntimeError(
+                "Target blocks leave too little context; reduce pred_scale or npred."
+            )
         free = torch.ones(total, dtype=torch.bool)
         free[covered] = False
         free = free.nonzero().flatten()
         contexts = []
         for _ in range(c.nenc):
-            fraction = c.enc_scale[0] + torch.rand(1, generator=g).item() * (c.enc_scale[1] - c.enc_scale[0])
+            fraction = c.enc_scale[0] + torch.rand(1, generator=g).item() * (
+                c.enc_scale[1] - c.enc_scale[0]
+            )
             count = max(c.min_keep, round(free.numel() * fraction))
             contexts.append(free[torch.randperm(free.numel(), generator=g)[:count]])
         b = images.shape[0]

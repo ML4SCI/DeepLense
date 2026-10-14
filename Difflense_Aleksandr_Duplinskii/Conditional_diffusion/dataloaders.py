@@ -1,32 +1,34 @@
-
 import os
-from typing import Optional, Tuple, Union
+from dataclasses import dataclass
+
 import numpy as np
 import torch
 import torch.nn.functional as F
-from torch.utils.data import Dataset
-from dataclasses import dataclass
 from scipy.ndimage import gaussian_filter
+from torch.utils.data import Dataset
+
 
 @dataclass
 class NoiseConfig:
     # Background in counts (pre-normalization, preserved DC)
     bg_enable: bool = True
-    bg_peak_counts: Union[float, Tuple[float, float]] = (800.0, 1500.0)
-    bg_sky_counts:  Union[float, Tuple[float, float]] = (80.0, 300.0)
+    bg_peak_counts: float | tuple[float, float] = (800.0, 1500.0)
+    bg_sky_counts: float | tuple[float, float] = (80.0, 300.0)
     bg_read_std_counts: float = 3.0
     bg_prob: float = 1.0
 
     # Optional post scaling noise (in [0,1])
-    post_mode: str = "none"          # "none"|"gaussian"|"poisson"|"poissongauss"
-    post_level: Union[float, Tuple[float, float]] = 0.0
+    post_mode: str = "none"  # "none"|"gaussian"|"poisson"|"poissongauss"
+    post_level: float | tuple[float, float] = 0.0
     post_read_std: float = 0.0
     post_prob: float = 1.0
+
 
 class LRNoiseAugment:
     """
     Deterministic per-index LR noise. Same idx -> same noise every epoch.
     """
+
     def __init__(self, cfg: NoiseConfig, base_seed: int = 12345):
         self.cfg = cfg
         self.base_seed = int(base_seed)
@@ -39,7 +41,7 @@ class LRNoiseAugment:
         return float(v)
 
     def _rng(self, idx: int):
-        seed = (self.base_seed * 1000003 + idx * 9176) & 0x7fffffff
+        seed = (self.base_seed * 1000003 + idx * 9176) & 0x7FFFFFFF
         return np.random.RandomState(seed)
 
     def _background_counts_then_scale01(self, lr_np: np.ndarray, rng) -> np.ndarray:
@@ -50,13 +52,15 @@ class LRNoiseAugment:
         lr01 = np.clip(lr_np / scale, 0.0, 1.0).astype(np.float32)
 
         peak = self._u(rng, self.cfg.bg_peak_counts)
-        sky  = self._u(rng, self.cfg.bg_sky_counts)
+        sky = self._u(rng, self.cfg.bg_sky_counts)
 
-        src  = lr01 * peak
+        src = lr01 * peak
         mean = src + sky
         counts = rng.poisson(mean).astype(np.float32)
         if self.cfg.bg_read_std_counts > 0:
-            counts += rng.normal(0.0, self.cfg.bg_read_std_counts, size=counts.shape).astype(np.float32)
+            counts += rng.normal(
+                0.0, self.cfg.bg_read_std_counts, size=counts.shape
+            ).astype(np.float32)
         counts = np.clip(counts, 0.0, None, out=counts)
 
         denom = max(1.0, peak + sky)
@@ -80,7 +84,9 @@ class LRNoiseAugment:
             lam = np.clip(img01, 0.0, 1.0) * peak
             counts = rng.poisson(lam).astype(np.float32)
             if self.cfg.post_read_std > 0.0:
-                counts += rng.normal(0.0, self.cfg.post_read_std, size=counts.shape).astype(np.float32)
+                counts += rng.normal(
+                    0.0, self.cfg.post_read_std, size=counts.shape
+                ).astype(np.float32)
             counts = np.clip(counts, 0.0, None, out=counts)
             return np.clip(counts / peak, 0.0, 1.0)
         return img01
@@ -96,15 +102,14 @@ class LRNoiseAugment:
         return self._post(lr01, rng)
 
 
-
 # --- helper to accept (N,H,W), (N,1,H,W) or (N,H,W,1) ---
 def _ensure_nhw(x: np.ndarray) -> np.ndarray:
     if x.ndim == 3:
         return x
     if x.ndim == 4 and x.shape[1] == 1:
-        return np.squeeze(x, axis=1)    # (N,1,H,W) -> (N,H,W)
+        return np.squeeze(x, axis=1)  # (N,1,H,W) -> (N,H,W)
     if x.ndim == 4 and x.shape[-1] == 1:
-        return np.squeeze(x, axis=-1)   # (N,H,W,1) -> (N,H,W)
+        return np.squeeze(x, axis=-1)  # (N,H,W,1) -> (N,H,W)
     raise ValueError(f"Expected (N,H,W) or (N,1,H,W)/(N,H,W,1), got {x.shape}")
 
 
@@ -135,35 +140,33 @@ class PairsDatasetUnified(Dataset):
       return_mask: if True and pad_to is not None, also returns a [1, pad_to, pad_to] mask of valid region
     """
 
-    def __init__(self,
-                 root_dir: str,
-                 hr_name: str = "Mejiro_dataset/hr_all_lsst_20k.npy",
-                 lr_name: str = "Mejiro_dataset/lr_all_lsst_20k.npy",
-                 mmap: bool = True,
-
-                 # ---- normalization controls ----
-                 norm_preset: str = "minmax",
-                 hr_norm: Optional[str] = None,
-                 lr_norm: Optional[str] = None,
-                 percentile_p: float = 99.99,
-                 percentile_from: str = "lr",
-
-                 # ---- output / shape controls ----
-                 out_range: str = "[-1,1]",                # "[-1,1]" | "[0,1]"
-                 resize_to: Optional[Union[int, Tuple[int, int]]] = None,
-                 resize_mode: str = "bilinear",
-                 align_corners: Optional[bool] = False,
-                 pad_to: Optional[int] = 48,
-                 pad_mode: str = "reflect",
-                 constant_pad_value: float = 0.0,
-                 channels: int = 1,
-
-                 # ---- LR noise (index-deterministic) ----
-                 noise_aug: Optional[object] = None,
-
-                 # ---- API shape ----
-                 return_order: str = "HRLR",
-                 return_mask: bool = False):
+    def __init__(
+        self,
+        root_dir: str,
+        hr_name: str = "Mejiro_dataset/hr_all_lsst_20k.npy",
+        lr_name: str = "Mejiro_dataset/lr_all_lsst_20k.npy",
+        mmap: bool = True,
+        # ---- normalization controls ----
+        norm_preset: str = "minmax",
+        hr_norm: str | None = None,
+        lr_norm: str | None = None,
+        percentile_p: float = 99.99,
+        percentile_from: str = "lr",
+        # ---- output / shape controls ----
+        out_range: str = "[-1,1]",  # "[-1,1]" | "[0,1]"
+        resize_to: int | tuple[int, int] | None = None,
+        resize_mode: str = "bilinear",
+        align_corners: bool | None = False,
+        pad_to: int | None = 48,
+        pad_mode: str = "reflect",
+        constant_pad_value: float = 0.0,
+        channels: int = 1,
+        # ---- LR noise (index-deterministic) ----
+        noise_aug: object | None = None,
+        # ---- API shape ----
+        return_order: str = "HRLR",
+        return_mask: bool = False,
+    ):
 
         # Load arrays
         hr_path = os.path.join(root_dir, hr_name)
@@ -187,15 +190,17 @@ class PairsDatasetUnified(Dataset):
         if preset not in ("minmax", "percentile", "hybrid"):
             raise ValueError("norm_preset must be 'minmax'|'percentile'|'hybrid'")
         preset_map = {
-            "minmax":     ("minmax", "minmax"),
+            "minmax": ("minmax", "minmax"),
             "percentile": ("percentile", "percentile"),
-            "hybrid":     ("minmax", "percentile"),  # HR=minmax, LR=percentile
+            "hybrid": ("minmax", "percentile"),  # HR=minmax, LR=percentile
         }
         def_hr, def_lr = preset_map[preset]
         self.hr_norm = (hr_norm or def_hr).lower()
         self.lr_norm = (lr_norm or def_lr).lower()
-        if self.hr_norm not in ("minmax", "percentile"): raise ValueError("hr_norm invalid")
-        if self.lr_norm not in ("minmax", "percentile"): raise ValueError("lr_norm invalid")
+        if self.hr_norm not in ("minmax", "percentile"):
+            raise ValueError("hr_norm invalid")
+        if self.lr_norm not in ("minmax", "percentile"):
+            raise ValueError("lr_norm invalid")
 
         # Global percentile scale computed once
         self.percentile_p = float(percentile_p)
@@ -222,10 +227,14 @@ class PairsDatasetUnified(Dataset):
 
         self.resize_mode = resize_mode.lower()
         if self.resize_mode not in ("bilinear", "bicubic", "nearest", "area"):
-            raise ValueError("resize_mode must be 'bilinear'|'bicubic'|'nearest'|'area'")
+            raise ValueError(
+                "resize_mode must be 'bilinear'|'bicubic'|'nearest'|'area'"
+            )
 
         # align_corners only valid for linear/bicubic
-        self.align_corners = align_corners if self.resize_mode in ("bilinear", "bicubic") else None
+        self.align_corners = (
+            align_corners if self.resize_mode in ("bilinear", "bicubic") else None
+        )
 
         self.pad_to = pad_to
         self.pad_mode = pad_mode
@@ -248,7 +257,11 @@ class PairsDatasetUnified(Dataset):
     def _minmax01(x: np.ndarray) -> np.ndarray:
         x = x.astype(np.float32, copy=False)
         mn, mx = float(x.min()), float(x.max())
-        return ((x - mn) / (mx - mn + 1e-8)).astype(np.float32) if mx > mn else np.zeros_like(x, np.float32)
+        return (
+            ((x - mn) / (mx - mn + 1e-8)).astype(np.float32)
+            if mx > mn
+            else np.zeros_like(x, np.float32)
+        )
 
     def _percentile01(self, x: np.ndarray) -> np.ndarray:
         s = self.global_scale
@@ -260,7 +273,7 @@ class PairsDatasetUnified(Dataset):
 
     def _pad(self, x: torch.Tensor, side: int) -> torch.Tensor:
         # x: [C,H,W]
-        C, H, W = x.shape
+        _C, H, W = x.shape
         ph, pw = side - H, side - W
         if ph == 0 and pw == 0:
             return x
@@ -274,7 +287,9 @@ class PairsDatasetUnified(Dataset):
         elif self.pad_mode == "replicate":
             return F.pad(x, (l, r, t, b), mode="replicate")
         elif self.pad_mode == "constant":
-            return F.pad(x, (l, r, t, b), mode="constant", value=self.constant_pad_value)
+            return F.pad(
+                x, (l, r, t, b), mode="constant", value=self.constant_pad_value
+            )
         else:
             raise ValueError("pad_mode must be 'reflect'|'replicate'|'constant'")
 
@@ -288,7 +303,7 @@ class PairsDatasetUnified(Dataset):
         return x if self.channels == 1 else x.repeat(self.channels, 1, 1)
 
     # resizing helper (x is [C,H,W])
-    def _resize(self, x: torch.Tensor, size_hw: Tuple[int, int]) -> torch.Tensor:
+    def _resize(self, x: torch.Tensor, size_hw: tuple[int, int]) -> torch.Tensor:
         x4d = x.unsqueeze(0)  # [1,C,H,W]
         kwargs = {"mode": self.resize_mode}
         if self.resize_mode in ("bilinear", "bicubic"):
@@ -309,10 +324,18 @@ class PairsDatasetUnified(Dataset):
         if self.noise_aug is not None:
             lr01 = self.noise_aug(lr_np, idx=idx)  # expected to return [0,1]
         else:
-            lr01 = self._minmax01(lr_np) if self.lr_norm == "minmax" else self._percentile01(lr_np)
+            lr01 = (
+                self._minmax01(lr_np)
+                if self.lr_norm == "minmax"
+                else self._percentile01(lr_np)
+            )
 
         # HR normalization by selected mode
-        hr01 = self._minmax01(hr_np) if self.hr_norm == "minmax" else self._percentile01(hr_np)
+        hr01 = (
+            self._minmax01(hr_np)
+            if self.hr_norm == "minmax"
+            else self._percentile01(hr_np)
+        )
 
         # → tensors [1,H,W]
         HR_t = self._to_tensor(hr01)
@@ -330,9 +353,9 @@ class PairsDatasetUnified(Dataset):
                 _, H, W = HR_t.shape
                 mask = torch.zeros((1, self.pad_to, self.pad_to), dtype=torch.float32)
                 ph, pw = self.pad_to - H, self.pad_to - W
-                l, r = pw // 2, pw - pw // 2
-                t, b = ph // 2, ph - ph // 2
-                mask[..., t:t+H, l:l+W] = 1.0
+                l, _r = pw // 2, pw - pw // 2
+                t, _b = ph // 2, ph - ph // 2
+                mask[..., t : t + H, l : l + W] = 1.0
             HR_t = self._pad(HR_t, self.pad_to)
             LR_t = self._pad(LR_t, self.pad_to)
 
@@ -346,9 +369,10 @@ class PairsDatasetUnified(Dataset):
             return (HR_t, LR_t, mask) if self.return_mask else (HR_t, LR_t)
         else:
             return (LR_t, HR_t, mask) if self.return_mask else (LR_t, HR_t)
-        
-        
-#---------------------------- Model I --------------------------------------------------------
+
+
+# ---------------------------- Model I --------------------------------------------------------
+
 
 class PTImageDataset(torch.utils.data.Dataset):
     def __init__(self, pt_path, downsample_size=None):
@@ -365,20 +389,20 @@ class PTImageDataset(torch.utils.data.Dataset):
             img = F.interpolate(
                 img.unsqueeze(0),
                 size=self.downsample_size,
-                mode='bilinear',
-                align_corners=False
+                mode="bilinear",
+                align_corners=False,
             ).squeeze(0)
         return img, 0  # dummy label for uncond model
 
 
+# ---------------------------- Model II --------------------------------------------------------
 
-#---------------------------- Model II --------------------------------------------------------
 
 class NpyDiffusionDataset(torch.utils.data.Dataset):
     def __init__(self, root_folder, downsample_size=None):
         self.image_paths = []
         self.labels = []
-        self.class_to_label = {'axion': 0, 'cdm': 1, 'no_sub': 2}
+        self.class_to_label = {"axion": 0, "cdm": 1, "no_sub": 2}
         self.downsample_size = downsample_size
 
         # Walk through folders and store paths + labels
@@ -387,7 +411,7 @@ class NpyDiffusionDataset(torch.utils.data.Dataset):
             if not os.path.isdir(class_folder):
                 continue
             for fname in os.listdir(class_folder):
-                if fname.endswith('.npy'):
+                if fname.endswith(".npy"):
                     self.image_paths.append(os.path.join(class_folder, fname))
                     self.labels.append(label)
 
@@ -403,11 +427,13 @@ class NpyDiffusionDataset(torch.utils.data.Dataset):
         if label == 0:
             img = data[0]  # axion: [image, intensity]
         else:
-            img = data     # others: plain image
+            img = data  # others: plain image
 
         # Validate and normalize to [0, 1]
         if not isinstance(img, np.ndarray) or img.ndim < 2:
-            raise ValueError(f"Invalid image at {path}, got shape {getattr(img, 'shape', None)}")
+            raise ValueError(
+                f"Invalid image at {path}, got shape {getattr(img, 'shape', None)}"
+            )
 
         img = img.astype(np.float32)
         img_min, img_max = np.min(img), np.max(img)
@@ -424,7 +450,12 @@ class NpyDiffusionDataset(torch.utils.data.Dataset):
 
         # Resize if needed
         if self.downsample_size:
-            img = F.interpolate(img.unsqueeze(0), size=self.downsample_size, mode='bilinear', align_corners=False).squeeze(0)
+            img = F.interpolate(
+                img.unsqueeze(0),
+                size=self.downsample_size,
+                mode="bilinear",
+                align_corners=False,
+            ).squeeze(0)
 
         # Normalize to [-1, 1]
         img = (img - 0.5) * 2
@@ -435,7 +466,7 @@ class NpyDiffusionDataset(torch.utils.data.Dataset):
 class NpyDiffusionDatasetHighLowRes(torch.utils.data.Dataset):
     def __init__(self, root_folder, downsample_size=None, blur_sigma=3):
         self.image_paths = []
-        self.class_to_label = {'axion': 0, 'cdm': 1, 'no_sub': 2}
+        self.class_to_label = {"axion": 0, "cdm": 1, "no_sub": 2}
         self.downsample_size = downsample_size
         self.blur_sigma = blur_sigma  # standard deviation for Gaussian blur
 
@@ -444,7 +475,7 @@ class NpyDiffusionDatasetHighLowRes(torch.utils.data.Dataset):
             if not os.path.isdir(class_folder):
                 continue
             for fname in os.listdir(class_folder):
-                if fname.endswith('.npy'):
+                if fname.endswith(".npy"):
                     self.image_paths.append(os.path.join(class_folder, fname))
 
     def __len__(self):
@@ -461,7 +492,9 @@ class NpyDiffusionDatasetHighLowRes(torch.utils.data.Dataset):
             img = data
 
         if not isinstance(img, np.ndarray) or img.ndim < 2:
-            raise ValueError(f"Invalid image at {path}, got shape {getattr(img, 'shape', None)}")
+            raise ValueError(
+                f"Invalid image at {path}, got shape {getattr(img, 'shape', None)}"
+            )
 
         img = img.astype(np.float32)
         img_min, img_max = img.min(), img.max()
@@ -475,7 +508,12 @@ class NpyDiffusionDatasetHighLowRes(torch.utils.data.Dataset):
 
         # Resize if needed
         if self.downsample_size:
-            x0 = F.interpolate(x0.unsqueeze(0), size=self.downsample_size, mode='bilinear', align_corners=False).squeeze(0)
+            x0 = F.interpolate(
+                x0.unsqueeze(0),
+                size=self.downsample_size,
+                mode="bilinear",
+                align_corners=False,
+            ).squeeze(0)
 
         # Create low-res conditional image by blurring
         img_blur_np = gaussian_filter(img, sigma=self.blur_sigma)
@@ -483,7 +521,12 @@ class NpyDiffusionDatasetHighLowRes(torch.utils.data.Dataset):
 
         # Resize low-res image as well if needed
         if self.downsample_size:
-            x_cond = F.interpolate(x_cond.unsqueeze(0), size=self.downsample_size, mode='bilinear', align_corners=False).squeeze(0)
+            x_cond = F.interpolate(
+                x_cond.unsqueeze(0),
+                size=self.downsample_size,
+                mode="bilinear",
+                align_corners=False,
+            ).squeeze(0)
 
         # Normalize both to [-1, 1]
         x0 = (x0 - 0.5) * 2
@@ -495,11 +538,9 @@ class NpyDiffusionDatasetHighLowRes(torch.utils.data.Dataset):
 cfg = NoiseConfig(
     bg_enable=True,
     bg_peak_counts=(800.0, 1500.0),
-    bg_sky_counts=(80.0*10, 300.0*10),
+    bg_sky_counts=(80.0 * 10, 300.0 * 10),
     bg_read_std_counts=3.0,
     bg_prob=1.0,
-    post_mode="none"
+    post_mode="none",
 )
 noise_aug = LRNoiseAugment(cfg, base_seed=42)
-
-

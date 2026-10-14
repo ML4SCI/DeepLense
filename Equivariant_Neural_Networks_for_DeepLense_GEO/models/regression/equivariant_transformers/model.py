@@ -1,18 +1,26 @@
 import torch
+
 from . import coordinates, networks, transformers
 
-class ET(object):
+
+class ET:
     def __init__(
         self,
-        tfs=[],
+        tfs=None,
         coords=coordinates.identity_grid,
         net=None,
         equivariant=True,
         downsample=1,
-        tf_opts={},
-        net_opts={},
+        tf_opts=None,
+        net_opts=None,
         load_path=None,
     ):
+        if net_opts is None:
+            net_opts = {}
+        if tf_opts is None:
+            tf_opts = {}
+        if tfs is None:
+            tfs = []
         if load_path is not None:
             spec = torch.load(load_path)
             tfs = spec["tfs"]

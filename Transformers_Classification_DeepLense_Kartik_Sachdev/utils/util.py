@@ -1,11 +1,10 @@
-import os
-from typing import List
-import random
-import torch
-import numpy as np
 import logging
-import torch.nn as nn
-from typing import Optional
+import os
+import random
+
+import numpy as np
+import torch
+from torch import nn
 
 
 def make_directory(dirname: str) -> None:
@@ -17,7 +16,7 @@ def make_directory(dirname: str) -> None:
     os.makedirs(dirname, exist_ok=True)
 
 
-def make_directories(dirnames: List[str]) -> None:
+def make_directories(dirnames: list[str]) -> None:
     """makes directories from a list of desired directories
 
     Args:
@@ -56,17 +55,15 @@ def get_device(use_cuda=True, cuda_idx=0):
 
     if use_cuda:
         if torch.cuda.is_available():
-            assert cuda_idx in range(
-                0, torch.cuda.device_count()
-            ), "GPU index out of range. index lies in [{}, {})".format(
-                0, torch.cuda.device_count()
+            assert cuda_idx in range(torch.cuda.device_count()), (
+                f"GPU index out of range. index lies in [{0}, {torch.cuda.device_count()})"
             )
             device = torch.device("cuda:" + str(cuda_idx))
         else:
             print("cuda not found, will switch to cpu")
     else:
         device = torch.device("cpu")
-    print(f"Using device = {str(device)}")
+    print(f"Using device = {device!s}")
     return device
 
 
@@ -90,7 +87,7 @@ def init_logging_handler(log_dir, current_time, extra="", use_ray=False):
 
     stderr_handler = logging.StreamHandler()
     file_handler = logging.FileHandler(
-        "{}/{}/log_{}.txt".format(log_dir, current_time, current_time + extra)
+        f"{log_dir}/{current_time}/log_{current_time + extra}.txt"
     )
     logging.basicConfig(handlers=[stderr_handler, file_handler])
     logger = logging.getLogger()
@@ -114,7 +111,7 @@ def load_model_add_head(
     pretrain_model: nn.Module,
     saved_model_path,
     head: nn.Module,
-    freeze_pretrain_layers: Optional[bool] = True,
+    freeze_pretrain_layers: bool | None = True,
 ) -> nn.Module:
     pretrain_model.load_state_dict(torch.load(saved_model_path))
 
@@ -145,7 +142,7 @@ def count_parameters(model):
 
 def get_second_last_layer(model: nn.Module):
     # Get the second last layer
-    layers = list(model.children())
+    list(model.children())
 
     layer_names = list(model._modules.keys())
     second_last_layer_name = layer_names[-3]
@@ -187,7 +184,7 @@ def update_momentum(model: nn.Module, model_ema: nn.Module, m: float):
         >>> update_momentum(moco, moco_momentum, m=0.999)
         >>> update_momentum(projection_head, projection_head_momentum, m=0.999)
     """
-    for model_ema, model in zip(model_ema.parameters(), model.parameters()):
+    for model_ema, model in zip(model_ema.parameters(), model.parameters(), strict=False):
         model_ema.data = model_ema.data * m + model.data * (1.0 - m)
 
 
@@ -207,13 +204,13 @@ def update_momentum(model: nn.Module, model_ema: nn.Module, m: float):
         >>> update_momentum(moco, moco_momentum, m=0.999)
         >>> update_momentum(projection_head, projection_head_momentum, m=0.999)
     """
-    for model_ema, model in zip(model_ema.parameters(), model.parameters()):
+    for model_ema, model in zip(model_ema.parameters(), model.parameters(), strict=False):
         model_ema.data = model_ema.data * m + model.data * (1.0 - m)
 
 
 def get_last_layer_features(model: nn.Module, num_input=1, device="cuda"):
     random_input = []
-    for num in range(num_input):
+    for _num in range(num_input):
         random_input.append(torch.randn(1, 1, 224, 224).to(device))
 
     if num_input == 1:

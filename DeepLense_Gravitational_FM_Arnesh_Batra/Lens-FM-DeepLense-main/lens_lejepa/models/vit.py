@@ -26,24 +26,32 @@ def sincos_2d_position_embedding(dim: int, grid_size: int) -> np.ndarray:
         raise ValueError("Embedding dimension must be divisible by 4.")
 
     def one_axis(positions: np.ndarray, axis_dim: int) -> np.ndarray:
-        omega = 1.0 / 10000 ** (np.arange(axis_dim // 2, dtype=np.float64) / (axis_dim / 2.0))
+        omega = 1.0 / 10000 ** (
+            np.arange(axis_dim // 2, dtype=np.float64) / (axis_dim / 2.0)
+        )
         angles = np.einsum("m,d->md", positions.reshape(-1), omega)
         return np.concatenate([np.sin(angles), np.cos(angles)], axis=1)
 
     coords = np.arange(grid_size, dtype=np.float64)
     grid_w, grid_h = np.meshgrid(coords, coords)  # width first, as in I-JEPA
-    return np.concatenate([one_axis(grid_w, dim // 2), one_axis(grid_h, dim // 2)], axis=1)
+    return np.concatenate(
+        [one_axis(grid_w, dim // 2), one_axis(grid_h, dim // 2)], axis=1
+    )
 
 
 class PatchEmbed(nn.Module):
-    def __init__(self, img_size: int, patch_size: int, in_chans: int, embed_dim: int) -> None:
+    def __init__(
+        self, img_size: int, patch_size: int, in_chans: int, embed_dim: int
+    ) -> None:
         super().__init__()
         if img_size % patch_size:
             raise ValueError("Image size must be a multiple of the patch size.")
         self.img_size = img_size
         self.patch_size = patch_size
         self.num_patches = (img_size // patch_size) ** 2
-        self.proj = nn.Conv2d(in_chans, embed_dim, kernel_size=patch_size, stride=patch_size)
+        self.proj = nn.Conv2d(
+            in_chans, embed_dim, kernel_size=patch_size, stride=patch_size
+        )
 
     def forward(self, x: torch.Tensor) -> torch.Tensor:
         return self.proj(x).flatten(2).transpose(1, 2)
@@ -69,7 +77,11 @@ class Attention(nn.Module):
 
     def forward(self, x: torch.Tensor) -> torch.Tensor:
         batch, tokens, dim = x.shape
-        qkv = self.qkv(x).reshape(batch, tokens, 3, self.num_heads, dim // self.num_heads).permute(2, 0, 3, 1, 4)
+        qkv = (
+            self.qkv(x)
+            .reshape(batch, tokens, 3, self.num_heads, dim // self.num_heads)
+            .permute(2, 0, 3, 1, 4)
+        )
         out = F.scaled_dot_product_attention(qkv[0], qkv[1], qkv[2])
         return self.proj(out.transpose(1, 2).reshape(batch, tokens, dim))
 
@@ -109,8 +121,12 @@ class VisionTransformer(nn.Module):
         self.grid_size = img_size // patch_size
         self.patch_embed = PatchEmbed(img_size, patch_size, in_chans, embed_dim)
         position = sincos_2d_position_embedding(embed_dim, self.grid_size)
-        self.pos_embed = nn.Parameter(torch.from_numpy(position).float().unsqueeze(0), requires_grad=False)
-        self.blocks = nn.ModuleList([Block(embed_dim, num_heads, mlp_ratio, norm_layer) for _ in range(depth)])
+        self.pos_embed = nn.Parameter(
+            torch.from_numpy(position).float().unsqueeze(0), requires_grad=False
+        )
+        self.blocks = nn.ModuleList(
+            [Block(embed_dim, num_heads, mlp_ratio, norm_layer) for _ in range(depth)]
+        )
         self.norm = norm_layer(embed_dim)
         self.init_std = init_std
         self.apply(self._init_weights)
@@ -131,7 +147,9 @@ class VisionTransformer(nn.Module):
             block.attn.proj.weight.data.div_(math.sqrt(2.0 * layer_id))
             block.mlp.fc2.weight.data.div_(math.sqrt(2.0 * layer_id))
 
-    def forward(self, x: torch.Tensor, masks: list[torch.Tensor] | None = None) -> torch.Tensor:
+    def forward(
+        self, x: torch.Tensor, masks: list[torch.Tensor] | None = None
+    ) -> torch.Tensor:
         """Patch tokens ``[B, N, D]``; with I-JEPA ``masks``, only the kept tokens."""
         x = self.patch_embed(x) + self.pos_embed
         if masks is not None:
@@ -153,20 +171,34 @@ VIT_CONFIGS: dict[str, dict[str, int]] = {
 def build_vit(name: str, img_size: int, patch_size: int) -> VisionTransformer:
     if name not in VIT_CONFIGS:
         raise ValueError(f"Unknown ViT {name!r}; choose from {sorted(VIT_CONFIGS)}.")
-    return VisionTransformer(img_size=img_size, patch_size=patch_size, **VIT_CONFIGS[name])
+    return VisionTransformer(
+        img_size=img_size, patch_size=patch_size, **VIT_CONFIGS[name]
+    )
 
 
 class JEPAPredictor(nn.Module):
     """I-JEPA predictor: a narrow ViT that fills in target tokens from context tokens."""
 
-    def __init__(self, num_patches: int, embed_dim: int, predictor_dim: int = 384, depth: int = 6, num_heads: int = 12, init_std: float = 0.02) -> None:
+    def __init__(
+        self,
+        num_patches: int,
+        embed_dim: int,
+        predictor_dim: int = 384,
+        depth: int = 6,
+        num_heads: int = 12,
+        init_std: float = 0.02,
+    ) -> None:
         super().__init__()
         norm_layer = partial(nn.LayerNorm, eps=1e-6)
         self.predictor_embed = nn.Linear(embed_dim, predictor_dim)
         self.mask_token = nn.Parameter(torch.zeros(1, 1, predictor_dim))
         position = sincos_2d_position_embedding(predictor_dim, int(num_patches**0.5))
-        self.predictor_pos_embed = nn.Parameter(torch.from_numpy(position).float().unsqueeze(0), requires_grad=False)
-        self.predictor_blocks = nn.ModuleList([Block(predictor_dim, num_heads, 4.0, norm_layer) for _ in range(depth)])
+        self.predictor_pos_embed = nn.Parameter(
+            torch.from_numpy(position).float().unsqueeze(0), requires_grad=False
+        )
+        self.predictor_blocks = nn.ModuleList(
+            [Block(predictor_dim, num_heads, 4.0, norm_layer) for _ in range(depth)]
+        )
         self.predictor_norm = norm_layer(predictor_dim)
         self.predictor_proj = nn.Linear(predictor_dim, embed_dim)
         self.init_std = init_std
@@ -185,14 +217,24 @@ class JEPAPredictor(nn.Module):
             nn.init.ones_(module.weight)
             nn.init.zeros_(module.bias)
 
-    def forward(self, context: torch.Tensor, masks_enc: list[torch.Tensor], masks_pred: list[torch.Tensor]) -> torch.Tensor:
+    def forward(
+        self,
+        context: torch.Tensor,
+        masks_enc: list[torch.Tensor],
+        masks_pred: list[torch.Tensor],
+    ) -> torch.Tensor:
         batch = len(context) // len(masks_enc)
         x = self.predictor_embed(context)
         x = x + apply_masks(self.predictor_pos_embed.repeat(batch, 1, 1), masks_enc)
         n_context = x.shape[1]
-        target_pos = apply_masks(self.predictor_pos_embed.repeat(batch, 1, 1), masks_pred)
+        target_pos = apply_masks(
+            self.predictor_pos_embed.repeat(batch, 1, 1), masks_pred
+        )
         target_pos = repeat_interleave_batch(target_pos, batch, repeat=len(masks_enc))
-        targets = self.mask_token.repeat(target_pos.shape[0], target_pos.shape[1], 1) + target_pos
+        targets = (
+            self.mask_token.repeat(target_pos.shape[0], target_pos.shape[1], 1)
+            + target_pos
+        )
         x = torch.cat([x.repeat(len(masks_pred), 1, 1), targets], dim=1)
         for block in self.predictor_blocks:
             x = block(x)

@@ -1,12 +1,8 @@
 import torch
-import numpy as np
-from torch import nn
-from torch import Tensor
-from typing import Tuple, Union, List
-import torchvision.transforms as transforms
+from torch import Tensor, nn
+
 
 class MultiLocallySelfAttention(nn.Module):
-
     """
     Implements a MultiLocallySelfAttention layer, which is a specialized form of multi-head self-attention
     designed to attend over local patches of an image.
@@ -21,8 +17,14 @@ class MultiLocallySelfAttention(nn.Module):
         mha (nn.MultiheadAttention): Standard multi-head attention layer.
     """
 
-    def __init__(self, embed_dim: int, num_heads: int, num_patches: int, device: torch.device, dropout: float = 0.1):
-
+    def __init__(
+        self,
+        embed_dim: int,
+        num_heads: int,
+        num_patches: int,
+        device: torch.device,
+        dropout: float = 0.1,
+    ):
         """
         Initializes the MultiLocallySelfAttention layer.
 
@@ -45,14 +47,20 @@ class MultiLocallySelfAttention(nn.Module):
         self.device = device
 
         # Initialize attention mask (a lower triangular matrix with True values)
-        self.attn_mask = torch.eye(1 + self.num_patches, 1 + self.num_patches, dtype=torch.bool, requires_grad=False)
+        self.attn_mask = torch.eye(
+            1 + self.num_patches,
+            1 + self.num_patches,
+            dtype=torch.bool,
+            requires_grad=False,
+        )
         self.attn_mask = self.attn_mask.to(device)
 
         # Initialize multi-head attention layer
-        self.mha = nn.MultiheadAttention(embed_dim, num_heads, dropout, batch_first=True)
+        self.mha = nn.MultiheadAttention(
+            embed_dim, num_heads, dropout, batch_first=True
+        )
 
     def forward(self, key: Tensor, query: Tensor, value: Tensor) -> Tensor:
-
         """
         Performs the forward pass through the MultiLocallySelfAttention layer.
 

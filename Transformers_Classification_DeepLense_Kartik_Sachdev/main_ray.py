@@ -1,39 +1,34 @@
-from __future__ import print_function
 import os
 import time
-
-import torch.nn as nn
-from typing import *
-from utils.util import (
-    make_directories,
-    seed_everything,
-    get_device,
-    init_logging_handler,
-)
-from utils.dataset import DeepLenseDataset
-from utils.train_ray import train
 from argparse import ArgumentParser
-from config.data_config import DATASET
-from utils.augmentation import get_transform_train
-from torch.utils.data import random_split
+from typing import *
 
-from config.twinssvt_config import TWINSSVT_RAY_CONFIG
-from config.cct_config import CCT_RAY_CONFIG
-from config.levit_config import LEVIT_RAY_CONFIG
+import ray
 from config.cait_config import CAIT_RAY_CONFIG
+from config.cct_config import CCT_RAY_CONFIG
+from config.crossformer_config import CROSSFORMER_RAY_CONFIG
 from config.crossvit_config import CROSSVIT_RAY_CONFIG
+from config.cvt_config import CvT_RAY_CONFIG
+from config.data_config import DATASET
+from config.levit_config import LEVIT_RAY_CONFIG
 from config.pit_config import PIT_RAY_CONFIG
 from config.swin_config import SWIN_RAY_CONFIG
 from config.t2tvit_config import T2TViT_RAY_CONFIG
-from config.crossformer_config import CROSSFORMER_RAY_CONFIG
-from config.cvt_config import CvT_RAY_CONFIG
-
-
+from config.twinssvt_config import TWINSSVT_RAY_CONFIG
 from ray import tune
 from ray.tune import CLIReporter
-import ray
-
 from ray.tune.schedulers import ASHAScheduler
+from torch import nn
+from torch.utils.data import random_split
+from utils.augmentation import get_transform_train
+from utils.dataset import DeepLenseDataset
+from utils.train_ray import train
+from utils.util import (
+    get_device,
+    init_logging_handler,
+    make_directories,
+    seed_everything,
+)
 
 parser = ArgumentParser()
 parser.add_argument(
@@ -198,13 +193,15 @@ def main():
     )
 
     ray.init()
-    result = tune.run(
+    tune.run(
         trainable,
         name=f"{train_config_name}_{current_time}",
         config=train_config,
         scheduler=scheduler,
         resources_per_trial={"cpu": num_workers, "gpu": 1},
-        stop={"training_iteration": epochs,},
+        stop={
+            "training_iteration": epochs,
+        },
         verbose=1,
         num_samples=num_samples,
         keep_checkpoints_num=2,
@@ -218,4 +215,3 @@ def main():
 
 if __name__ == "__main__":
     main()
-

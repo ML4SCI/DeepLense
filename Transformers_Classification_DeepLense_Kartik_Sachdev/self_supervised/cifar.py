@@ -6,8 +6,6 @@ import copy
 
 import torch
 import torchvision
-from torch import nn
-
 from lightly.loss import NegativeCosineSimilarity
 from lightly.models.modules import BYOLPredictionHead, BYOLProjectionHead
 from lightly.models.utils import deactivate_requires_grad, update_momentum
@@ -17,6 +15,7 @@ from lightly.transforms.byol_transform import (
     BYOLView2Transform,
 )
 from lightly.utils.scheduler import cosine_schedule
+from torch import nn
 
 
 class BYOL(nn.Module):

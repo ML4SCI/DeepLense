@@ -1,5 +1,4 @@
 import numpy as np
-
 from lens_lejepa.data import (
     AxionMassDataset,
     LensClassificationDataset,
@@ -36,7 +35,11 @@ def test_datasets(fake_root):
 
     sr = SyntheticSuperResolutionDataset(fake_root, image_size=32)
     pair = sr[0]
-    assert pair["high_res"].shape == (1, 64, 64) and pair["low_res"].shape == (1, 32, 32)
+    assert pair["high_res"].shape == (1, 64, 64) and pair["low_res"].shape == (
+        1,
+        32,
+        32,
+    )
     assert pair["high_res"].min() >= 0 and pair["high_res"].max() <= 1
 
     ssl = UnlabelledLensDataset(fake_root, image_size=32, max_samples=10)

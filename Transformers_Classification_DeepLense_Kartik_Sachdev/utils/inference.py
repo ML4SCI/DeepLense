@@ -1,28 +1,20 @@
-from __future__ import print_function
-from os.path import join
-from typing import Union
+from abc import ABC
+from typing import *
+
 import matplotlib.pyplot as plt
-import matplotlib
 import numpy as np
 import torch
 from PIL import Image
+from sklearn.metrics import auc, confusion_matrix, roc_curve
+from torch import nn
+from torch.utils.data import DataLoader, Dataset
 from torchvision.transforms import (
-    RandomRotation,
-    RandomCrop,
+    Grayscale,
     Pad,
     Resize,
-    RandomAffine,
     ToTensor,
-    Compose,
-    RandomPerspective,
-    Grayscale,
 )
-from sklearn.metrics import roc_curve, auc, confusion_matrix
 from utils.dataset import DeepLenseDataset
-import torch.nn as nn
-from torch.utils.data import DataLoader, Dataset
-from typing import *
-from abc import ABC
 
 # matplotlib.use("Agg")
 
@@ -32,7 +24,7 @@ class InferenceABC(ABC):
         self,
         best_model: nn.Module,
         test_loader: DataLoader,
-        device: Union[int, str],
+        device: int | str,
         num_classes: int,
         testset: Dataset,
         dataset_name: str,
@@ -166,9 +158,9 @@ class InferenceABC(ABC):
                 self.y_true.append(j)
         self.y_true = np.array(self.y_true)
 
-        fpr = dict()
-        tpr = dict()
-        roc_auc = dict()
+        fpr = {}
+        tpr = {}
+        roc_auc = {}
 
         for i in range(self.num_classes):
             fpr[i], tpr[i], _ = roc_curve(y_true_onehot[:, i], y_score[:, i])
@@ -186,15 +178,15 @@ class InferenceABC(ABC):
         plt.plot(
             fpr["micro"],
             tpr["micro"],
-            label="micro-average ROC curve (area = {0:0.4f})"
-            "".format(roc_auc["micro"]),
+            label="micro-average ROC curve (area = {:0.4f})".format(roc_auc["micro"]),
         )
         for i in range(self.num_classes):
             plt.plot(
                 fpr[i],
                 tpr[i],
-                label="ROC curve of class " + self.inv_map[i] + " (area = {0:0.4f})"
-                "".format(roc_auc[i]),
+                label="ROC curve of class "
+                + self.inv_map[i]
+                + f" (area = {roc_auc[i]:0.4f})",
             )
 
         plt.plot([0, 1], [0, 1], "k--")
@@ -277,19 +269,17 @@ class Inference(InferenceABC):
     def infer_plot_roc(self):
         """Plots `ROC` curve"""
         total = 0
-        all_test_loss = []
-        all_test_accuracy = []
         self.label_true_arr = []
         self.label_true_arr_onehot = []
         self.label_pred_arr = []
         self.pred_arr = []
         plt.rcParams.update(plt.rcParamsDefault)
-        fig = plt.figure()
+        plt.figure()
 
         correct = 0
         with torch.no_grad():
             self.best_model.eval()
-            for i, (x, t) in enumerate(self.test_loader):
+            for _i, (x, t) in enumerate(self.test_loader):
                 x = x.to(self.device)
                 t = t.to(self.device)
                 y = self.best_model(x)
@@ -311,7 +301,7 @@ class Inference(InferenceABC):
         self,
         model: torch.nn.Module,
         x: Any,
-        device: Union[int, str],
+        device: int | str,
         labels_map: dict,
         resize1: int,
         resize2: int,
@@ -346,7 +336,7 @@ class Inference(InferenceABC):
 
         print("###########################")
         header = "angle |  " + "  ".join(
-            ["{}".format(value) for key, value in labels_map.items()]
+            [f"{value}" for key, value in labels_map.items()]
         )
         print(header)
         with torch.no_grad():
@@ -360,7 +350,7 @@ class Inference(InferenceABC):
                 y = y.to("cpu").numpy().squeeze()
 
                 angle = r * 45
-                print("{:5d} : {}".format(angle, y))
+                print(f"{angle:5d} : {y}")
         print("###########################")
 
     def test_equivariance(self):
@@ -453,19 +443,17 @@ class InferenceSSL(InferenceABC):
         """Plots `ROC` curve"""
         print("Inference started ...")
         total = 0
-        all_test_loss = []
-        all_test_accuracy = []
         self.label_true_arr = []
         self.label_true_arr_onehot = []
         self.label_pred_arr = []
         self.pred_arr = []
         plt.rcParams.update(plt.rcParamsDefault)
-        fig = plt.figure()
+        plt.figure()
 
         correct = 0
         with torch.no_grad():
             self.best_model.eval()
-            for batch_idx, batch in enumerate(self.test_loader):
+            for _batch_idx, batch in enumerate(self.test_loader):
                 x = batch[0].to(self.device)
                 t = batch[-1].to(self.device)
                 y = self.best_model(x)
@@ -550,20 +538,16 @@ class InferenceRegressionSSL(InferenceABC):
     def infer(self):
         """Plots `ROC` curve"""
         print("Inference started ...")
-        total = 0
-        all_test_loss = []
-        all_test_accuracy = []
         self.label_true_arr = []
         self.label_true_arr_onehot = []
         self.label_pred_arr = []
         self.pred_arr = []
         plt.rcParams.update(plt.rcParamsDefault)
-        fig = plt.figure()
+        plt.figure()
 
-        correct = 0
         with torch.no_grad():
             self.best_model.eval()
-            for batch_idx, batch in enumerate(self.test_loader):
+            for _batch_idx, batch in enumerate(self.test_loader):
                 x = batch[0].to(self.device)
                 t = batch[-1].to(self.device)
                 y = self.best_model(x)

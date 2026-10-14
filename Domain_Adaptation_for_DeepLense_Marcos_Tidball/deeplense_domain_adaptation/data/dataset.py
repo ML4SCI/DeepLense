@@ -1,6 +1,7 @@
-import torch
-from torch.utils.data import Dataset, DataLoader
 import numpy as np
+import torch
+from torch.utils.data import DataLoader, Dataset
+
 
 class NumpyDataset(Dataset):
     def __init__(self, data_path, labels_path, transform, three_channels=False):
@@ -22,8 +23,8 @@ class NumpyDataset(Dataset):
             If True the one-channel image is copied over the other channels, creating a three-channel image.
         """
 
-        self.data = np.load(data_path, mmap_mode='r')
-        self.labels = np.load(labels_path, mmap_mode='r')
+        self.data = np.load(data_path, mmap_mode="r")
+        self.labels = np.load(labels_path, mmap_mode="r")
 
         self.transform = transform
         self.three_channels = three_channels
@@ -34,8 +35,8 @@ class NumpyDataset(Dataset):
     def __getitem__(self, idx):
         data = self.data[idx]
         if self.three_channels:
-            data = np.tile(data, (3, 1, 1)) # copies 2d array to the other 3 channels
-        
+            data = np.tile(data, (3, 1, 1))  # copies 2d array to the other 3 channels
+
         data = data.astype(np.float32)
         data = self.transform(torch.from_numpy(data))
 
@@ -43,7 +44,16 @@ class NumpyDataset(Dataset):
 
         return data, label
 
-def get_dataloader(data_path, labels_path, augmentations, bs=100, three_channels=False, num_workers=2, shuffle=False):
+
+def get_dataloader(
+    data_path,
+    labels_path,
+    augmentations,
+    bs=100,
+    three_channels=False,
+    num_workers=2,
+    shuffle=False,
+):
     """
     Creates PyTorch DataLoaders that load image NumPy arrays and labels NumPy arrays and applies transforms to them in a memory-efficient manner.
 
@@ -74,8 +84,10 @@ def get_dataloader(data_path, labels_path, augmentations, bs=100, three_channels
 
     # create dataset
     dataset = NumpyDataset(data_path, labels_path, augmentations, three_channels)
-    
+
     # create dataloader
-    dataloader = DataLoader(dataset, shuffle=shuffle, batch_size=bs, num_workers=num_workers)
-    
+    dataloader = DataLoader(
+        dataset, shuffle=shuffle, batch_size=bs, num_workers=num_workers
+    )
+
     return dataloader

@@ -1,10 +1,8 @@
-from typing import Optional
-
 import albumentations as A
+import numpy as np
 from albumentations.pytorch import ToTensorV2
 from PIL import Image, ImageFilter, ImageOps
 from timm.data import create_transform
-from torch.utils.data import DataLoader, Dataset
 from torchvision import transforms
 from torchvision.transforms import (
     Compose,
@@ -20,11 +18,9 @@ from torchvision.transforms import (
     Resize,
     ToTensor,
 )
-import numpy as np
 
-def get_transform_train(
-    upsample_size: int, final_size: int, channels: Optional[int] = 1
-):
+
+def get_transform_train(upsample_size: int, final_size: int, channels: int | None = 1):
     """Trainset transformation
 
     Args:
@@ -61,7 +57,7 @@ def get_transform_train(
     for transform in transform_list:
         random_transform.append(RandomApply([transform], transform_prob))
 
-    transform_simple = Compose(
+    Compose(
         [
             Resize(final_size),
             Grayscale(num_output_channels=1),
@@ -105,7 +101,7 @@ def get_transform_train(
     return transform_effective
 
 
-def get_transform_test(final_size: int, channels: Optional[int] = 1):
+def get_transform_test(final_size: int, channels: int | None = 1):
     """Testset transformation
 
     Args:
@@ -281,9 +277,7 @@ class DefaultTransformations:
 
     def transform_factory(self):
         random_transform = []
-        normalize = transforms.Normalize(
-            mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225]
-        )
+        transforms.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225])
 
         transform_1 = transforms.Compose(
             [
@@ -305,7 +299,7 @@ class DefaultTransformations:
         for transform in transform_list:
             random_transform.append(transforms.RandomApply([transform], transform_prob))
 
-        transform_3 = transforms.Compose(
+        transforms.Compose(
             [
                 transforms.RandomResizedCrop(150, scale=(0.08, 1.0)),
                 transforms.RandomHorizontalFlip(),
@@ -318,7 +312,7 @@ class DefaultTransformations:
                 # normalize,
             ]
         )
-        transform_4 = transforms.Compose(
+        transforms.Compose(
             [
                 transforms.RandomResizedCrop(150, scale=(0.08, 1.0)),
                 transforms.RandomHorizontalFlip(),
@@ -333,7 +327,7 @@ class DefaultTransformations:
             ]
         )
 
-        transform_random = create_transform(
+        create_transform(
             input_size=150,
             is_training=True,
             color_jitter=0.4,

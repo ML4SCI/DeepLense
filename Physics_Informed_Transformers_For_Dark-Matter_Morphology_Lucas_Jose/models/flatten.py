@@ -1,4 +1,5 @@
-from torch import nn, Tensor
+from torch import Tensor, nn
+
 
 class Flatten(nn.Module):
     """
@@ -17,7 +18,7 @@ class Flatten(nn.Module):
 
     def __init__(self, num_neurons_flatten: int):
         # Initialize the superclass
-        super(Flatten, self).__init__()
+        super().__init__()
         self.num_neurons_flatten = num_neurons_flatten
 
     def forward(self, x: Tensor) -> Tensor:
