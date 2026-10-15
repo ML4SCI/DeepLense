@@ -14,6 +14,7 @@ from utils.util import (
     get_last_layer_features,
 )
 from torchsummary import summary
+import argparse
 from models.byol import BYOLSingleChannel, FinetuneModelByol
 import torchvision
 from models.utils.finetune_model import FinetuneModel
@@ -22,6 +23,11 @@ from models.utils.finetune_model import FinetuneModel
 device = "cuda"  # torch.device("cuda" if torch.cuda.is_available() else "cpu")
 learning_method = "contrastive_embedding"
 saved_model_path = "/home/kartik/git/DeepLense/Transformers_Classification_DeepLense_Kartik_Sachdev/logger/2023-07-23-13-30-24/checkpoint/Resnet_finetune_Model_II_2023-07-23-13-30-24.pt"
+parser = argparse.ArgumentParser()
+parser.add_argument('--saved_model_path', type=str, required=True,
+                    help='Path to saved BYOL model checkpoint')
+args = parser.parse_args()
+saved_model_path = args.saved_model_path
 
 # Set hyperparameters
 batch_size = 512

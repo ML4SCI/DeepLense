@@ -6,13 +6,18 @@ from utils.dataset import DefaultDatasetSetup
 from models.cnn_zoo import CustomResNet
 from utils.losses.contrastive_loss import ContrastiveLossEuclidean
 from utils.train import train_simplistic
+import argparse
 from utils.util import load_model_add_head
 from torchsummary import summary
 
 # Set device
 device = "cuda"  # torch.device("cuda" if torch.cuda.is_available() else "cpu")
 learning_method = "contrastive_embedding"
-saved_model_path = "/home/kartik/git/deepLense_transformer_ssl/output/pretrained_contrastive_embedding.pth"
+parser = argparse.ArgumentParser()
+parser.add_argument('--saved_model_path', type=str, required=True,
+                    help='Path to saved pretrained model checkpoint')
+args = parser.parse_args()
+saved_model_path = args.saved_model_path
 
 # Set hyperparameters
 batch_size = 128
