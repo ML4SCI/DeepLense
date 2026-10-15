@@ -20,6 +20,35 @@ Use the following to install the required libraries in a virtual environment of 
 
 `pip install -r requirements.txt`
 
+### Running test.ipynb
+
+Before running `test.ipynb`, ensure you have the required pretrained weights and grid artifacts:
+
+**Required Files:**
+
+1. **Pretrained Model Weights:**
+   - `vdl_weights.pt` - Pretrained model weights (must be in the root directory)
+   - **How to obtain:** Train the model using `python train.py --exp-name vdl`
+   - Note: Training requires the dataset and may take significant time. The weights will be saved as `vdl_weights.pt` in the root directory upon completion.
+
+2. **Grid Matrices** (should be in `grid_matrices/` directory):
+   - `scatter_to_log_128.pt`
+   - `forward_from_log_128.pt`
+   - `scatter_from_log_128.pt`
+   - `sparse_grid_fracs_euclid_backward.pt`
+   - **How to obtain:** These files are included in the repository in the `grid_matrices/` directory. If they are missing, you can regenerate them by running the creation notebooks:
+     - `create_log_grid.ipynb` (generates `scatter_to_log_128.pt`)
+     - `create_log_forward_grid.ipynb` (generates `forward_from_log_128.pt`)
+     - `create_log_crop_grid.ipynb` (generates `scatter_from_log_128.pt`)
+     - `create_backward_grid.ipynb` (generates `sparse_grid_fracs_euclid_backward.pt`)
+
+**Quick Start:**
+1. Install dependencies: `pip install -r requirements.txt`
+2. Ensure all required files are present (the notebook includes a setup cell that checks this automatically)
+3. Run `test.ipynb` cells in order
+
+The `test.ipynb` notebook includes a setup cell that automatically checks for all required files and provides clear error messages with instructions if any files are missing.
+
 Do find the implementation in Section 4 if you want to skip to it.
 
 Observed galaxy images of the [Galaxy10 DECaLS Dataset](https://astronn.readthedocs.io/en/latest/galaxy10.html) are used in the analyses of this work.
