@@ -58,6 +58,7 @@ def evaluate(model, data_loader, loss_fn, device):
     loss.append(loss_fn(logits, y))
     accuracy.append(accuracy_fn(logits, y, num_classes=NUM_CLASSES))
     class_auroc.append(auroc_fn(logits, y, num_classes=NUM_CLASSES, average=None))
+    micro_auroc.append(auroc_fn(logits, y, num_classes=NUM_CLASSES, average="micro"))
     macro_auroc.append(auroc_fn(logits, y, num_classes=NUM_CLASSES, average="macro"))
 
     result = {
@@ -169,9 +170,9 @@ if __name__ == "__main__":
         roc_auc = dict()
         for idx, cls in enumerate(LABELS):
             class_truth = (metrics["ground_truth"].numpy() == idx).astype(int)
-            class_pred = torch.nn.functional.softmax(metrics["logits"]).numpy()[
-                ..., idx
-            ]
+            class_pred = torch.nn.functional.softmax(
+                metrics["logits"], dim=-1
+            ).numpy()[..., idx]
             fpr[idx], tpr[idx], _ = roc_curve(class_truth, class_pred)
             _ = axes[0].plot(
                 fpr[idx],
