@@ -11,6 +11,8 @@ import csv
 import json
 from pathlib import Path
 
+from lens_lejepa.models import is_encoder
+
 COLUMNS = {
     "classification": ["accuracy", "mean_auroc", "macro_f1"],
     "regression": ["mae_dex", "rmse_dex", "r2", "pearson_r"],
@@ -31,7 +33,7 @@ def collect(runs: Path) -> list[dict]:
                 "task": config["task"],
                 "run": summary_path.parent.name,
                 "backbone": config["backbone"],
-                "adaptation": config["adaptation"] if config["backbone"].startswith("vit") else "-",
+                "adaptation": config["adaptation"] if is_encoder(config["backbone"]) else "-",
                 "train": config["train_dataset"],
                 "shots": "full" if config["shots"] is None else config["shots"],
                 "test": Path(test["test_root"]).name,
