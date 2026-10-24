@@ -21,6 +21,7 @@ BYOL trains two networks, the target network and the online network, both in par
 
 <img src="byol.png">
 
+
 ## Classification Results
 The values in the Model columns represent AUC for axion, cdm and no_sub respectively.
 e.g (0.97, 0.96, 1.0) represents 0.97 AUC for axion, 0.96 AUC for cdm and 1.0 AUC for no_sub.
@@ -34,6 +35,30 @@ All results were calculated on a **separate test set**.
 |  Contrastive Learning Rotation Pretext | 0.92, 0.91, 1.0 |**0.99, 0.99, 1.0** | **1.0, 0.99, 1.0** |   
 |Contrastive Learning Gaussian Noise Pretext| 0.96,0.95,1.0   | **0.99, 0.99, 1.0**     |   **1.0, 0.99, 1.0**    | 
 | Bootstrap Your Own Latent | 0.95, 0.93, 1.0 |    **1.0, 0.98, 1.0**  |   0.98, 0.92, 0.98   | 
+
+## Dataset Setup
+
+  The experiments use simulated strong gravitational lensing datasets with 3 substructure classes:
+  - **`axion`**: Vortex substructure (axion dark matter models)
+  - **`cdm`**: Cold Dark Matter point-mass subhalos
+  - **`no_sub`**: No dark matter substructure (smooth lens baseline)
+
+### Download Links
+  - **Model I (Train)**: [Google Drive](https://drive.google.com/file/d/1QMVLpqag6S9JWqzmGM_pK4C0F1eBVIfV/view?usp=sharing)
+  - **Model I Test (Test)**: [Google Drive](https://drive.google.com/file/d/1rUAKLLS3p9jDaL9R9m84JVKvMcUuVsO1/view?usp=sharing)
+  - **All Models (Google Drive Folder)**: [DeepLense Datasets](https://drive.google.com/drive/folders/1m7QzSzXyE8u_QoYplN9dIe-X2pf1KXxt)
+
+You can download them via terminal using `gdown`:
+```bash
+pip install gdown
+# Download Model I train & test archives
+gdown 1QMVLpqag6S9JWqzmGM_pK4C0F1eBVIfV
+gdown 1rUAKLLS3p9jDaL9R9m84JVKvMcUuVsO1
+
+# Extract archives
+tar -xf Model_I.tar
+tar -xf Model_I_Test.tar
+```
 
 ## Conclusion and Future Goals
 So far, we can see that the results for self-supervised learning seem superior to their ResNet50 Baseline. 
