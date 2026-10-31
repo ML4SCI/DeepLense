@@ -1,5 +1,4 @@
 absl-py==2.3.1
-apturl==0.5.2
 asttokens==3.0.0
 bcrypt==3.2.0
 blinker==1.4
