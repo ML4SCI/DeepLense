@@ -17,7 +17,7 @@ from utils import get_device, set_seed
 from eval import evaluate
 
 
-def train_step(model, images, labels, optimizer, scheduler, criterion, device="cpu"):
+def train_step(model, images, labels, optimizer, criterion, device="cpu"):
     """
     Takes one train step (forward + backward pass) on a batch
 
@@ -31,8 +31,6 @@ def train_step(model, images, labels, optimizer, scheduler, criterion, device="c
         Ground truth of shape [None]
     optimizer : torch.optim.Optimizer
         Optimizer algorithm
-    scheduler : torch.optim.lr_scheduler._LRScheduler (or something similar)
-        Train scheduler to use (If None, no scheduler is used)
     criterion : torch.nn.CrossEntropyLoss (or similar)
         Loss Function
     device : str
@@ -53,8 +51,6 @@ def train_step(model, images, labels, optimizer, scheduler, criterion, device="c
     loss = criterion(logits, labels)  # Compute loss
     loss.backward()  # Backward pass
     optimizer.step()  # Optimize weights step
-    if scheduler is not None:
-        scheduler.step(loss)  # Modify learning rate if scheduler is set
     return loss
 
 
@@ -115,7 +111,7 @@ def train(
             images, labels = batch_data  # Get data
             # Do forward + backward pass
             loss = train_step(
-                model, images, labels, optimizer, scheduler, criterion, device=device
+                model, images, labels, optimizer, criterion, device=device
             )
 
             # Compute metrics for validation data after every few epochs
@@ -128,6 +124,7 @@ def train(
                     "epoch": epoch,
                     "batch_num": batch_num,
                     "train/loss": loss,
+                    "train/lr": optimizer.param_groups[0]["lr"],
                     "val/loss": val_metrics["loss"],
                     "val/accuracy": val_metrics["accuracy"],
                     "val/micro_auroc": val_metrics["micro_auroc"],
@@ -169,6 +166,10 @@ def train(
                     torch.save(
                         model.state_dict(), os.path.join(wandb.run.dir, "best_model.pt")
                     )
+
+        # Step learning rate scheduler at the end of each epoch
+        if scheduler is not None:
+            scheduler.step()
 
         # Sync best model at a lesser frequency (i.e. at the end of each epoch)
         wandb.save(os.path.join(wandb.run.dir, "best_model.pt"))
@@ -319,7 +320,7 @@ if __name__ == "__main__":
         # Scheduler
         if run_config.decay_lr:
             scheduler = CosineAnnealingWarmRestarts(
-                optimizer, T_0=15, T_mult=1, eta_min=1e-6, verbose=True
+                optimizer, T_0=15, T_mult=1, eta_min=1e-6
             )
         else:
             scheduler = None
