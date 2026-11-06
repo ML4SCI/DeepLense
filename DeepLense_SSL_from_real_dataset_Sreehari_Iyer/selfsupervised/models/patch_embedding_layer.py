@@ -31,8 +31,8 @@ class patch_embedding(nn.Module):
                 f'image width {image_size[1]} is not divisible by patch width {patch_size[1]}'
             self.resolution = [image_size[0]//patch_size[0], image_size[1]//patch_size[1]]
         else:
-            self.pad_h = (self.patch_size[0] - H % self.patch_size[0]) % self.patch_size[0]
-            self.pad_w = (self.patch_size[1] - W % self.patch_size[1]) % self.patch_size[1]
+            self.pad_h = (self.patch_size[0] - image_size[0] % self.patch_size[0]) % self.patch_size[0]
+            self.pad_w = (self.patch_size[1] - image_size[1] % self.patch_size[1]) % self.patch_size[1]
             self.resolution = [(image_size[0]+self.pad_h)//patch_size[0], (image_size[1]+self.pad_w)//patch_size[1]]
         self.num_patches = (self.resolution[0])*(self.resolution[1])
         self.proj = nn.Conv2d(input_channels, patch_embedding_dim, kernel_size=patch_size, stride=patch_size, bias=bias)
@@ -88,8 +88,8 @@ class ConvPatchEmbed(nn.Module):
                 f'image width {image_size[1]} is not divisible by patch width {patch_size[1]}'
             self.resolution = [image_size[0]//patch_size[0], image_size[1]//patch_size[1]]
         else:
-            self.pad_h = (self.patch_size[0] - H % self.patch_size[0]) % self.patch_size[0]
-            self.pad_w = (self.patch_size[1] - W % self.patch_size[1]) % self.patch_size[1]
+            self.pad_h = (self.patch_size[0] - image_size[0] % self.patch_size[0]) % self.patch_size[0]
+            self.pad_w = (self.patch_size[1] - image_size[1] % self.patch_size[1]) % self.patch_size[1]
             self.resolution = [(image_size[0]+self.pad_h)//patch_size[0], (image_size[1]+self.pad_w)//patch_size[1]]
         self.num_patches = (self.resolution[0])*(self.resolution[1])
 
@@ -211,8 +211,8 @@ class channel_vit_patch_embedding(nn.Module):
                 f'image width {image_size[1]} is not divisible by patch width {patch_size[1]}'
             self.num_patches = (image_size[0]//patch_size[0])*(image_size[1]//patch_size[1])*input_channels
         else:
-            self.pad_h = (self.patch_size[0] - H % self.patch_size[0]) % self.patch_size[0]
-            self.pad_w = (self.patch_size[1] - W % self.patch_size[1]) % self.patch_size[1]
+            self.pad_h = (self.patch_size[0] - image_size[0] % self.patch_size[0]) % self.patch_size[0]
+            self.pad_w = (self.patch_size[1] - image_size[1] % self.patch_size[1]) % self.patch_size[1]
             self.num_patches = ((image_size[0]+self.pad_h)//patch_size[0])*((image_size[1]+self.pad_w)//patch_size[1])*input_channels
         self.proj = nn.Conv3d(1, patch_embedding_dim, kernel_size=(1, patch_size[0], patch_size[1]), stride=(1, patch_size[0], patch_size[1]), bias=bias)
         # self.channel_embed = nn.parameter.Parameter(
