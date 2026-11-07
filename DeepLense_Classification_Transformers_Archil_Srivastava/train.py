@@ -187,6 +187,7 @@ if __name__ == "__main__":
     )
     parser.add_argument("--log_interval", type=int, default=100)
     parser.add_argument("--project", type=str, default="ml4sci_deeplense_final")
+    parser.add_argument("--entity", type=str, default=os.environ.get("WANDB_ENTITY", None))
 
     # Timm-Specific parameters
     parser.add_argument("--model_name", type=str, default="vit_base_patch16_224")
@@ -234,7 +235,7 @@ if __name__ == "__main__":
 
     # Start wandb run
     with wandb.init(
-        entity="_archil",
+        entity=run_config.entity,
         project=run_config.project,
         config=run_config,
         group=group,
