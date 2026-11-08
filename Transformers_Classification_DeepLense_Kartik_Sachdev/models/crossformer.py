@@ -1,11 +1,13 @@
+import itertools
+
 import torch
-from torch import nn, einsum
 from einops import rearrange
 from einops.layers.torch import Rearrange, Reduce
-import torch.nn.functional as F
+from torch import einsum, nn
 
 # file adapted from: https://github.com/lucidrains/vit-pytorch/blob/main/vit_pytorch/crossformer.py
 # helpers
+
 
 def cast_tuple(val, length=1):
     return val if isinstance(val, tuple) else ((val,) * length)
@@ -21,11 +23,11 @@ class CrossEmbedLayer(nn.Module):
         num_scales = len(kernel_sizes)
 
         # calculate the dimension at each scale
-        dim_scales = [int(dim_out / (2 ** i)) for i in range(1, num_scales)]
+        dim_scales = [int(dim_out / (2**i)) for i in range(1, num_scales)]
         dim_scales = [*dim_scales, dim_out - sum(dim_scales)]
 
         self.convs = nn.ModuleList([])
-        for kernel, dim_scale in zip(kernel_sizes, dim_scales):
+        for kernel, dim_scale in zip(kernel_sizes, dim_scales, strict=False):
             self.convs.append(
                 nn.Conv2d(
                     dim_in,
@@ -37,7 +39,7 @@ class CrossEmbedLayer(nn.Module):
             )
 
     def forward(self, x):
-        fmaps = tuple(map(lambda conv: conv(x), self.convs))
+        fmaps = tuple(conv(x) for conv in self.convs)
         return torch.cat(fmaps, dim=1)
 
 
@@ -95,7 +97,7 @@ class Attention(nn.Module):
         }, "attention type must be one of local or distant"
         heads = dim // dim_head
         self.heads = heads
-        self.scale = dim_head ** -0.5
+        self.scale = dim_head**-0.5
         inner_dim = dim_head * heads
 
         self.attn_type = attn_type
@@ -145,8 +147,8 @@ class Attention(nn.Module):
 
         # split heads
 
-        q, k, v = map(
-            lambda t: rearrange(t, "b (h d) x y -> b h (x y) d", h=heads), (q, k, v)
+        q, k, v = (
+            rearrange(t, "b (h d) x y -> b h (x y) d", h=heads) for t in (q, k, v)
         )
         q = q * self.scale
 
@@ -279,7 +281,7 @@ class CrossFormer(nn.Module):
 
         last_dim = dim[-1]
         dims = [channels, *dim]
-        dim_in_and_out = tuple(zip(dims[:-1], dims[1:]))
+        dim_in_and_out = tuple(itertools.pairwise(dims))
 
         # layers
 
@@ -298,7 +300,7 @@ class CrossFormer(nn.Module):
             global_window_size,
             local_window_size,
             cross_embed_kernel_sizes,
-            cross_embed_strides,
+            cross_embed_strides, strict=False,
         ):
             self.layers.append(
                 nn.ModuleList(

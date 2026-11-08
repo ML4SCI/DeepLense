@@ -1,8 +1,9 @@
-import torch.nn as nn
+from torch import nn
+
 
 class FinetuneClassifierTransformer(nn.Module):
     def __init__(self, backbone, head):
-        super(FinetuneClassifierTransformer, self).__init__()
+        super().__init__()
         self.backbone = backbone
         self.head = head
 

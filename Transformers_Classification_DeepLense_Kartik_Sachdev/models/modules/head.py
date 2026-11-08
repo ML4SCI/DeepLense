@@ -1,13 +1,12 @@
-import torch.nn as nn
-from typing import Optional, List, Tuple
 import torch
+from torch import nn
+
 
 class ProjectionHead(nn.Module):
-
     def __init__(
-        self, blocks: List[Tuple[int, int, Optional[nn.Module], Optional[nn.Module]]]
+        self, blocks: list[tuple[int, int, nn.Module | None, nn.Module | None]]
     ):
-        super(ProjectionHead, self).__init__()
+        super().__init__()
 
         layers = []
         for input_dim, output_dim, batch_norm, non_linearity in blocks:
@@ -21,13 +20,13 @@ class ProjectionHead(nn.Module):
 
     def forward(self, x: torch.Tensor):
         return self.layers(x)
-    
-class BYOLProjectionHead(ProjectionHead):
 
+
+class BYOLProjectionHead(ProjectionHead):
     def __init__(
         self, input_dim: int = 2048, hidden_dim: int = 4096, output_dim: int = 256
     ):
-        super(BYOLProjectionHead, self).__init__(
+        super().__init__(
             [
                 (input_dim, hidden_dim, nn.BatchNorm1d(hidden_dim), nn.ReLU()),
                 (hidden_dim, output_dim, None, None),
@@ -39,7 +38,7 @@ class BYOLPredictionHead(ProjectionHead):
     def __init__(
         self, input_dim: int = 256, hidden_dim: int = 4096, output_dim: int = 256
     ):
-        super(BYOLPredictionHead, self).__init__(
+        super().__init__(
             [
                 (input_dim, hidden_dim, nn.BatchNorm1d(hidden_dim), nn.ReLU()),
                 (hidden_dim, output_dim, None, None),

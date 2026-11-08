@@ -1,14 +1,16 @@
-from .crossformer import CrossFormer
-from .twins_svt import TwinsSVT
-from .levit import LeViT
-from .pit import PiT
-from .cait import CaiT
-from .cross_vit import CrossViT
-from .swin import SwinTransformer
-from .cvt import CvT
+from typing import Any
+
 from vit_pytorch.cct import CCT
 from vit_pytorch.t2t import T2TViT
-from typing import Any
+
+from .cait import CaiT
+from .cross_vit import CrossViT
+from .crossformer import CrossFormer
+from .cvt import CvT
+from .levit import LeViT
+from .pit import PiT
+from .swin import SwinTransformer
+from .twins_svt import TwinsSVT
 
 
 def GetCrossFormer(num_classes: int, num_channels: int):
@@ -21,7 +23,7 @@ def GetCrossFormer(num_classes: int, num_channels: int):
 
     Returns:
         model (nn.Module): CrossFormer model
-    
+
     https://arxiv.org/pdf/2203.13387.pdf
     """
     model = CrossFormer(
@@ -45,7 +47,7 @@ def GetTwinsSVT(num_classes: int, num_channels: int):
 
     Returns:
         model (nn.Module): TwinsSVT model
-    
+
     https://arxiv.org/pdf/2104.13840.pdf
     """
 
@@ -89,7 +91,7 @@ def GetLeViT(num_classes: int, num_channels: int, img_size: int):
 
     Returns:
         model (nn.Module): LeViT model
-    
+
     https://openaccess.thecvf.com/content/ICCV2021/papers/Graham_LeViT_A_Vision_Transformer_in_ConvNets_Clothing_for_Faster_Inference_ICCV_2021_paper.pdf
     """
 
@@ -117,7 +119,7 @@ def GetPiT(num_classes: int, num_channels: int, img_size: int):
 
     Returns:
         model (nn.Module): PiT model
-    
+
     https://arxiv.org/pdf/2103.16302.pdf
     """
 
@@ -150,7 +152,7 @@ def GetCCT(num_classes: int, num_channels: int, img_size: int):
 
     Returns:
         model (nn.Module): CCT model
-    
+
     https://arxiv.org/pdf/2104.05704v4.pdf
     """
     model = CCT(
@@ -195,34 +197,33 @@ def TransformerModels(
     num_classes: int,
     num_channels: int,
     img_size: int,
-    **kwargs: Any
+    **kwargs: Any,
 ):
-
     """Get different transform architecture
 
     Args:
-        transformer_type (str): 
+        transformer_type (str):
             name of the transformer ["CvT", "CCT", "TwinsSVT", "LeViT", "CaiT", "CrossViT", "PiT"]
-        num_classes (int): # of classes for classification 
-        num_channels (int): # of channels of input image 
+        num_classes (int): # of classes for classification
+        num_channels (int): # of channels of input image
         img_size (int): size of input image
 
     Returns:
         model (nn.Module): Required transformer architecture
-    
+
     Example:
         >>>     TransformerModels(
         >>>     transformer_type="LeViT",
         >>>     num_channels=1,
         >>>     num_classes=3,
         >>>     img_size=224,
-        >>>     {   "stages": 3,  
-        >>>         "dim": (64, 128, 128),  
-        >>>         "depth": 5, 
+        >>>     {   "stages": 3,
+        >>>         "dim": (64, 128, 128),
+        >>>         "depth": 5,
         >>>         "heads": (2, 4, 5),
         >>>         "mlp_mult": 2,
         >>>         "dropout": 0.1})
-    
+
     CvT: https://arxiv.org/pdf/2103.15808.pdf \n
     CCT: https://arxiv.org/pdf/2104.05704v4.pdf \n
     TwinsSVT: https://arxiv.org/pdf/2104.13840.pdf \n
@@ -405,7 +406,7 @@ def TransformerModels(
             s2_heads=kwargs["s2_heads"],
             s2_depth=kwargs["s2_depth"],
             s2_mlp_mult=kwargs["s2_mlp_mult"],
-            s3_emb_dim=kwargs["s3_emb_dim"],  
+            s3_emb_dim=kwargs["s3_emb_dim"],
             s3_emb_kernel=kwargs["s3_emb_kernel"],
             s3_emb_stride=kwargs["s3_emb_stride"],
             s3_proj_kernel=kwargs["s3_proj_kernel"],
@@ -427,4 +428,3 @@ def TransformerModels(
             local_window_size=kwargs["local_window_size"],
         )
     return model
-

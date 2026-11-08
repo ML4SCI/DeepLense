@@ -1,11 +1,9 @@
 from math import sqrt
 
 import torch
-from torch import nn, einsum
-import torch.nn.functional as F
-
 from einops import rearrange, repeat
 from einops.layers.torch import Rearrange
+from torch import einsum, nn
 
 # file adapted from: https://github.com/lucidrains/vit-pytorch/blob/main/vit_pytorch/pit.py
 #  helpers
@@ -54,7 +52,7 @@ class Attention(nn.Module):
         project_out = not (heads == 1 and dim_head == dim)
 
         self.heads = heads
-        self.scale = dim_head ** -0.5
+        self.scale = dim_head**-0.5
 
         self.attend = nn.Softmax(dim=-1)
         self.to_qkv = nn.Linear(dim, inner_dim * 3, bias=False)
@@ -66,9 +64,9 @@ class Attention(nn.Module):
         )
 
     def forward(self, x):
-        b, n, _, h = *x.shape, self.heads
+        _b, _n, _, h = *x.shape, self.heads
         qkv = self.to_qkv(x).chunk(3, dim=-1)
-        q, k, v = map(lambda t: rearrange(t, "b n (h d) -> b h n d", h=h), qkv)
+        q, k, v = (rearrange(t, "b n (h d) -> b h n d", h=h) for t in qkv)
 
         dots = einsum("b h i d, b h j d -> b h i j", q, k) * self.scale
 
@@ -168,18 +166,18 @@ class PiT(nn.Module):
         dim_head=64,
         dropout=0.0,
         emb_dropout=0.0,
-        channels=3
+        channels=3,
     ):
         super().__init__()
-        assert (
-            image_size % patch_size == 0
-        ), "Image dimensions must be divisible by the patch size."
-        assert isinstance(
-            depth, tuple
-        ), "depth must be a tuple of integers, specifying the number of blocks before each downsizing"
+        assert image_size % patch_size == 0, (
+            "Image dimensions must be divisible by the patch size."
+        )
+        assert isinstance(depth, tuple), (
+            "depth must be a tuple of integers, specifying the number of blocks before each downsizing"
+        )
         heads = cast_tuple(heads, len(depth))
 
-        patch_dim = channels * patch_size ** 2
+        patch_dim = channels * patch_size**2
 
         self.to_patch_embedding = nn.Sequential(
             nn.Unfold(kernel_size=patch_size, stride=patch_size // 2),
@@ -188,7 +186,7 @@ class PiT(nn.Module):
         )
 
         output_size = conv_output_size(image_size, patch_size, patch_size // 2)
-        num_patches = output_size ** 2
+        num_patches = output_size**2
 
         self.pos_embedding = nn.Parameter(torch.randn(1, num_patches + 1, dim))
         self.cls_token = nn.Parameter(torch.randn(1, 1, dim))
@@ -196,7 +194,7 @@ class PiT(nn.Module):
 
         layers = []
 
-        for ind, (layer_depth, layer_heads) in enumerate(zip(depth, heads)):
+        for ind, (layer_depth, layer_heads) in enumerate(zip(depth, heads, strict=False)):
             not_last = ind < (len(depth) - 1)
 
             layers.append(

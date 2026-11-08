@@ -1,13 +1,15 @@
-import torch
-import torch.nn as nn
-import numpy as np
 import warnings
+
+import numpy as np
+import torch
+from torch import nn
 from torch.nn.functional import cosine_similarity
+
 
 # Define the contrastive loss function
 class ContrastiveLossCrossEntropy(nn.Module):
     def __init__(self, temperature, device):
-        super(ContrastiveLossCrossEntropy, self).__init__()
+        super().__init__()
         self.temperature = temperature
         self.device = device
 
@@ -45,7 +47,7 @@ class ContrastiveLossEuclidean(nn.Module):
 # Define the contrastive loss function
 class ContrastiveLossEmbedding(nn.Module):
     def __init__(self, temperature, device):
-        super(ContrastiveLossEmbedding, self).__init__()
+        super().__init__()
         self.temperature = temperature
         self.device = device
 
@@ -67,7 +69,7 @@ class ContrastiveLossEmbedding(nn.Module):
 
 class SimCLR_Loss(nn.Module):
     def __init__(self, batch_size, temperature):
-        super(SimCLR_Loss, self).__init__()
+        super().__init__()
         self.batch_size = batch_size
         self.temperature = temperature
 
@@ -167,7 +169,7 @@ def contrastive_loss(proj_feat1, proj_feat2, temperature=0.5, neg_pairs="all"):
         max_val = torch.sum(neg_sample_indicators[0]).item() - 1
         if neg_pairs < 0:
             raise ValueError(
-                f"Cannot use a negative amount of negative pairs " f"({neg_pairs})."
+                f"Cannot use a negative amount of negative pairs ({neg_pairs})."
             )
         elif neg_pairs < 1:
             num_retain = int(neg_pairs * len(neg_sample_indicators))
@@ -178,7 +180,7 @@ def contrastive_loss(proj_feat1, proj_feat2, temperature=0.5, neg_pairs="all"):
             warnings.warn(
                 "Increasing the number of negative pairs to use per "
                 f"image in the contrastive loss from {num_retain} to the "
-                f"minimum value of {min_val}."
+                f"minimum value of {min_val}.", stacklevel=2
             )
             num_retain = min_val
         elif num_retain > max_val:  # retain all
@@ -221,19 +223,16 @@ def contrastive_loss(proj_feat1, proj_feat2, temperature=0.5, neg_pairs="all"):
 
 
 def test_simclr_loss():
-    
-    
+
     arr_1 = torch.randn((20, 1, 224, 224))
     arr_3 = torch.randn((19, 1, 224, 224))
-    
+
     assert arr_1.shape[0] != 20, "size correct"
     assert arr_3.shape[0] != 20, f"{arr_3} size not correct"
 
 
 class NegativeCosineSimilarity(torch.nn.Module):
-    """Implementation of the Negative Cosine Simililarity used in the SimSiam[0] paper.
-
-    """
+    """Implementation of the Negative Cosine Simililarity used in the SimSiam[0] paper."""
 
     def __init__(self, dim: int = 1, eps: float = 1e-8) -> None:
         """Same parameters as in torch.nn.CosineSimilarity
@@ -250,7 +249,7 @@ class NegativeCosineSimilarity(torch.nn.Module):
 
     def forward(self, x0: torch.Tensor, x1: torch.Tensor) -> torch.Tensor:
         return -cosine_similarity(x0, x1, self.dim, self.eps).mean()
-    
+
 
 if __name__ == "__main__":
     cos = cosine_similarity

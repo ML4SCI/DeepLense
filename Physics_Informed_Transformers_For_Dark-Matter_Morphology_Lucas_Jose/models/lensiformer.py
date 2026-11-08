@@ -1,26 +1,32 @@
 import torch
-import numpy as np
-from torch import nn
-from torch import Tensor
-from typing import Tuple, Union, List
-import torchvision.transforms as transforms
-from models import FeedForward, TransformerLSABlock, Flatten, ShiftedPatchTokenization, RelativisticPhysicalInformedEncoder
+from torch import Tensor, nn
+
+from models import (
+    FeedForward,
+    Flatten,
+    RelativisticPhysicalInformedEncoder,
+    ShiftedPatchTokenization,
+    TransformerLSABlock,
+)
+
 
 class Lensiformer(nn.Module):
-    def __init__(self,
-                 image_size: int,
-                 patch_size: int,
-                 embed_dim: int,
-                 in_channels: int,
-                 num_classes: int,
-                 num_heads: int,
-                 num_hidden_neurons: int,
-                 num_hidden_layers: int,
-                 transformer_activation: nn.Module,
-                 feedforward_activation: nn.Module,
-                 num_transformer_blocks: int,
-                 device: torch.device,
-                 dropout_rate: float = 0.1):
+    def __init__(
+        self,
+        image_size: int,
+        patch_size: int,
+        embed_dim: int,
+        in_channels: int,
+        num_classes: int,
+        num_heads: int,
+        num_hidden_neurons: int,
+        num_hidden_layers: int,
+        transformer_activation: nn.Module,
+        feedforward_activation: nn.Module,
+        num_transformer_blocks: int,
+        device: torch.device,
+        dropout_rate: float = 0.1,
+    ):
         """
         Initializes Lensiformer, a Relativistic Physics-Informed Vision Transformer (PIViT) Architecture for Dark Matter Morphology.
 
@@ -39,7 +45,7 @@ class Lensiformer(nn.Module):
             device (torch.device): Computational device (CPU/GPU).
             dropout_rate (float, optional): Dropout rate. Defaults to 0.1.
         """
-        super(Lensiformer, self).__init__()
+        super().__init__()
 
         # Initialize parameters
         self.image_size = image_size
@@ -57,33 +63,66 @@ class Lensiformer(nn.Module):
         self.dropout_rate = dropout_rate
 
         # Initialize modules
-        self.initial_tokenizer = ShiftedPatchTokenization(image_size, patch_size, embed_dim, in_channels, device)
-        self.secondary_tokenizer = ShiftedPatchTokenization(image_size, patch_size, embed_dim, in_channels, device)
-        self.encoder = RelativisticPhysicalInformedEncoder(image_size, patch_size, embed_dim, self.initial_tokenizer.get_num_patches(), num_heads, num_hidden_neurons, transformer_activation, num_transformer_blocks, device)
+        self.initial_tokenizer = ShiftedPatchTokenization(
+            image_size, patch_size, embed_dim, in_channels, device
+        )
+        self.secondary_tokenizer = ShiftedPatchTokenization(
+            image_size, patch_size, embed_dim, in_channels, device
+        )
+        self.encoder = RelativisticPhysicalInformedEncoder(
+            image_size,
+            patch_size,
+            embed_dim,
+            self.initial_tokenizer.get_num_patches(),
+            num_heads,
+            num_hidden_neurons,
+            transformer_activation,
+            num_transformer_blocks,
+            device,
+        )
 
         # Transformer blocks
-        self.transformer_blocks = nn.ModuleList([
-            TransformerLSABlock(embed_dim, num_heads, self.initial_tokenizer.get_num_patches(), num_hidden_neurons, transformer_activation, device, dropout_rate)
-            for _ in range(num_transformer_blocks)
-        ])
+        self.transformer_blocks = nn.ModuleList(
+            [
+                TransformerLSABlock(
+                    embed_dim,
+                    num_heads,
+                    self.initial_tokenizer.get_num_patches(),
+                    num_hidden_neurons,
+                    transformer_activation,
+                    device,
+                    dropout_rate,
+                )
+                for _ in range(num_transformer_blocks)
+            ]
+        )
 
         # Flatten and FeedForward layers
-        self.flatten_layer = Flatten((self.initial_tokenizer.get_num_patches() + 1) * embed_dim)
-        self.feedforward_layer = FeedForward(self.flatten_layer.num_neurons_flatten,
-                                             num_classes, feedforward_activation, num_hidden_neurons,
-                                             num_hidden_layers, task_type='multi_classification', dropout=dropout_rate)
+        self.flatten_layer = Flatten(
+            (self.initial_tokenizer.get_num_patches() + 1) * embed_dim
+        )
+        self.feedforward_layer = FeedForward(
+            self.flatten_layer.num_neurons_flatten,
+            num_classes,
+            feedforward_activation,
+            num_hidden_neurons,
+            num_hidden_layers,
+            task_type="multi_classification",
+            dropout=dropout_rate,
+        )
 
     def invert_lens(self, images: Tensor) -> Tensor:
         batch_size = images.size(0)
 
         # Tokenize input images into patches
-        initial_patches = self.initial_tokenizer(images.reshape(batch_size, 1, self.image_size, self.image_size))
+        initial_patches = self.initial_tokenizer(
+            images.reshape(batch_size, 1, self.image_size, self.image_size)
+        )
 
         # Encode images and patches
         lens_corrected_images = self.encoder(images, initial_patches)
 
         return lens_corrected_images
-
 
     def forward(self, images: Tensor) -> Tensor:
         """
@@ -98,11 +137,17 @@ class Lensiformer(nn.Module):
         batch_size = images.size(0)
 
         # Tokenize input images into patches
-        initial_patches = self.initial_tokenizer(images.reshape(batch_size, 1, self.image_size, self.image_size))
+        initial_patches = self.initial_tokenizer(
+            images.reshape(batch_size, 1, self.image_size, self.image_size)
+        )
 
         # Encode images and patches
         lens_corrected_images = self.encoder(images, initial_patches)
-        lens_corrected_patches = self.secondary_tokenizer(lens_corrected_images.reshape(batch_size, 1, self.image_size, self.image_size))
+        lens_corrected_patches = self.secondary_tokenizer(
+            lens_corrected_images.reshape(
+                batch_size, 1, self.image_size, self.image_size
+            )
+        )
 
         # Pass through transformer blocks
         for block in self.transformer_blocks:

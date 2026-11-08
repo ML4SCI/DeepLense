@@ -1,7 +1,8 @@
 import torch
-import torch.nn as nn
 import torch.nn.functional as F
+from torch import nn
 from tqdm import tqdm
+
 
 class EMA:
     def __init__(self, beta):
@@ -10,7 +11,9 @@ class EMA:
         self.step = 0
 
     def update_model_average(self, ma_model, current_model):
-        for current_params, ma_params in zip(current_model.parameters(), ma_model.parameters()):
+        for current_params, ma_params in zip(
+            current_model.parameters(), ma_model.parameters(), strict=False
+        ):
             old_weight, up_weight = ma_params.data, current_params.data
             ma_params.data = self.update_average(old_weight, up_weight)
 
@@ -30,9 +33,10 @@ class EMA:
     def reset_parameters(self, ema_model, model):
         ema_model.load_state_dict(model.state_dict())
 
+
 class SelfAttention(nn.Module):
     def __init__(self, channels, size):
-        super(SelfAttention, self).__init__()
+        super().__init__()
         self.channels = channels
         self.size = size
         self.mha = nn.MultiheadAttention(channels, 4, batch_first=True)
@@ -50,7 +54,10 @@ class SelfAttention(nn.Module):
         attention_value, _ = self.mha(x_ln, x_ln, x_ln)
         attention_value = attention_value + x
         attention_value = self.ff_self(attention_value) + attention_value
-        return attention_value.swapaxes(2, 1).view(-1, self.channels, self.size, self.size)
+        return attention_value.swapaxes(2, 1).view(
+            -1, self.channels, self.size, self.size
+        )
+
 
 class DoubleConv(nn.Module):
     def __init__(self, in_channels, out_channels, mid_channels=None, residual=False):
@@ -72,6 +79,7 @@ class DoubleConv(nn.Module):
         else:
             return self.double_conv(x)
 
+
 class Down(nn.Module):
     def __init__(self, in_channels, out_channels, emb_dim=256):
         super().__init__()
@@ -83,17 +91,17 @@ class Down(nn.Module):
 
         self.emb_layer = nn.Sequential(
             nn.SiLU(),
-            nn.Linear(
-                emb_dim,
-                out_channels
-            ),
+            nn.Linear(emb_dim, out_channels),
         )
 
     def forward(self, x, t, cond):
         x = self.maxpool_conv(x)
         emb = self.emb_layer(t)[:, :, None, None].repeat(1, 1, x.shape[-2], x.shape[-1])
-        cond = nn.functional.interpolate(cond, size=(x.shape[-2], x.shape[-1]), mode='bilinear', align_corners=True)
+        cond = nn.functional.interpolate(
+            cond, size=(x.shape[-2], x.shape[-1]), mode="bilinear", align_corners=True
+        )
         return x + emb + cond
+
 
 class Up(nn.Module):
     def __init__(self, in_channels, out_channels, emb_dim=256):
@@ -107,10 +115,7 @@ class Up(nn.Module):
 
         self.emb_layer = nn.Sequential(
             nn.SiLU(),
-            nn.Linear(
-                emb_dim,
-                out_channels
-            ),
+            nn.Linear(emb_dim, out_channels),
         )
 
     def forward(self, x, skip_x, t, cond):
@@ -118,8 +123,11 @@ class Up(nn.Module):
         x = torch.cat([skip_x, x], dim=1)
         x = self.conv(x)
         emb = self.emb_layer(t)[:, :, None, None].repeat(1, 1, x.shape[-2], x.shape[-1])
-        cond = nn.functional.interpolate(cond, size=(x.shape[-2], x.shape[-1]), mode='bilinear', align_corners=True)
+        cond = nn.functional.interpolate(
+            cond, size=(x.shape[-2], x.shape[-1]), mode="bilinear", align_corners=True
+        )
         return x + emb + cond
+
 
 class UNet(nn.Module):
     def __init__(self, c_in=1, c_out=1, time_dim=256, device="cuda"):
@@ -180,9 +188,17 @@ class UNet(nn.Module):
         x = self.sa6(x)
         output = self.outc(x)
         return output
-    
+
+
 class Diffusion:
-    def __init__(self, noise_steps=1000, beta_start=1e-4, beta_end=0.02, img_size=64, device="cuda"):
+    def __init__(
+        self,
+        noise_steps=1000,
+        beta_start=1e-4,
+        beta_end=0.02,
+        img_size=64,
+        device="cuda",
+    ):
         self.noise_steps = noise_steps
         self.beta_start = beta_start
         self.beta_end = beta_end
@@ -190,7 +206,7 @@ class Diffusion:
         self.device = device
 
         self.beta = self.prepare_noise_schedule().to(device)
-        self.alpha = 1. - self.beta
+        self.alpha = 1.0 - self.beta
         self.alpha_hat = torch.cumprod(self.alpha, dim=0)
 
     def prepare_noise_schedule(self):
@@ -198,7 +214,9 @@ class Diffusion:
 
     def noise_images(self, x, t):
         sqrt_alpha_hat = torch.sqrt(self.alpha_hat[t])[:, None, None, None]
-        sqrt_one_minus_alpha_hat = torch.sqrt(1 - self.alpha_hat[t])[:, None, None, None]
+        sqrt_one_minus_alpha_hat = torch.sqrt(1 - self.alpha_hat[t])[
+            :, None, None, None
+        ]
         Ɛ = torch.randn_like(x)
         return sqrt_alpha_hat * x + sqrt_one_minus_alpha_hat * Ɛ, Ɛ
 
@@ -220,12 +238,16 @@ class Diffusion:
                     noise = torch.randn_like(x)
                 else:
                     noise = torch.zeros_like(x)
-                x = 1 / torch.sqrt(alpha) * (x - ((1 - alpha) / (torch.sqrt(1 - alpha_hat))) * predicted_noise) + torch.sqrt(beta) * noise
+                x = (
+                    1
+                    / torch.sqrt(alpha)
+                    * (
+                        x
+                        - ((1 - alpha) / (torch.sqrt(1 - alpha_hat))) * predicted_noise
+                    )
+                    + torch.sqrt(beta) * noise
+                )
         model.train()
         x = (x.clamp(-1, 1) + 1) / 2
-        x = (x - torch.amin(x))/(torch.amax(x) - torch.amin(x))
+        x = (x - torch.amin(x)) / (torch.amax(x) - torch.amin(x))
         return x
-
-
-
- 

@@ -1,18 +1,19 @@
-import torch
-import torch.nn as nn
-import numpy as np
 import argparse
-from torchvision.models import resnet18, ResNet18_Weights
-from torchvision import transforms
+
+import numpy as np
+import torch
 import torch.nn.functional as F
 from in_progress.dataset import classifier_transforms
+from torch import nn
+from torchvision.models import resnet18
 
 # It's assumed 'classifier_transforms' is defined as it was in your training dataset file.
 # If not, you must redefine it here. We are recreating it based on standard practices.
 
 
 # Define the class names
-CLASS_NAMES = ['axion', 'cdm', 'no_sub'] # Modify these to your actual class names
+CLASS_NAMES = ["axion", "cdm", "no_sub"]  # Modify these to your actual class names
+
 
 def predict(npy_path, model_path, device):
     """
@@ -24,15 +25,17 @@ def predict(npy_path, model_path, device):
         device (str): The device to run inference on ('cuda' or 'cpu').
     """
     # 1. Load the model architecture
-    model = resnet18(weights=None) # We don't need pretrained weights for inference, just the architecture
+    model = resnet18(
+        weights=None
+    )  # We don't need pretrained weights for inference, just the architecture
     num_ftrs = model.fc.in_features
     model.fc = nn.Linear(num_ftrs, len(CLASS_NAMES))
 
     # 2. Load the trained weights
     try:
         checkpoint = torch.load(model_path, map_location=device)
-        
-        state_dict = checkpoint['model_state_dict'] 
+
+        state_dict = checkpoint["model_state_dict"]
         new_state_dict = {}
         for k, v in state_dict.items():
             new_key = k.replace("_orig_mod.", "")  # just that one simple trick
@@ -55,10 +58,10 @@ def predict(npy_path, model_path, device):
         # The shape should be (H, W, C) or (C, H, W)
         image_data = np.load(npy_path)
         print(f"Loaded .npy file from: {npy_path} with shape: {image_data.shape}")
-        
+
         # Apply the same transforms used during training
         input_tensor = classifier_transforms(image_data).float()
-        
+
         # Add a batch dimension (B, C, H, W)
         input_tensor = input_tensor.unsqueeze(0)
 
@@ -73,10 +76,10 @@ def predict(npy_path, model_path, device):
     with torch.no_grad():
         input_tensor = input_tensor.to(device)
         output = model(input_tensor)
-        
+
         # Apply Softmax to get probabilities
         probabilities = F.softmax(output, dim=1)
-        
+
         # Get the top prediction
         top_prob, top_catid = torch.max(probabilities, 1)
         predicted_class_index = top_catid.item()
@@ -91,20 +94,19 @@ def predict(npy_path, model_path, device):
 
 
 if __name__ == "__main__":
-    parser = argparse.ArgumentParser(description="Inference script for ResNet18 classifier.")
-    parser.add_argument(
-        '--npy_path', 
-        type=str, 
-        required=True,
-        help='Path to the input .npy file.'
+    parser = argparse.ArgumentParser(
+        description="Inference script for ResNet18 classifier."
     )
     parser.add_argument(
-        '--model_path', 
-        type=str, 
-        default='/speech/advait/rooshil/nanoDiT/in_progress/classifier_training_resnet18/classifier_ckpts/resnet18_best.pt',
-        help='Path to the trained model checkpoint (.pt file).'
+        "--npy_path", type=str, required=True, help="Path to the input .npy file."
     )
-    
+    parser.add_argument(
+        "--model_path",
+        type=str,
+        default="/speech/advait/rooshil/nanoDiT/in_progress/classifier_training_resnet18/classifier_ckpts/resnet18_best.pt",
+        help="Path to the trained model checkpoint (.pt file).",
+    )
+
     args = parser.parse_args()
 
     # Set device

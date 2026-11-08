@@ -1,18 +1,15 @@
-from requests import head
 import torch
-from torch import nn, einsum
-import torch.nn.functional as F
-
-from einops import rearrange, repeat
+from einops import rearrange
 from einops.layers.torch import Rearrange
+from torch import einsum, nn
 
 # file adapted from: https://github.com/lucidrains/vit-pytorch/blob/main/vit_pytorch/twins_svt.py
 # helper methods
 
 
 def group_dict_by_key(cond, d):
-    return_val = [dict(), dict()]
-    for key in d.keys():
+    return_val = [{}, {}]
+    for key in d:
         match = bool(cond(key))
         ind = int(not match)
         return_val[ind][key] = d[key]
@@ -21,9 +18,9 @@ def group_dict_by_key(cond, d):
 
 def group_by_key_prefix_and_remove_prefix(prefix, d):
     kwargs_with_prefix, kwargs = group_dict_by_key(lambda x: x.startswith(prefix), d)
-    kwargs_without_prefix = dict(
-        map(lambda x: (x[0][len(prefix) :], x[1]), tuple(kwargs_with_prefix.items()))
-    )
+    kwargs_without_prefix = {
+        x[0][len(prefix) :]: x[1] for x in tuple(kwargs_with_prefix.items())
+    }
     return kwargs_without_prefix, kwargs
 
 
@@ -84,7 +81,7 @@ class PatchEmbedding(nn.Module):
         self.dim = dim
         self.dim_out = dim_out
         self.patch_size = patch_size
-        self.proj = nn.Conv2d(patch_size ** 2 * dim, dim_out, 1)
+        self.proj = nn.Conv2d(patch_size**2 * dim, dim_out, 1)
 
     def forward(self, fmap):
         p = self.patch_size
@@ -116,7 +113,7 @@ class LocalAttention(nn.Module):
         inner_dim = dim_head * heads
         self.patch_size = patch_size
         self.heads = heads
-        self.scale = dim_head ** -0.5
+        self.scale = dim_head**-0.5
 
         self.to_q = nn.Conv2d(dim, inner_dim, 1, bias=False)
         self.to_kv = nn.Conv2d(dim, inner_dim * 2, 1, bias=False)
@@ -125,14 +122,14 @@ class LocalAttention(nn.Module):
 
     def forward(self, fmap):
         shape, p = fmap.shape, self.patch_size
-        b, n, x, y, h = *shape, self.heads
-        x, y = map(lambda t: t // p, (x, y))
+        _b, _n, x, y, h = *shape, self.heads
+        x, y = (t // p for t in (x, y))
 
         fmap = rearrange(fmap, "b c (x p1) (y p2) -> (b x y) c p1 p2", p1=p, p2=p)
 
         q, k, v = (self.to_q(fmap), *self.to_kv(fmap).chunk(2, dim=1))
-        q, k, v = map(
-            lambda t: rearrange(t, "b (h d) p1 p2 -> (b h) (p1 p2) d", h=h), (q, k, v)
+        q, k, v = (
+            rearrange(t, "b (h d) p1 p2 -> (b h) (p1 p2) d", h=h) for t in (q, k, v)
         )
 
         dots = einsum("b i d, b j d -> b i j", q, k) * self.scale
@@ -157,7 +154,7 @@ class GlobalAttention(nn.Module):
         super().__init__()
         inner_dim = dim_head * heads
         self.heads = heads
-        self.scale = dim_head ** -0.5
+        self.scale = dim_head**-0.5
 
         self.to_q = nn.Conv2d(dim, inner_dim, 1, bias=False)
         self.to_kv = nn.Conv2d(dim, inner_dim * 2, k, stride=k, bias=False)
@@ -166,12 +163,10 @@ class GlobalAttention(nn.Module):
 
     def forward(self, x):
         shape = x.shape
-        b, n, _, y, h = *shape, self.heads
+        _b, _n, _, y, h = *shape, self.heads
         q, k, v = (self.to_q(x), *self.to_kv(x).chunk(2, dim=1))
 
-        q, k, v = map(
-            lambda t: rearrange(t, "b (h d) x y -> (b h) (x y) d", h=h), (q, k, v)
-        )
+        q, k, v = (rearrange(t, "b (h d) x y -> (b h) (x y) d", h=h) for t in (q, k, v))
 
         dots = einsum("b i d, b j d -> b i j", q, k) * self.scale
 

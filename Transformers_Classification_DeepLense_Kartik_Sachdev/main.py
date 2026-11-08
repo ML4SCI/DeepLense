@@ -1,58 +1,40 @@
-from __future__ import print_function
+import json
+import math
 import os
 import time
-
-import torch.nn as nn
-import torch.optim as optim
-from torch.optim.lr_scheduler import StepLR, ReduceLROnPlateau
-from torchinfo import summary
+from argparse import ArgumentParser
 
 # from models.cvt import CvT, EqCvT
 from typing import *
-from utils.util import (
-    make_directories,
-    seed_everything,
-    get_device,
-    init_logging_handler,
-)
-from utils.dataset import download_dataset, DeepLenseDataset, visualize_samples
-from utils.train import train
-from utils.inference import Inference
-from argparse import ArgumentParser
-from config.data_config import DATASET
-from config.eqcvt_config import EQCVT_CONFIG
-from utils.augmentation import get_transform_test, get_transform_train
-from torch.utils.data import DataLoader
-from models.cnn_zoo import Model, ConViT
-import math
-from transformers import get_cosine_schedule_with_warmup
-import albumentations as A
-from albumentations.pytorch import ToTensorV2
-from torch.utils.data import DataLoader, Dataset
-from torch.utils.data import DataLoader, Dataset, random_split
-from models.transformer_zoo import (
-    GetCrossFormer,
-    GetTwinsSVT,
-    GetLeViT,
-    GetPiT,
-    GetCCT,
-    GetT2TViT,
-    TransformerModels,
-)
 
-from config.cct_config import CCT_CONFIG
-from config.twinssvt_config import TWINSSVT_CONFIG
-from config.levit_config import LEVIT_CONFIG
 from config.cait_config import CAIT_CONFIG
+from config.cct_config import CCT_CONFIG
+from config.crossformer_config import CROSSFORMER_CONFIG
 from config.crossvit_config import CROSSVIT_CONFIG
+from config.cvt_config import CvT_CONFIG
+from config.data_config import DATASET
+from config.levit_config import LEVIT_CONFIG
 from config.pit_config import PIT_CONFIG
 from config.swin_config import SWIN_CONFIG
 from config.t2tvit_config import T2TViT_CONFIG
-from config.cvt_config import CvT_CONFIG
-from config.crossformer_config import CROSSFORMER_CONFIG
-
-import json
-
+from config.twinssvt_config import TWINSSVT_CONFIG
+from models.transformer_zoo import (
+    TransformerModels,
+)
+from torch import nn, optim
+from torch.utils.data import DataLoader, random_split
+from torchinfo import summary
+from transformers import get_cosine_schedule_with_warmup
+from utils.augmentation import get_transform_train
+from utils.dataset import DeepLenseDataset
+from utils.inference import Inference
+from utils.train import train
+from utils.util import (
+    get_device,
+    init_logging_handler,
+    make_directories,
+    seed_everything,
+)
 
 parser = ArgumentParser()
 parser.add_argument(
@@ -130,10 +112,10 @@ def main():
         train_config = CvT_CONFIG
 
     network_type = train_config["network_type"]
-    network_config = train_config["network_config"]
+    train_config["network_config"]
     image_size = train_config["image_size"]
     optimizer_config = train_config["optimizer_config"]
-    lr_schedule_config = train_config["lr_schedule_config"]
+    train_config["lr_schedule_config"]
 
     make_directories([dataset_dir])
 
@@ -230,9 +212,9 @@ def main():
 
     train_config["dataset_name"] = dataset_name
     train_config["lr_schedule_config"]["cosine_scheduler"] = {}
-    train_config["lr_schedule_config"]["cosine_scheduler"][
-        "num_warmup_steps"
-    ] = num_warmup_steps
+    train_config["lr_schedule_config"]["cosine_scheduler"]["num_warmup_steps"] = (
+        num_warmup_steps
+    )
     train_config["lr_schedule_config"]["cosine_scheduler"]["num_training_steps"] = int(
         num_training_steps
     )
@@ -275,4 +257,3 @@ def main():
 
 if __name__ == "__main__":
     main()
-

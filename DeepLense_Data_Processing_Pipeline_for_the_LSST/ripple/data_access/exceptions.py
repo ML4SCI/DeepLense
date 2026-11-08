@@ -6,13 +6,13 @@ providing specific error types for different failure scenarios with
 appropriate recovery strategies.
 """
 
-from typing import Optional, Dict, Any
+from typing import Any
 
 
 class RippleError(Exception):
     """Base exception for all RIPPLe-related errors."""
-    
-    def __init__(self, message: str, details: Optional[Dict[str, Any]] = None):
+
+    def __init__(self, message: str, details: dict[str, Any] | None = None):
         super().__init__(message)
         self.message = message
         self.details = details or {}
@@ -20,14 +20,18 @@ class RippleError(Exception):
 
 class DataAccessError(RippleError):
     """Base class for data access related errors."""
-    pass
 
 
 class ButlerConnectionError(DataAccessError):
     """Raised when Butler connection fails."""
-    
-    def __init__(self, message: str, repo_path: Optional[str] = None, 
-                 server_url: Optional[str] = None, **kwargs):
+
+    def __init__(
+        self,
+        message: str,
+        repo_path: str | None = None,
+        server_url: str | None = None,
+        **kwargs,
+    ):
         super().__init__(message, **kwargs)
         self.repo_path = repo_path
         self.server_url = server_url
@@ -35,19 +39,23 @@ class ButlerConnectionError(DataAccessError):
 
 class DataIdValidationError(DataAccessError):
     """Raised when DataId validation fails."""
-    
-    def __init__(self, message: str, data_id: Optional[Dict[str, Any]] = None, 
-                 **kwargs):
+
+    def __init__(self, message: str, data_id: dict[str, Any] | None = None, **kwargs):
         super().__init__(message, **kwargs)
         self.data_id = data_id
 
 
 class CutoutExtractionError(DataAccessError):
     """Raised when cutout extraction fails."""
-    
-    def __init__(self, message: str, ra: Optional[float] = None, 
-                 dec: Optional[float] = None, size: Optional[int] = None, 
-                 **kwargs):
+
+    def __init__(
+        self,
+        message: str,
+        ra: float | None = None,
+        dec: float | None = None,
+        size: int | None = None,
+        **kwargs,
+    ):
         super().__init__(message, **kwargs)
         self.ra = ra
         self.dec = dec
@@ -56,18 +64,22 @@ class CutoutExtractionError(DataAccessError):
 
 class CollectionError(DataAccessError):
     """Raised when collection operations fail."""
-    
-    def __init__(self, message: str, collection_name: Optional[str] = None, 
-                 **kwargs):
+
+    def __init__(self, message: str, collection_name: str | None = None, **kwargs):
         super().__init__(message, **kwargs)
         self.collection_name = collection_name
 
 
 class CoordinateConversionError(DataAccessError):
     """Raised when coordinate conversion fails."""
-    
-    def __init__(self, message: str, from_coords: Optional[tuple] = None, 
-                 to_coords: Optional[tuple] = None, **kwargs):
+
+    def __init__(
+        self,
+        message: str,
+        from_coords: tuple | None = None,
+        to_coords: tuple | None = None,
+        **kwargs,
+    ):
         super().__init__(message, **kwargs)
         self.from_coords = from_coords
         self.to_coords = to_coords
@@ -75,15 +87,19 @@ class CoordinateConversionError(DataAccessError):
 
 class CacheError(DataAccessError):
     """Raised when cache operations fail."""
-    pass
 
 
 class PerformanceError(DataAccessError):
     """Raised when performance thresholds are exceeded."""
-    
-    def __init__(self, message: str, metric: Optional[str] = None, 
-                 threshold: Optional[float] = None, 
-                 measured: Optional[float] = None, **kwargs):
+
+    def __init__(
+        self,
+        message: str,
+        metric: str | None = None,
+        threshold: float | None = None,
+        measured: float | None = None,
+        **kwargs,
+    ):
         super().__init__(message, **kwargs)
         self.metric = metric
         self.threshold = threshold

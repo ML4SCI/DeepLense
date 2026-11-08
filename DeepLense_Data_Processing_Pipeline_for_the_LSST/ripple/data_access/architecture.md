@@ -167,9 +167,7 @@ class ButlerConfig:
 ```python
 # Basic usage
 config = ButlerConfig(
-    repo_path="/path/to/repo",
-    collections=["2.2i/runs/DP0.2"],
-    cache_size=500
+    repo_path="/path/to/repo", collections=["2.2i/runs/DP0.2"], cache_size=500
 )
 
 with LsstDataFetcher(config) as fetcher:

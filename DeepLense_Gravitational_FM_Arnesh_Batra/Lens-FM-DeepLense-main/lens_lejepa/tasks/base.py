@@ -20,12 +20,18 @@ from torch import nn
 from torch.utils.data import Dataset
 
 from ..config import FinetuneConfig
-from ..models import NEEDS_DISTORTION, canonical_adapter_name, inject_adapters, is_encoder, load_pretrained_encoder
+from ..models import (
+    NEEDS_DISTORTION,
+    canonical_adapter_name,
+    inject_adapters,
+    is_encoder,
+    load_pretrained_encoder,
+)
 
 
 class Task(ABC):
     name: str = ""
-    monitor: str = ""          # validation metric used for checkpoint selection
+    monitor: str = ""  # validation metric used for checkpoint selection
     higher_is_better: bool = True
 
     def __init__(self, config: FinetuneConfig) -> None:
@@ -53,13 +59,22 @@ class Task(ABC):
         c = self.config
         if not is_encoder(c.backbone):
             return self.build_baseline(c.backbone)
-        encoder = load_pretrained_encoder(c.backbone, c.image_size, c.patch_size, c.pretrained)
+        encoder = load_pretrained_encoder(
+            c.backbone, c.image_size, c.patch_size, c.pretrained
+        )
         if c.adaptation == "full":
             pass
         elif c.adaptation == "linear_probe":
             encoder.requires_grad_(False)
         else:
-            inject_adapters(encoder, canonical_adapter_name(c.adaptation), c.rank, c.alpha, c.dropout, c.rank_schedule)
+            inject_adapters(
+                encoder,
+                canonical_adapter_name(c.adaptation),
+                c.rank,
+                c.alpha,
+                c.dropout,
+                c.rank_schedule,
+            )
         return self.build_head(encoder)
 
     @property
@@ -75,11 +90,15 @@ class Task(ABC):
 
     # ---- optimisation and evaluation ---------------------------------------
     @abstractmethod
-    def loss(self, output: torch.Tensor, batch: dict[str, torch.Tensor]) -> torch.Tensor:
+    def loss(
+        self, output: torch.Tensor, batch: dict[str, torch.Tensor]
+    ) -> torch.Tensor:
         """Training loss from model output and the batch."""
 
     @abstractmethod
-    def collect(self, output: torch.Tensor, batch: dict[str, torch.Tensor]) -> dict[str, np.ndarray]:
+    def collect(
+        self, output: torch.Tensor, batch: dict[str, torch.Tensor]
+    ) -> dict[str, np.ndarray]:
         """Per-batch arrays needed to compute metrics (moved to CPU)."""
 
     @abstractmethod

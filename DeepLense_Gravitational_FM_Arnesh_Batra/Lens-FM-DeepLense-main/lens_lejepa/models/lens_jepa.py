@@ -19,7 +19,15 @@ from .masking import apply_masks
 
 
 class _FeedForward(nn.Module):
-    def __init__(self, in_features: int, out_features: int, activation, hidden: int, hidden_layers: int, dropout: float = 0.1) -> None:
+    def __init__(
+        self,
+        in_features: int,
+        out_features: int,
+        activation,
+        hidden: int,
+        hidden_layers: int,
+        dropout: float = 0.1,
+    ) -> None:
         super().__init__()
         layers = [nn.Linear(in_features, hidden), activation(), nn.Dropout(dropout)]
         for _ in range(hidden_layers):
@@ -41,16 +49,22 @@ class _NoSelfAttention(nn.Module):
     def forward(self, key, query, value):
         mask = None
         if query.shape[1] > 1 and key.shape[1] > 1:
-            mask = torch.eye(query.shape[1], key.shape[1], dtype=torch.bool, device=query.device)
+            mask = torch.eye(
+                query.shape[1], key.shape[1], dtype=torch.bool, device=query.device
+            )
         return self.mha(query, key, value, attn_mask=mask)[0]
 
 
 class _LSABlock(nn.Module):
-    def __init__(self, dim: int, heads: int, hidden: int, activation, dropout: float = 0.1) -> None:
+    def __init__(
+        self, dim: int, heads: int, hidden: int, activation, dropout: float = 0.1
+    ) -> None:
         super().__init__()
         self.mlsa = _NoSelfAttention(dim, heads, dropout)
         self.first_norm = nn.LayerNorm(dim)
-        self.feedforward = _FeedForward(dim, dim, activation, hidden, hidden_layers=1, dropout=dropout)
+        self.feedforward = _FeedForward(
+            dim, dim, activation, hidden, hidden_layers=1, dropout=dropout
+        )
         self.second_norm = nn.LayerNorm(dim)
         self.dropout_layer = nn.Dropout(dropout)
         self.temperature = nn.Parameter(torch.ones(1))
@@ -64,7 +78,9 @@ class _LSABlock(nn.Module):
 
 
 class _ShiftedPatchTokenization(nn.Module):
-    def __init__(self, image_size: int, patch: int, dim: int, channels: int = 1) -> None:
+    def __init__(
+        self, image_size: int, patch: int, dim: int, channels: int = 1
+    ) -> None:
         super().__init__()
         self.shift = patch // 2
         self.num_patches = (image_size // patch) ** 2
@@ -74,8 +90,15 @@ class _ShiftedPatchTokenization(nn.Module):
 
     def forward(self, image: torch.Tensor) -> torch.Tensor:
         s = self.shift
-        shifted = [TF.affine(image, angle=0, translate=(dx, dy), fill=0, scale=1, shear=0) for dx, dy in ((-s, -s), (s, -s), (-s, s), (s, s))]
-        tokens = self.projection(torch.cat([image, *shifted], dim=1)).flatten(2).transpose(1, 2)
+        shifted = [
+            TF.affine(image, angle=0, translate=(dx, dy), fill=0, scale=1, shear=0)
+            for dx, dy in ((-s, -s), (s, -s), (-s, s), (s, s))
+        ]
+        tokens = (
+            self.projection(torch.cat([image, *shifted], dim=1))
+            .flatten(2)
+            .transpose(1, 2)
+        )
         return self.layer_norm(tokens) + self.positional_encoding
 
 
@@ -87,18 +110,44 @@ class _PatchDecoder(nn.Module):
 
     def forward(self, tokens: torch.Tensor) -> torch.Tensor:
         b, g, p = tokens.shape[0], self.grid, self.patch
-        return self.patch_decoder(tokens).view(b, g, g, p, p).permute(0, 1, 3, 2, 4).reshape(b, self.image_size, self.image_size)
+        return (
+            self.patch_decoder(tokens)
+            .view(b, g, g, p, p)
+            .permute(0, 1, 3, 2, 4)
+            .reshape(b, self.image_size, self.image_size)
+        )
 
 
 class _SISInverter(nn.Module):
     """Predicts a per-pixel Einstein-radius factor ``k`` in ``[k_min, k_max]``
     and moves every pixel to ``theta - k * theta / |theta|`` (SIS lens model)."""
 
-    def __init__(self, image_size, patch, dim, heads, hidden, activation, blocks, dropout=0.1,
-                 pixel_scale=0.101, k_min=0.8, k_max=1.2, eps=1e-8) -> None:
+    def __init__(
+        self,
+        image_size,
+        patch,
+        dim,
+        heads,
+        hidden,
+        activation,
+        blocks,
+        dropout=0.1,
+        pixel_scale=0.101,
+        k_min=0.8,
+        k_max=1.2,
+        eps=1e-8,
+    ) -> None:
         super().__init__()
-        self.size, self.pixel_scale, self.k_min, self.k_max, self.eps = image_size, pixel_scale, k_min, k_max, eps
-        layers: list[nn.Module] = [_LSABlock(dim, heads, hidden, activation, dropout) for _ in range(blocks)]
+        self.size, self.pixel_scale, self.k_min, self.k_max, self.eps = (
+            image_size,
+            pixel_scale,
+            k_min,
+            k_max,
+            eps,
+        )
+        layers: list[nn.Module] = [
+            _LSABlock(dim, heads, hidden, activation, dropout) for _ in range(blocks)
+        ]
         layers += [_PatchDecoder(image_size, patch, dim), nn.Sigmoid()]
         self.transformer = nn.ModuleList(layers)
         half = image_size // 2
@@ -126,20 +175,28 @@ class _SISInverter(nn.Module):
         out = torch.zeros(b, n * n, device=images.device, dtype=flat_in.dtype)
         current = out.gather(1, index)
         values = flat_in[:, nonzero]
-        out.scatter_(1, index, torch.where(current == 0, values, (current + values) / 2))
+        out.scatter_(
+            1, index, torch.where(current == 0, values, (current + values) / 2)
+        )
         out = out.view(b, n, n)
         return out / (out.amax(dim=(1, 2), keepdim=True) + self.eps)
 
 
 class _Lensiformer(nn.Module):
-    def __init__(self, image_size, patch, dim, heads, hidden, blocks, dropout=0.1) -> None:
+    def __init__(
+        self, image_size, patch, dim, heads, hidden, blocks, dropout=0.1
+    ) -> None:
         super().__init__()
         self.image_size = image_size
         act = nn.ELU
         self.initial_tokenizer = _ShiftedPatchTokenization(image_size, patch, dim)
         self.secondary_tokenizer = _ShiftedPatchTokenization(image_size, patch, dim)
-        self.encoder = _SISInverter(image_size, patch, dim, heads, hidden, act, blocks, dropout)
-        self.transformer_blocks = nn.ModuleList(_LSABlock(dim, heads, hidden, act, dropout) for _ in range(blocks))
+        self.encoder = _SISInverter(
+            image_size, patch, dim, heads, hidden, act, blocks, dropout
+        )
+        self.transformer_blocks = nn.ModuleList(
+            _LSABlock(dim, heads, hidden, act, dropout) for _ in range(blocks)
+        )
 
     def forward(self, images: torch.Tensor, masks=None) -> torch.Tensor:
         b, n = images.shape[0], self.image_size
@@ -158,13 +215,22 @@ class _Lensiformer(nn.Module):
 class LensJEPAEncoder(nn.Module):
     """Lens-JEPA backbone: 384-d tokens, 16 heads, one block (2.45M parameters)."""
 
-    def __init__(self, image_size: int = 160, patch_size: int = 16, embed_dim: int = 384, num_heads: int = 16, depth: int = 1) -> None:
+    def __init__(
+        self,
+        image_size: int = 160,
+        patch_size: int = 16,
+        embed_dim: int = 384,
+        num_heads: int = 16,
+        depth: int = 1,
+    ) -> None:
         super().__init__()
         self.embed_dim = embed_dim
         self.num_heads = num_heads
         self.patch_size = patch_size
         self.num_patches = (image_size // patch_size) ** 2
-        self.backbone = _Lensiformer(image_size, patch_size, embed_dim, num_heads, hidden=64, blocks=depth)
+        self.backbone = _Lensiformer(
+            image_size, patch_size, embed_dim, num_heads, hidden=64, blocks=depth
+        )
         for module in self.modules():  # the initialisation used by the original runs
             if isinstance(module, nn.Linear):
                 nn.init.trunc_normal_(module.weight, std=0.02, a=-2.0, b=2.0)
