@@ -94,17 +94,36 @@ def get_transforms(config, initial_size, final_size, mode="test"):
         The transformation pipeline
     """
     transform_pipeline = [transforms.ToTensor()]
-    # if mode == 'train':
-    #     transform_pipeline.extend([transforms.RandomHorizontalFlip(), transforms.RandomVerticalFlip()])
-    #     if config.random_rotation > 0:
-    #         transform_pipeline.append(transforms.RandomRotation(config.random_rotation, interpolation=transforms.InterpolationMode.BILINEAR))
-    #     if config.random_zoom < 1: # 1 is when the random crop is the whole image
-    #         transform_pipeline.append(transforms.RandomResizedCrop(final_size, scale=(config.random_zoom**2, 1.), ratio=(1., 1.)))
 
     if initial_size == 150:  # Model I
         transform_pipeline.append(transforms.CenterCrop(100))
     else:  # Model II and Model III
         transform_pipeline.append(transforms.CenterCrop(50))
+
+    if mode == "train" and config is not None:
+        random_rotation = (
+            config.get("random_rotation", 0)
+            if isinstance(config, dict)
+            else getattr(config, "random_rotation", 0)
+        )
+        random_zoom = (
+            config.get("random_zoom", 1)
+            if isinstance(config, dict)
+            else getattr(config, "random_zoom", 1)
+        )
+
+        if random_rotation > 0:
+            transform_pipeline.append(
+                transforms.RandomRotation(
+                    random_rotation, interpolation=transforms.InterpolationMode.BILINEAR
+                )
+            )
+        if random_zoom < 1:  # 1 is when the random crop is the whole image
+            transform_pipeline.append(
+                transforms.RandomResizedCrop(
+                    final_size, scale=(random_zoom**2, 1.0), ratio=(1.0, 1.0)
+                )
+            )
 
     if initial_size != final_size:
         transform_pipeline.append(transforms.Resize(final_size))
