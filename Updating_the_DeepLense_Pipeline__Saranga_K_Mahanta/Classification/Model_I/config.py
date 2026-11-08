@@ -4,7 +4,25 @@ BATCH_SIZE = 64
 LOAD_PRETRAINED_MODEL = False
 SAVE_MODEL = False
 
+import os
 
-MODEL_PATH = r'C:\Users\Saranga\Desktop\ML4SCI\All MODELS\Classification\Model_I\model1_EfficientNetB2Backbone.pth'
-TRAIN_DATA_PATH = r'C:\Users\Saranga\Desktop\ML4SCI\Work\Model_I_subset\*\*'
-TEST_DATA_PATH = r'C:\Users\Saranga\Desktop\ML4SCI\Work\Model_I_test\*\*'
+# Base directory of Model_I
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+
+# Expected dataset structure:
+# data/
+#   Model_I/
+#       axion/
+#       cdm/
+#       no_sub/
+#   Model_I_test/
+#       axion/
+#       cdm/
+#       no_sub/
+
+DATA_DIR = os.path.join(BASE_DIR, "data")
+
+TRAIN_DATA_PATH = os.path.join(DATA_DIR, "Model_I")
+TEST_DATA_PATH = os.path.join(DATA_DIR, "Model_I_test")
+
+MODEL_PATH = os.path.join(BASE_DIR, "checkpoints", "model.pth")
