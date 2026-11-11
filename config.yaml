@@ -1,0 +1,12 @@
+# DeepLense Super-Resolution Configuration
+
+dataset:
+  hr_path: "data/simulated/HR"
+  lr_path: "data/simulated/LR"
+  scale_factor: 4
+  patch_size: 64
+
+training:
+  batch_size: 16
+  learning_rate: 0.0002
+  epochs: 50
