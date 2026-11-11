@@ -1,40 +1,21 @@
-from __future__ import print_function
+import json
 import os
 import time
-import copy
-
-import torch.nn as nn
-import torch.optim as optim
-from torchinfo import summary
-import torchvision
-from typing import *
-from utils.util import *
-from utils.inference import InferenceSSL
 from argparse import ArgumentParser
-from config.data_config import DATASET
-from torch.utils.data import DataLoader, random_split
-from models.cnn_zoo import CustomResNet
-from models.byol import BYOL, BYOLSingleChannel
+from typing import *
 
-import json
+import torchvision
 import yaml
+from config.data_config import DATASET
+from models.byol import BYOLSingleChannel
+from torch import nn
+from torch.utils.data import DataLoader, random_split
 from utils.dataset import DefaultDatasetSetupSSL
-from utils.losses.contrastive_loss import (
-    ContrastiveLossEuclidean,
-    ContrastiveLossEmbedding,
-    SimCLR_Loss,
-    NegativeCosineSimilarity
-)
-from utils.train import (
-    train_simplistic,
-    train_byol,
-    train_contrastive_pair,
-    train_contrastive_with_labels,
-    train_contrastive,
-)
 from utils.losses.sym_neg_cos_sim_loss import SymNegCosineSimilarityLoss
-
-from models.modules.head import BYOLProjectionHead, BYOLPredictionHead
+from utils.train import (
+    train_byol,
+)
+from utils.util import *
 
 parser = ArgumentParser()
 parser.add_argument(
@@ -73,7 +54,8 @@ TODO:
 1. Resnet baselines: Test on Model I, II, III
 2. Transformer baselines: CVT/best transformer model
 """
-    
+
+
 def main():
     dataset_name = args.dataset_name
     dataset_dir = args.save
@@ -85,7 +67,7 @@ def main():
     num_classes = len(classes)
 
     # Open the YAML file and load its contents
-    with open(train_config_path, "r") as file:
+    with open(train_config_path) as file:
         train_config = yaml.safe_load(file)
 
     ########################## boilerplate ##########################
@@ -97,15 +79,15 @@ def main():
     # Set hyperparameters
     batch_size = train_config["batch_size"]
     epochs_pretrained = train_config["pretrained"]["num_epochs"]
-    epochs_finetuned = train_config["finetuned"]["num_epochs"]
+    train_config["finetuned"]["num_epochs"]
 
-    learning_rate = train_config["optimizer_config"]["lr"]
-    margin = train_config["ssl"]["margin"]
-    num_channels = train_config["channels"]
-    temperature = train_config["ssl"]["temperature"]
+    train_config["optimizer_config"]["lr"]
+    train_config["ssl"]["margin"]
+    train_config["channels"]
+    train_config["ssl"]["temperature"]
     network_type = train_config["network_type"]
     image_size = train_config["image_size"]
-    optimizer_config = train_config["optimizer_config"]
+    train_config["optimizer_config"]
 
     backbone = train_config["backbone"]
 
@@ -123,7 +105,7 @@ def main():
         json.dump(train_config, fp)
 
     # saving model path location
-    model_path_pretrained = os.path.join(
+    os.path.join(
         f"{log_dir}/checkpoint",
         f"{network_type}_pretrained_{dataset_name}_{current_time}.pt",
     )
@@ -152,14 +134,14 @@ def main():
     train_dataset, val_set = random_split(train_dataset, [train_len, valid_len])
 
     train_loader = DataLoader(
-        dataset=train_dataset, batch_size=batch_size, shuffle=True, num_workers=num_workers
+        dataset=train_dataset,
+        batch_size=batch_size,
+        shuffle=True,
+        num_workers=num_workers,
     )
 
     val_loader = DataLoader(
-        dataset=val_set,
-        batch_size=batch_size,
-        shuffle=True,
-        num_workers=num_workers
+        dataset=val_set, batch_size=batch_size, shuffle=True, num_workers=num_workers
     )
 
     # Load test dataset
@@ -183,10 +165,10 @@ def main():
     # summary(model, input_size=(1, 1, 224, 224), device="cuda")
 
     ########################## Pretraining #############################
-    
+
     # optimizer and loss function for pretrain
     optimizer_pretrain = torch.optim.SGD(model.parameters(), lr=0.06)
-    
+
     # criterion
     # criterion_pretrain = NegativeCosineSimilarity()s
     criterion_pretrain = SymNegCosineSimilarityLoss()
@@ -199,8 +181,8 @@ def main():
         train_loader=train_loader,
         criterion=criterion_pretrain,
         optimizer=optimizer_pretrain,
-        saved_model_path = model_path_finetune,
-        valid_loader = val_loader,
+        saved_model_path=model_path_finetune,
+        valid_loader=val_loader,
     )
 
     # train_contrastive_pair(
@@ -214,6 +196,6 @@ def main():
     #     batch_size=batch_size,
     # )
 
- 
+
 if __name__ == "__main__":
     main()

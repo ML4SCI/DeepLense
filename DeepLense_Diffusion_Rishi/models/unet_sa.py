@@ -1,7 +1,7 @@
 import torch
 import torch.nn.functional as F
-
 from torch import nn
+
 
 class SelfAttention(nn.Module):
     def __init__(self, channels):
@@ -25,6 +25,7 @@ class SelfAttention(nn.Module):
         attention_value = self.ff_self(attention_value) + attention_value
         return attention_value.swapaxes(2, 1).view(-1, self.channels, size, size)
 
+
 class DoubleConv(nn.Module):
     def __init__(self, in_channels, out_channels, mid_channels=None, residual=False):
         super().__init__()
@@ -41,9 +42,10 @@ class DoubleConv(nn.Module):
 
     def forward(self, x):
         if self.residual:
-            return F.gelu(x+self.double_conv(x))
+            return F.gelu(x + self.double_conv(x))
         else:
             return self.double_conv(x)
+
 
 class Down(nn.Module):
     def __init__(self, in_channels, out_channels, emb_dim=128):
@@ -67,6 +69,7 @@ class Down(nn.Module):
         emb = self.emb_layer(t)[:, :, None, None].repeat(1, 1, x.shape[-2], x.shape[-1])
         return x + emb
 
+
 class Down_mass(nn.Module):
     def __init__(self, in_channels, out_channels, emb_dim=128):
         super().__init__()
@@ -86,16 +89,15 @@ class Down_mass(nn.Module):
 
         self.mass_emb_layer = nn.Sequential(
             nn.SiLU(),
-            nn.Linear(
-                emb_dim,
-                out_channels
-            ),
+            nn.Linear(emb_dim, out_channels),
         )
 
     def forward(self, x, t, m):
         x = self.maxpool_conv(x)
         emb = self.emb_layer(t)[:, :, None, None].repeat(1, 1, x.shape[-2], x.shape[-1])
-        mass = self.mass_emb_layer(m)[:, :, None, None].repeat(1, 1, x.shape[-2], x.shape[-1])
+        mass = self.mass_emb_layer(m)[:, :, None, None].repeat(
+            1, 1, x.shape[-2], x.shape[-1]
+        )
         return x + emb + mass
 
 
@@ -111,12 +113,8 @@ class Up(nn.Module):
 
         self.emb_layer = nn.Sequential(
             nn.SiLU(),
-            nn.Linear(
-                emb_dim,
-                out_channels
-            ),
+            nn.Linear(emb_dim, out_channels),
         )
-        
 
     def forward(self, x, skip_x, t):
         x = self.up(x)
@@ -124,7 +122,8 @@ class Up(nn.Module):
         x = self.conv(x)
         emb = self.emb_layer(t)[:, :, None, None].repeat(1, 1, x.shape[-2], x.shape[-1])
         return x + emb
-    
+
+
 class Up_mass(nn.Module):
     def __init__(self, in_channels, out_channels, emb_dim=128):
         super().__init__()
@@ -137,34 +136,30 @@ class Up_mass(nn.Module):
 
         self.emb_layer = nn.Sequential(
             nn.SiLU(),
-            nn.Linear(
-                emb_dim,
-                out_channels
-            ),
+            nn.Linear(emb_dim, out_channels),
         )
 
         self.mass_emb_layer = nn.Sequential(
             nn.SiLU(),
-            nn.Linear(
-                emb_dim,
-                out_channels
-            ),
+            nn.Linear(emb_dim, out_channels),
         )
-        
 
     def forward(self, x, skip_x, t, m):
         x = self.up(x)
         x = torch.cat([skip_x, x], dim=1)
         x = self.conv(x)
         emb = self.emb_layer(t)[:, :, None, None].repeat(1, 1, x.shape[-2], x.shape[-1])
-        mass = self.mass_emb_layer(m)[:, :, None, None].repeat(1, 1, x.shape[-2], x.shape[-1])
+        mass = self.mass_emb_layer(m)[:, :, None, None].repeat(
+            1, 1, x.shape[-2], x.shape[-1]
+        )
         return x + emb + mass
+
 
 class UNet(nn.Module):
     def __init__(self, c_in=3, c_out=1, time_dim=128):
-    #def __init__(self, config):
+        # def __init__(self, config):
         super().__init__()
-        #self.config = config
+        # self.config = config
         self.time_dim = time_dim
         self.inc = DoubleConv(c_in, 64)
         self.down1 = Down(64, 128)
@@ -187,7 +182,10 @@ class UNet(nn.Module):
         # Sinusoidal embedding
         inv_freq = 1.0 / (
             10000
-            ** (torch.arange(0, channels, 2, device=self.config.device).float() / channels)
+            ** (
+                torch.arange(0, channels, 2, device=self.config.device).float()
+                / channels
+            )
         )
         pos_enc_a = torch.sin(t.repeat(1, channels // 2) * inv_freq)
         pos_enc_b = torch.cos(t.repeat(1, channels // 2) * inv_freq)
@@ -195,7 +193,7 @@ class UNet(nn.Module):
         return pos_enc
 
     def unet_forwad(self, x, t):
-        #print(x.shape)
+        # print(x.shape)
         x1 = self.inc(x)
         x2 = self.down1(x1, t)
         x2 = self.sa1(x2)
@@ -218,7 +216,6 @@ class UNet(nn.Module):
         t = t.unsqueeze(-1)
         t = self.pos_encoding(t, self.time_dim)
         return self.unet_forwad(x, t)
-
 
 
 class UNet_conditional(nn.Module):
@@ -287,6 +284,7 @@ class UNet_conditional(nn.Module):
         output = self.outc(x)
         return output
 
+
 class UNet_ae_conditional(nn.Module):
     def __init__(self, config, ae_model):
         super().__init__()
@@ -314,7 +312,6 @@ class UNet_ae_conditional(nn.Module):
 
         self.ae_model = ae_model
 
-        
     def pos_encoding(self, t, channels):
         inv_freq = 1.0 / (
             10000
@@ -353,7 +350,8 @@ class UNet_ae_conditional(nn.Module):
         x = self.sa6(x)
         output = self.outc(x)
         return output
-    
+
+
 class UNet_linear_conditional(nn.Module):
     def __init__(self, config):
         super().__init__()
@@ -379,11 +377,11 @@ class UNet_linear_conditional(nn.Module):
         self.sa6 = SelfAttention(64)
         self.outc = nn.Conv2d(64, config.unet.output_channels, kernel_size=1)
 
-        self.linear = nn.Linear(1,config.unet.time_emb)
+        self.linear = nn.Linear(1, config.unet.time_emb)
 
         if config.data.num_classes is not None:
             self.label_emb = nn.Embedding(config.data.num_classes, config.unet.time_emb)
-        
+
     def pos_encoding(self, t, channels):
         inv_freq = 1.0 / (
             10000
@@ -397,14 +395,14 @@ class UNet_linear_conditional(nn.Module):
     def forward(self, x, t, y):
         t = t.unsqueeze(-1).type(torch.float)
         t = self.pos_encoding(t, self.time_dim)
-        #print(t.shape)
+        # print(t.shape)
         if y is not None:
-            #mass_embedding = self.ae_model.encode(y)
-            #m = self.linear(y)
-            #m = y.repeat(1, self.time_dim)
+            # mass_embedding = self.ae_model.encode(y)
+            # m = self.linear(y)
+            # m = y.repeat(1, self.time_dim)
             m = self.label_emb(y)
-            #print(m.shape)
-            #t += mass_embedding
+            # print(m.shape)
+            # t += mass_embedding
 
         x1 = self.inc(x)
         x2 = self.down1(x1, t, m)
@@ -426,6 +424,7 @@ class UNet_linear_conditional(nn.Module):
         x = self.sa6(x)
         output = self.outc(x)
         return output
+
 
 class UNet_mass_em_conditional(nn.Module):
     def __init__(self, config):
@@ -452,11 +451,11 @@ class UNet_mass_em_conditional(nn.Module):
         self.sa6 = SelfAttention(64)
         self.outc = nn.Conv2d(64, config.unet.output_channels, kernel_size=1)
 
-        self.linear = nn.Linear(1,config.unet.time_emb)
+        self.linear = nn.Linear(1, config.unet.time_emb)
 
         # if config.data.num_classes is not None:
         #     self.label_emb = nn.Embedding(config.data.num_classes, config.unet.time_emb)
-        
+
     def pos_encoding(self, t, channels):
         inv_freq = 1.0 / (
             10000
@@ -470,15 +469,15 @@ class UNet_mass_em_conditional(nn.Module):
     def forward(self, x, t, y):
         t = t.unsqueeze(-1).type(torch.float)
         t = self.pos_encoding(t, self.time_dim)
-        #print(t.shape)
+        # print(t.shape)
         if y is not None:
-            #mass_embedding = self.ae_model.encode(y)
-            #m = self.linear(y)
+            # mass_embedding = self.ae_model.encode(y)
+            # m = self.linear(y)
             m = self.pos_encoding(y, self.time_dim)
-            #m = y.repeat(1, self.time_dim)
-            #m = self.label_emb(y)
-            #print(m.shape)
-            #t += mass_embedding
+            # m = y.repeat(1, self.time_dim)
+            # m = self.label_emb(y)
+            # print(m.shape)
+            # t += mass_embedding
 
         x1 = self.inc(x)
         x2 = self.down1(x1, t, m)

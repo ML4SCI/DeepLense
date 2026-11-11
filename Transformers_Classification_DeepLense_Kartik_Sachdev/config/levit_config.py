@@ -1,5 +1,5 @@
-from ray import tune
 import numpy as np
+from ray import tune
 
 LEVIT_CONFIG = {
     "network_type": "LeViT",
@@ -9,16 +9,16 @@ LEVIT_CONFIG = {
     "num_epochs": 15,
     "optimizer_config": {
         "name": "AdamW",
-        "weight_decay": 1e-4, #0.01
+        "weight_decay": 1e-4,  # 0.01
         "lr": 0.001,
         "momentum": 0.9,
         "betas": (0.9, 0.999),
         "warmup_epoch": 3,
     },
-    "out_features": 128, 
+    "out_features": 128,
     "optimizer_finetune_config": {
         "name": "AdamW",
-        "weight_decay": 0.01, #0.01
+        "weight_decay": 0.01,  # 0.01
         "lr": 3e-4,
         "momentum": 0.9,
         "betas": (0.9, 0.999),
@@ -26,7 +26,10 @@ LEVIT_CONFIG = {
     },
     "lr_schedule_config": {
         "use_lr_schedule": True,
-        "step_lr": {"gamma": 0.5, "step_size": 20,},
+        "step_lr": {
+            "gamma": 0.5,
+            "step_size": 20,
+        },
         "reduce_on_plateau": {
             "factor": 0.1,
             "patience": 4,
@@ -62,7 +65,10 @@ LEVIT_RAY_CONFIG = {
     },
     "lr_schedule_config": {
         "use_lr_schedule": True,
-        "step_lr": {"gamma": 0.5, "step_size": 20,},
+        "step_lr": {
+            "gamma": 0.5,
+            "step_size": 20,
+        },
         "reduce_on_plateau": {
             "factor": 0.1,
             "patience": 4,

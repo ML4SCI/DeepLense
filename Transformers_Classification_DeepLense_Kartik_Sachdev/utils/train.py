@@ -1,14 +1,13 @@
-from __future__ import print_function
-import logging
 import copy
-import torch
-from tqdm import tqdm
+import logging
 from typing import *
+
+import torch
 import wandb
-import torch.nn as nn
+from torch import nn
 from torch.nn.functional import normalize
+from tqdm import tqdm
 from utils.scheduler import cosine_schedule
-from utils.util import update_momentum
 
 
 def train(
@@ -63,11 +62,8 @@ def train(
     wandb.watch(model, criterion, log="all", log_freq=log_freq)
 
     steps = 0
-    all_train_loss = []
     all_val_loss = []
-    all_train_accuracy = []
     all_val_accuracy = []
-    all_test_accuracy = []
     all_epoch_loss = []
 
     best_accuracy = 0
@@ -76,9 +72,6 @@ def train(
     for epoch in range(epochs):
         model.train()
         epoch_loss = 0
-        epoch_accuracy = 0
-        tr_loss_epoch = []
-        running_loss = 0
 
         for data, label in tqdm(train_loader):
             # for step, (data, label) in loop:
@@ -99,8 +92,6 @@ def train(
 
         epoch_loss = epoch_loss / len(train_loader)
         all_epoch_loss.append(epoch_loss)
-
-        correct = 0
 
         with torch.no_grad():
             model.eval()
@@ -123,7 +114,7 @@ def train(
 
         all_val_accuracy.append(epoch_val_accuracy.item() * 100)
         logging.debug(
-            f"Epoch : {epoch+1} - LR {optimizer.param_groups[0]['lr']:.8f} - loss : {epoch_loss:.4f} - val_loss : {epoch_val_loss:.4f} - val_acc: {epoch_val_accuracy:.4f} \n"
+            f"Epoch : {epoch + 1} - LR {optimizer.param_groups[0]['lr']:.8f} - loss : {epoch_loss:.4f} - val_loss : {epoch_val_loss:.4f} - val_acc: {epoch_val_accuracy:.4f} \n"
         )
 
         # logging frequency = each epoch
@@ -335,7 +326,7 @@ def train_simplistic(
         all_val_accuracy.append(epoch_val_accuracy.item() * 100)
 
         print(
-            f"Epoch : {epoch+1} - loss : {epoch_loss:.4f} - val_loss : {epoch_val_loss:.4f} - val_acc: {epoch_val_accuracy:.4f} \n"
+            f"Epoch : {epoch + 1} - loss : {epoch_loss:.4f} - val_loss : {epoch_val_loss:.4f} - val_acc: {epoch_val_accuracy:.4f} \n"
         )
 
 
@@ -353,8 +344,8 @@ def train_byol(
     print("Starting Training")
     for epoch in range(epochs):
         total_loss = 0
-        momentum_val = cosine_schedule(epoch, epochs, 0.996, 1)
-        for batch_idx, (img1, img2, label) in enumerate(train_loader):
+        cosine_schedule(epoch, epochs, 0.996, 1)
+        for batch_idx, (img1, img2, _label) in enumerate(train_loader):
             x0, x1 = img1, img2
             x0 = x0.to(device)
             x1 = x1.to(device)

@@ -1,13 +1,13 @@
-import torch
-from torch import nn
-import torch.nn.functional as F
-import torch.optim as optim
-import numpy as np
 import matplotlib.pyplot as plt
-import sklearn.metrics
+import numpy as np
 import seaborn as sns
+import sklearn.metrics
+import torch
+import torch.nn.functional as F
+from torch import nn, optim
 
-class Supervised(object):
+
+class Supervised:
     def __init__(self, encoder, classifier):
         """
         Arguments:
@@ -52,17 +52,23 @@ class Supervised(object):
         classifier: PyTorch neural network
             Neural network that receives an array of size X and classifies it into N classes.
         """
-        
+
         # configure hyperparameters
         criterion = nn.CrossEntropyLoss()
-        lr = hyperparams['learning_rate']
-        wd = hyperparams['weight_decay']
-        cyclic_scheduler = hyperparams['cyclic_scheduler']
+        lr = hyperparams["learning_rate"]
+        wd = hyperparams["weight_decay"]
+        cyclic_scheduler = hyperparams["cyclic_scheduler"]
 
         # concatenate parameters of both self.encoder and self.classifier
-        optimizer = optim.Adam(list(self.encoder.parameters()) + list(self.classifier.parameters()), lr=lr, weight_decay=wd)
+        optimizer = optim.Adam(
+            list(self.encoder.parameters()) + list(self.classifier.parameters()),
+            lr=lr,
+            weight_decay=wd,
+        )
         if cyclic_scheduler:
-            scheduler = optim.lr_scheduler.OneCycleLR(optimizer, lr, epochs=epochs, steps_per_epoch=len(dataloader))
+            scheduler = optim.lr_scheduler.OneCycleLR(
+                optimizer, lr, epochs=epochs, steps_per_epoch=len(dataloader)
+            )
 
         # early stopping variables
         start_epoch = 0
@@ -71,7 +77,7 @@ class Supervised(object):
         bad_epochs = 0
 
         # metrics
-        self.history = {'loss': [], 'accuracy': []}
+        self.history = {"loss": [], "accuracy": []}
 
         # training loop
         for epoch in range(start_epoch, epochs):
@@ -89,7 +95,7 @@ class Supervised(object):
                 optimizer.zero_grad()
 
                 # classify and get loss
-                outputs = self.classifier(self.encoder(data)) # Cs(Ms(xs))
+                outputs = self.classifier(self.encoder(data))  # Cs(Ms(xs))
                 loss = criterion(outputs, labels)
 
                 # backpropagate and update weights
@@ -104,34 +110,42 @@ class Supervised(object):
 
             # get losses
             epoch_loss = running_loss / len(dataloader)
-            self.history['loss'].append(epoch_loss)
+            self.history["loss"].append(epoch_loss)
 
             # evaluate on training data (source domain)
-            epoch_accuracy = self.evaluate( dataloader)
+            epoch_accuracy = self.evaluate(dataloader)
             test_epoch_accuracy = self.evaluate(dataloader_test)
-            self.history['accuracy'].append(epoch_accuracy)
-            
+            self.history["accuracy"].append(epoch_accuracy)
+
             # save checkpoint
             if test_epoch_accuracy > best_acc:
-                torch.save({'encoder_weights': self.encoder.state_dict(),
-                            'classifier_weights': self.classifier.state_dict()
-                        }, save_path)
+                torch.save(
+                    {
+                        "encoder_weights": self.encoder.state_dict(),
+                        "classifier_weights": self.classifier.state_dict(),
+                    },
+                    save_path,
+                )
                 best_acc = test_epoch_accuracy
                 bad_epochs = 0
-                
+
             else:
                 bad_epochs += 1
-            
-            print('[Epoch {}/{}] loss: {:.6f}; accuracy: {:.6f}; val accuracy: {:.6f};'.format(epoch+1, epochs, epoch_loss, epoch_accuracy, test_epoch_accuracy))
-            
+
+            print(
+                f"[Epoch {epoch + 1}/{epochs}] loss: {epoch_loss:.6f}; accuracy: {epoch_accuracy:.6f}; val accuracy: {test_epoch_accuracy:.6f};"
+            )
+
             if bad_epochs >= patience:
-                print(f"reached {bad_epochs} bad epochs, stopping training with best val accuracy of {best_acc}!")
+                print(
+                    f"reached {bad_epochs} bad epochs, stopping training with best val accuracy of {best_acc}!"
+                )
                 break
 
         best = torch.load(save_path)
-        self.encoder.load_state_dict(best['encoder_weights'])
-        self.classifier.load_state_dict(best['classifier_weights'])
-        
+        self.encoder.load_state_dict(best["encoder_weights"])
+        self.classifier.load_state_dict(best["classifier_weights"])
+
         return self.encoder, self.classifier
 
     def evaluate(self, dataloader, return_lists_roc=False):
@@ -171,9 +185,9 @@ class Supervised(object):
 
                 # numpify
                 labels_numpy = labels.detach().cpu().numpy()
-                outputs_numpy = outputs.detach().cpu().numpy() # probs (AUROC)
-                
-                preds = np.argmax(outputs_numpy, axis=1) # accuracy
+                outputs_numpy = outputs.detach().cpu().numpy()  # probs (AUROC)
+
+                preds = np.argmax(outputs_numpy, axis=1)  # accuracy
 
                 # append
                 labels_list.append(labels_numpy)
@@ -185,12 +199,12 @@ class Supervised(object):
             preds_list = np.concatenate(preds_list)
 
         # metrics
-        #auc = sklearn.metrics.roc_auc_score(labels_list, outputs_list, multi_class='ovr')
+        # auc = sklearn.metrics.roc_auc_score(labels_list, outputs_list, multi_class='ovr')
         accuracy = sklearn.metrics.accuracy_score(labels_list, preds_list)
 
         if return_lists_roc:
             return accuracy, labels_list, outputs_list, preds_list
-            
+
         return accuracy
 
     def plot_metrics(self):
@@ -199,19 +213,19 @@ class Supervised(object):
         """
 
         # plot metrics from source
-        fig, axs = plt.subplots(1, 2, figsize=(12,5), dpi=200)
+        _fig, axs = plt.subplots(1, 2, figsize=(12, 5), dpi=200)
 
-        epochs = len(self.history['loss'])
+        epochs = len(self.history["loss"])
 
-        axs[0].plot(range(1, epochs+1), self.history['loss'])
-        axs[0].set_xlabel('Epochs')
-        axs[0].set_ylabel('Loss')
-        axs[0].set_title('Source loss')
+        axs[0].plot(range(1, epochs + 1), self.history["loss"])
+        axs[0].set_xlabel("Epochs")
+        axs[0].set_ylabel("Loss")
+        axs[0].set_title("Source loss")
 
-        axs[1].plot(range(1, epochs+1), self.history['accuracy'])
-        axs[1].set_xlabel('Epochs')
-        axs[1].set_ylabel('Accuracy')
-        axs[1].set_title('Source accuracy')
+        axs[1].plot(range(1, epochs + 1), self.history["accuracy"])
+        axs[1].set_xlabel("Epochs")
+        axs[1].set_ylabel("Accuracy")
+        axs[1].set_title("Source accuracy")
 
         plt.show()
 
@@ -236,19 +250,32 @@ class Supervised(object):
 
         cmap = sns.diverging_palette(220, 20, as_cmap=True)
 
-        accuracy, labels_list, outputs_list, preds_list = self.evaluate(dataloader, return_lists_roc=True)
+        _accuracy, labels_list, outputs_list, preds_list = self.evaluate(
+            dataloader, return_lists_roc=True
+        )
 
         # plot confusion matrix
         cm = sklearn.metrics.confusion_matrix(labels_list, preds_list)
-        group_counts = ['{0:0.0f}'.format(value) for value in cm.flatten()]
-        group_percentages = ['({0:.2%})'.format(value) for value in cm.flatten()/np.sum(cm)]
-        labels = [f'{v1}\n{v2}' for v1, v2 in zip(group_counts, group_percentages)]
-        labels = np.asarray(labels).reshape(n_classes,n_classes)
-        #tn, fp, fn, tp = cm.ravel()
+        group_counts = [f"{value:0.0f}" for value in cm.flatten()]
+        group_percentages = [f"({value:.2%})" for value in cm.flatten() / np.sum(cm)]
+        labels = [f"{v1}\n{v2}" for v1, v2 in zip(group_counts, group_percentages, strict=False)]
+        labels = np.asarray(labels).reshape(n_classes, n_classes)
+        # tn, fp, fn, tp = cm.ravel()
 
-        plt.figure(figsize=(4,4), dpi=200)
-        categories = ['no', 'spherical', 'vortex'] #  0:no substructure 1:spherical substructure 2:vortex substructure  
-        sns.heatmap(cm, annot=labels, cmap=cmap, fmt="", xticklabels=categories, yticklabels=categories)
+        plt.figure(figsize=(4, 4), dpi=200)
+        categories = [
+            "no",
+            "spherical",
+            "vortex",
+        ]  #  0:no substructure 1:spherical substructure 2:vortex substructure
+        sns.heatmap(
+            cm,
+            annot=labels,
+            cmap=cmap,
+            fmt="",
+            xticklabels=categories,
+            yticklabels=categories,
+        )
         plt.title("Confusion matrix")
         plt.ylabel("Actual label")
         plt.xlabel("Predicted label")
@@ -256,20 +283,22 @@ class Supervised(object):
 
         # plot roc
         ## one hot encode data
-        onehot = np.zeros((labels_list.size, labels_list.max()+1))
-        onehot[np.arange(labels_list.size),labels_list] = 1
-        onehot = onehot.astype('int')
+        onehot = np.zeros((labels_list.size, labels_list.max() + 1))
+        onehot[np.arange(labels_list.size), labels_list] = 1
+        onehot = onehot.astype("int")
 
-        fpr = dict()
-        tpr = dict()
-        roc_auc = dict()
+        fpr = {}
+        tpr = {}
+        roc_auc = {}
 
         ## get roc curve and auroc for each class
         for i in range(n_classes):
-            fpr[i], tpr[i], _ = sklearn.metrics.roc_curve(onehot[:, i], outputs_list[:, i])
+            fpr[i], tpr[i], _ = sklearn.metrics.roc_curve(
+                onehot[:, i], outputs_list[:, i]
+            )
             roc_auc[i] = sklearn.metrics.auc(fpr[i], tpr[i])
 
-        if output_path != None:
+        if output_path is not None:
             np.savez(output_path, fpr=fpr, tpr=tpr, roc_auc=roc_auc)
 
         ## get macro average auroc
@@ -284,20 +313,28 @@ class Supervised(object):
         tpr["macro"] = mean_tpr
         roc_auc["macro"] = sklearn.metrics.auc(fpr["macro"], tpr["macro"])
 
-        plt.figure(figsize=(6,6), dpi=200)
+        plt.figure(figsize=(6, 6), dpi=200)
 
-        plt.plot([0, 1], [0, 1], color='black', linestyle='--')
+        plt.plot([0, 1], [0, 1], color="black", linestyle="--")
 
-        c = ['blue', 'green', 'orange']
+        c = ["blue", "green", "orange"]
         for i in range(3):
-            plt.plot(fpr[i], tpr[i], label=f"AUC class {i} = {roc_auc[i]:.4f}", color=c[i])
+            plt.plot(
+                fpr[i], tpr[i], label=f"AUC class {i} = {roc_auc[i]:.4f}", color=c[i]
+            )
 
-        plt.plot(fpr["macro"], tpr["macro"], label=f"macro-average AUC = {roc_auc['macro']:.4f}", color='deeppink', linewidth=2)
-            
-        plt.title('Receiver Operating Characteristic (ROC)')
-        plt.xlabel('False Positives')
-        plt.ylabel('True Positives')
+        plt.plot(
+            fpr["macro"],
+            tpr["macro"],
+            label=f"macro-average AUC = {roc_auc['macro']:.4f}",
+            color="deeppink",
+            linewidth=2,
+        )
+
+        plt.title("Receiver Operating Characteristic (ROC)")
+        plt.xlabel("False Positives")
+        plt.ylabel("True Positives")
         ax = plt.gca()
-        ax.set_aspect('equal')
-        plt.legend(loc='lower right')
+        ax.set_aspect("equal")
+        plt.legend(loc="lower right")
         plt.show()

@@ -1,7 +1,7 @@
 import torch
 import torch.nn.functional as F
-
 from torch import nn
+
 
 class SelfAttention(nn.Module):
     def __init__(self, channels):
@@ -25,6 +25,7 @@ class SelfAttention(nn.Module):
         attention_value = self.ff_self(attention_value) + attention_value
         return attention_value.swapaxes(2, 1).view(-1, self.channels, size, size)
 
+
 class DoubleConv(nn.Module):
     def __init__(self, in_channels, out_channels, mid_channels=None, residual=False):
         super().__init__()
@@ -41,9 +42,10 @@ class DoubleConv(nn.Module):
 
     def forward(self, x):
         if self.residual:
-            return F.gelu(x+self.double_conv(x))
+            return F.gelu(x + self.double_conv(x))
         else:
             return self.double_conv(x)
+
 
 class Down(nn.Module):
     def __init__(self, in_channels, out_channels, emb_dim=128):
@@ -67,6 +69,7 @@ class Down(nn.Module):
         emb = self.emb_layer(t)[:, :, None, None].repeat(1, 1, x.shape[-2], x.shape[-1])
         return x + emb
 
+
 class Down_mass(nn.Module):
     def __init__(self, in_channels, out_channels, emb_dim=128):
         super().__init__()
@@ -86,36 +89,23 @@ class Down_mass(nn.Module):
 
         self.layer1 = nn.Sequential(
             nn.SiLU(),
-            nn.Linear(
-                emb_dim,
-                out_channels
-            ),
+            nn.Linear(emb_dim, out_channels),
         )
 
         self.layer2 = nn.Sequential(
             nn.SiLU(),
-            nn.Linear(
-                emb_dim,
-                out_channels
-            ),
+            nn.Linear(emb_dim, out_channels),
         )
 
         self.layer3 = nn.Sequential(
             nn.SiLU(),
-            nn.Linear(
-                emb_dim,
-                out_channels
-            ),
+            nn.Linear(emb_dim, out_channels),
         )
 
         self.layer4 = nn.Sequential(
             nn.SiLU(),
-            nn.Linear(
-                emb_dim,
-                out_channels
-            ),
+            nn.Linear(emb_dim, out_channels),
         )
-
 
     def forward(self, x, t, v1, v2, v3, v4):
         x = self.maxpool_conv(x)
@@ -139,12 +129,8 @@ class Up(nn.Module):
 
         self.emb_layer = nn.Sequential(
             nn.SiLU(),
-            nn.Linear(
-                emb_dim,
-                out_channels
-            ),
+            nn.Linear(emb_dim, out_channels),
         )
-        
 
     def forward(self, x, skip_x, t):
         x = self.up(x)
@@ -152,7 +138,8 @@ class Up(nn.Module):
         x = self.conv(x)
         emb = self.emb_layer(t)[:, :, None, None].repeat(1, 1, x.shape[-2], x.shape[-1])
         return x + emb
-    
+
+
 class Up_mass(nn.Module):
     def __init__(self, in_channels, out_channels, emb_dim=128):
         super().__init__()
@@ -165,44 +152,28 @@ class Up_mass(nn.Module):
 
         self.emb_layer = nn.Sequential(
             nn.SiLU(),
-            nn.Linear(
-                emb_dim,
-                out_channels
-            ),
+            nn.Linear(emb_dim, out_channels),
         )
 
         self.layer1 = nn.Sequential(
             nn.SiLU(),
-            nn.Linear(
-                emb_dim,
-                out_channels
-            ),
+            nn.Linear(emb_dim, out_channels),
         )
 
         self.layer2 = nn.Sequential(
             nn.SiLU(),
-            nn.Linear(
-                emb_dim,
-                out_channels
-            ),
+            nn.Linear(emb_dim, out_channels),
         )
 
         self.layer3 = nn.Sequential(
             nn.SiLU(),
-            nn.Linear(
-                emb_dim,
-                out_channels
-            ),
+            nn.Linear(emb_dim, out_channels),
         )
 
         self.layer4 = nn.Sequential(
             nn.SiLU(),
-            nn.Linear(
-                emb_dim,
-                out_channels
-            ),
+            nn.Linear(emb_dim, out_channels),
         )
-        
 
     def forward(self, x, skip_x, t, v1, v2, v3, v4):
         x = self.up(x)
@@ -214,6 +185,7 @@ class Up_mass(nn.Module):
         v3o = self.layer3(v3)[:, :, None, None].repeat(1, 1, x.shape[-2], x.shape[-1])
         v4o = self.layer4(v4)[:, :, None, None].repeat(1, 1, x.shape[-2], x.shape[-1])
         return x + emb + v1o + v2o + v3o + v4o
+
 
 class UNet_all_conditional(nn.Module):
     def __init__(self, config):
@@ -240,14 +212,14 @@ class UNet_all_conditional(nn.Module):
         self.sa6 = SelfAttention(64)
         self.outc = nn.Conv2d(64, config.unet.output_channels, kernel_size=1)
 
-        self.linear_1 = nn.Linear(1,config.unet.time_emb)
-        self.linear_2 = nn.Linear(1,config.unet.time_emb)
-        self.linear_3 = nn.Linear(1,config.unet.time_emb)
-        self.linear_4 = nn.Linear(1,config.unet.time_emb)
+        self.linear_1 = nn.Linear(1, config.unet.time_emb)
+        self.linear_2 = nn.Linear(1, config.unet.time_emb)
+        self.linear_3 = nn.Linear(1, config.unet.time_emb)
+        self.linear_4 = nn.Linear(1, config.unet.time_emb)
 
         # if config.data.num_classes is not None:
         #     self.label_emb = nn.Embedding(config.data.num_classes, config.unet.time_emb)
-        
+
     def pos_encoding(self, t, channels):
         inv_freq = 1.0 / (
             10000
@@ -261,7 +233,7 @@ class UNet_all_conditional(nn.Module):
     def forward(self, x, t, y1, y2, y3, y4):
         t = t.unsqueeze(-1).type(torch.float)
         t = self.pos_encoding(t, self.time_dim)
-        #print(t.shape)
+        # print(t.shape)
         if y1 is not None:
             v1 = self.linear_1(y1)
             v2 = self.linear_2(y2)
@@ -288,4 +260,3 @@ class UNet_all_conditional(nn.Module):
         x = self.sa6(x)
         output = self.outc(x)
         return output
-

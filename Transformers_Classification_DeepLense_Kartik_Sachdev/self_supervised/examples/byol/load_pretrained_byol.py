@@ -1,22 +1,11 @@
 import torch
-import torch.nn as nn
-import torch.optim as optim
-from torch.utils.data import DataLoader
-from utils.dataset import DeepLenseDatasetSSL, DefaultDatasetSetupSSL
-from torch.utils.data import DataLoader, random_split
-
-from models.cnn_zoo import CustomResNet
-from utils.losses.contrastive_loss import ContrastiveLossEuclidean
-from utils.train import train_simplistic
-from utils.util import (
-    load_model_add_head,
-    get_second_last_layer,
-    get_last_layer_features,
-)
-from torchsummary import summary
-from models.byol import BYOLSingleChannel, FinetuneModelByol
 import torchvision
-from models.utils.finetune_model import FinetuneModel
+from models.byol import BYOLSingleChannel, FinetuneModelByol
+from torch import nn, optim
+from torch.utils.data import DataLoader, random_split
+from torchsummary import summary
+from utils.dataset import DefaultDatasetSetupSSL
+from utils.train import train_simplistic
 
 # Set device
 device = "cuda"  # torch.device("cuda" if torch.cuda.is_available() else "cpu")

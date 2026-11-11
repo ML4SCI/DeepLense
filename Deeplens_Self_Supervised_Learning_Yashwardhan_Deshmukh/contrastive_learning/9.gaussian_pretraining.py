@@ -4,7 +4,9 @@ class ContrastiveModel(keras.Model):
         super().__init__()
 
         self.temperature = temperature
-        self.contrastive_augmenter = get_augmenter_only_gaussian(**contrastive_augmentation_gaussian)
+        self.contrastive_augmenter = get_augmenter_only_gaussian(
+            **contrastive_augmentation_gaussian
+        )
         self.encoder = get_encoder()
         # Non-linear MLP as projection head
         self.projection_head = keras.Sequential(
@@ -99,25 +101,27 @@ class ContrastiveModel(keras.Model):
         self.contrastive_optimizer.apply_gradients(
             zip(
                 gradients,
-                self.encoder.trainable_weights + self.projection_head.trainable_weights,
+                self.encoder.trainable_weights + self.projection_head.trainable_weights, strict=False,
             )
         )
         self.contrastive_loss_tracker.update_state(contrastive_loss)
 
         # Labels are only used in evalutation for an on-the-fly logistic regression
-#         preprocessed_images = self.classification_augmenter(
-#             labeled_images, training=True
-#         )
-        
+        #         preprocessed_images = self.classification_augmenter(
+        #             labeled_images, training=True
+        #         )
+
         with tf.GradientTape() as tape:
             # the encoder is used in inference mode here to avoid regularization
             # and updating the batch normalization paramers if they are used
-            features = self.encoder(labeled_images, training=False) #preprocessed_images replaced with labeled_images
+            features = self.encoder(
+                labeled_images, training=False
+            )  # preprocessed_images replaced with labeled_images
             class_logits = self.linear_probe(features, training=True)
             probe_loss = self.probe_loss(labels, class_logits)
         gradients = tape.gradient(probe_loss, self.linear_probe.trainable_weights)
         self.probe_optimizer.apply_gradients(
-            zip(gradients, self.linear_probe.trainable_weights)
+            zip(gradients, self.linear_probe.trainable_weights, strict=False)
         )
         self.probe_loss_tracker.update_state(probe_loss)
         self.probe_accuracy.update_state(labels, class_logits)
@@ -128,10 +132,12 @@ class ContrastiveModel(keras.Model):
         labeled_images, labels = data
 
         # For testing the components are used with a training=False flag
-#         preprocessed_images = self.classification_augmenter(
-#             labeled_images, training=False
-#         )
-        features = self.encoder(labeled_images, training=False) #preprocessed_images replaced with labeled_images
+        #         preprocessed_images = self.classification_augmenter(
+        #             labeled_images, training=False
+        #         )
+        features = self.encoder(
+            labeled_images, training=False
+        )  # preprocessed_images replaced with labeled_images
         class_logits = self.linear_probe(features, training=False)
         probe_loss = self.probe_loss(labels, class_logits)
         self.probe_loss_tracker.update_state(probe_loss)
@@ -148,4 +154,10 @@ pretraining_model_gaussian.compile(
     probe_optimizer=keras.optimizers.Adam(),
 )
 
-pretraining_history_gaussian = pretraining_model_gaussian.fit(train_generator_label, steps_per_epoch=steps_per_epoch, epochs=num_epochs, validation_data=test_generator_label, validation_steps = validation_steps)
+pretraining_history_gaussian = pretraining_model_gaussian.fit(
+    train_generator_label,
+    steps_per_epoch=steps_per_epoch,
+    epochs=num_epochs,
+    validation_data=test_generator_label,
+    validation_steps=validation_steps,
+)

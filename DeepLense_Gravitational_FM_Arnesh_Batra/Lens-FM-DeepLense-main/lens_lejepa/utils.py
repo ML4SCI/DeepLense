@@ -18,7 +18,11 @@ logger = logging.getLogger("lens_lejepa")
 
 
 def setup_logging(level: int = logging.INFO) -> None:
-    logging.basicConfig(level=level, format="%(asctime)s | %(levelname)s | %(message)s", datefmt="%H:%M:%S")
+    logging.basicConfig(
+        level=level,
+        format="%(asctime)s | %(levelname)s | %(message)s",
+        datefmt="%H:%M:%S",
+    )
 
 
 def set_seed(seed: int) -> None:
@@ -36,7 +40,11 @@ def resolve_device(name: str) -> torch.device:
 
 
 def make_run_dir(output_dir: str, group: str, run_name: str | None) -> Path:
-    run_dir = Path(output_dir) / group / (run_name or datetime.now().strftime("%Y%m%d_%H%M%S"))
+    run_dir = (
+        Path(output_dir)
+        / group
+        / (run_name or datetime.now().strftime("%Y%m%d_%H%M%S"))
+    )
     run_dir.mkdir(parents=True, exist_ok=True)
     return run_dir
 
@@ -61,7 +69,13 @@ def append_csv(path: Path, row: dict[str, Any]) -> None:
     if path.exists():
         with path.open(newline="") as handle:
             rows = list(csv.DictReader(handle))
-    rows.append({key: value for key, value in row.items() if np.isscalar(value) or value is None})
+    rows.append(
+        {
+            key: value
+            for key, value in row.items()
+            if np.isscalar(value) or value is None
+        }
+    )
     fieldnames = list(dict.fromkeys(key for r in rows for key in r))
     with path.open("w", newline="") as handle:
         writer = csv.DictWriter(handle, fieldnames=fieldnames)
@@ -82,7 +96,16 @@ class WarmupCosine:
     scheduling weight decay.
     """
 
-    def __init__(self, optimizer, key: str, start: float, peak: float, final: float, warmup_steps: int, total_steps: int) -> None:
+    def __init__(
+        self,
+        optimizer,
+        key: str,
+        start: float,
+        peak: float,
+        final: float,
+        warmup_steps: int,
+        total_steps: int,
+    ) -> None:
         self.optimizer, self.key = optimizer, key
         self.start, self.peak, self.final = start, peak, final
         self.warmup_steps, self.total_steps = warmup_steps, max(total_steps, 1)
@@ -90,9 +113,15 @@ class WarmupCosine:
 
     def value(self, step: int) -> float:
         if step < self.warmup_steps:
-            return self.start + (self.peak - self.start) * step / max(1, self.warmup_steps)
-        progress = (step - self.warmup_steps) / max(1, self.total_steps - self.warmup_steps)
-        return self.final + (self.peak - self.final) * 0.5 * (1.0 + math.cos(math.pi * min(progress, 1.0)))
+            return self.start + (self.peak - self.start) * step / max(
+                1, self.warmup_steps
+            )
+        progress = (step - self.warmup_steps) / max(
+            1, self.total_steps - self.warmup_steps
+        )
+        return self.final + (self.peak - self.final) * 0.5 * (
+            1.0 + math.cos(math.pi * min(progress, 1.0))
+        )
 
     def step(self) -> float:
         self.step_count += 1

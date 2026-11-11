@@ -1,5 +1,5 @@
-from ray import tune
 import numpy as np
+from ray import tune
 
 PIT_CONFIG = {
     "network_type": "PiT",
@@ -17,7 +17,10 @@ PIT_CONFIG = {
     },
     "lr_schedule_config": {
         "use_lr_schedule": True,
-        "step_lr": {"gamma": 0.5, "step_size": 20,},
+        "step_lr": {
+            "gamma": 0.5,
+            "step_size": 20,
+        },
         "reduce_on_plateau": {
             "factor": 0.1,
             "patience": 4,
@@ -29,7 +32,11 @@ PIT_CONFIG = {
     "network_config": {
         "patch_size": 14,
         "dim": 128,
-        "depth": (3, 3, 4,),
+        "depth": (
+            3,
+            3,
+            4,
+        ),
         "heads": 3,
         "mlp_dim": 256,
         "dropout": 0.1,
@@ -54,7 +61,10 @@ PIT_RAY_CONFIG = {
     },
     "lr_schedule_config": {
         "use_lr_schedule": True,
-        "step_lr": {"gamma": 0.5, "step_size": 20,},
+        "step_lr": {
+            "gamma": 0.5,
+            "step_size": 20,
+        },
         "reduce_on_plateau": {
             "factor": 0.1,
             "patience": 4,
@@ -66,7 +76,11 @@ PIT_RAY_CONFIG = {
     "network_config": {
         "patch_size": 14,
         "dim": tune.randint(128, 512),
-        "depth": (3, 3, 4,),
+        "depth": (
+            3,
+            3,
+            4,
+        ),
         "heads": tune.randint(2, 5),
         "mlp_dim": 256,
         "dropout": tune.choice([0.0, 0.1, 0.2]),

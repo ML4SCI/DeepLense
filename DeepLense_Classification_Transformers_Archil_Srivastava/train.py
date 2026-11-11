@@ -1,20 +1,18 @@
-import torch
-from torch.utils.data import DataLoader, random_split
-from torch.optim import AdamW, Adam, SGD
-from torch.optim.lr_scheduler import CosineAnnealingWarmRestarts
-from torch.nn import CrossEntropyLoss
-from tqdm import tqdm
-import numpy as np
 import argparse
 import os
-import wandb
 
-from data import LensDataset, WrapperDataset, get_transforms
+import torch
+import wandb
 from constants import *
-from models import get_timm_model
-from models.transformers import get_transformer_model
-from utils import get_device, set_seed
+from data import LensDataset, WrapperDataset, get_transforms
 from eval import evaluate
+from models import get_timm_model
+from torch.nn import CrossEntropyLoss
+from torch.optim import SGD, Adam, AdamW
+from torch.optim.lr_scheduler import CosineAnnealingWarmRestarts
+from torch.utils.data import DataLoader, random_split
+from tqdm import tqdm
+from utils import get_device, set_seed
 
 
 def train_step(model, images, labels, optimizer, scheduler, criterion, device="cpu"):
@@ -44,9 +42,10 @@ def train_step(model, images, labels, optimizer, scheduler, criterion, device="c
         Loss value from the forward pass
     """
     # Send to device
-    images, labels = images.to(device, dtype=torch.float), labels.type(
-        torch.LongTensor
-    ).to(device)
+    images, labels = (
+        images.to(device, dtype=torch.float),
+        labels.type(torch.LongTensor).to(device),
+    )
     model.train()  # Set train mode
     optimizer.zero_grad()  # Reset gradients
     logits = model(images)  # Forward pass
@@ -106,7 +105,7 @@ def train(
     # Alert wandb to log this training
     wandb.watch(model, criterion, log="all", log_freq=log_interval)
 
-    best_val_auroc, best_val_metrics = 0.0, dict()
+    best_val_auroc, best_val_metrics = 0.0, {}
     batch_num = 0
     for epoch in range(1, epochs + 1):
         for batch_data in tqdm(train_loader, desc=f"Epoch {epoch}"):

@@ -19,7 +19,7 @@ MODELS = {
     },
     "Model-5": {
         "train": "https://drive.google.com/file/d/1-eG5Y2ETDFPP_lwjkoxzRGZC7bm0rtCK/view?usp=sharing",
-        "test": None
+        "test": None,
     },
 }
 

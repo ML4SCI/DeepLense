@@ -31,17 +31,20 @@ class EinsteinRadiusDataset(Dataset):
 from .base import Task
 from . import register
 
+
 @register
 class EinsteinRadiusTask(Task):
     """Predict the Einstein radius in pixels."""
 
     name = "einstein_radius"
-    monitor = "mae"            # validation metric used to pick the checkpoint
+    monitor = "mae"  # validation metric used to pick the checkpoint
     higher_is_better = False
 
     def build_datasets(self):
         c = self.config
-        dataset = EinsteinRadiusDataset(f"{c.data_root}/{c.train_dataset}", c.image_size)
+        dataset = EinsteinRadiusDataset(
+            f"{c.data_root}/{c.train_dataset}", c.image_size
+        )
         train_idx, val_idx = quantile_split(dataset.targets, c.train_fraction, c.seed)
         return Subset(dataset, train_idx.tolist()), Subset(dataset, val_idx.tolist())
 
@@ -49,13 +52,16 @@ class EinsteinRadiusTask(Task):
         return EinsteinRadiusDataset(root, self.config.image_size)
 
     def build_head(self, encoder):
-        return EncoderRegressor(encoder)          # any nn.Module that wraps the encoder
+        return EncoderRegressor(encoder)  # any nn.Module that wraps the encoder
 
     def loss(self, output, batch):
         return F.smooth_l1_loss(output.float(), batch["target"])
 
-    def collect(self, output, batch):             # per-batch arrays for the metrics
-        return {"pred": output.float().cpu().numpy(), "true": batch["target"].cpu().numpy()}
+    def collect(self, output, batch):  # per-batch arrays for the metrics
+        return {
+            "pred": output.float().cpu().numpy(),
+            "true": batch["target"].cpu().numpy(),
+        }
 
     def metrics(self, outputs):
         return {"mae": float(np.abs(outputs["pred"] - outputs["true"]).mean())}

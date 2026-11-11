@@ -22,14 +22,14 @@ from .ssl.objective import ObjectiveConfig
 class PretrainConfig:
     """Self-supervised pretraining on unlabelled images (Model I in the paper)."""
 
-    method: str = "lens_lejepa"            # lens_lejepa | lejepa | ijepa | lens_jepa | lens_jepa_sym | lens_jepa_focus
+    method: str = "lens_lejepa"  # lens_lejepa | lejepa | ijepa | lens_jepa | lens_jepa_sym | lens_jepa_focus
     data_root: str = "../datasets"
     dataset: str = "Model_I"
     max_samples: int | None = None
     image_size: int = 160
     patch_size: int = 16
-    encoder: str = "vit_small"             # vit_small | vit_base_3blocks | lens_jepa | ...
-    projector_dim: int = 256               # LeJEPA methods only
+    encoder: str = "vit_small"  # vit_small | vit_base_3blocks | lens_jepa | ...
+    projector_dim: int = 256  # LeJEPA methods only
     epochs: int = 100
     batch_size: int = 128
     lr: float = 5e-4
@@ -38,8 +38,12 @@ class PretrainConfig:
     warmup_epochs: int = 10
     weight_decay: float = 0.05
     final_weight_decay: float = 0.05
-    objective: ObjectiveConfig = field(default_factory=ObjectiveConfig)      # lens_lejepa / lejepa
-    masked: MaskedJEPAConfig = field(default_factory=MaskedJEPAConfig)      # masked-prediction references
+    objective: ObjectiveConfig = field(
+        default_factory=ObjectiveConfig
+    )  # lens_lejepa / lejepa
+    masked: MaskedJEPAConfig = field(
+        default_factory=MaskedJEPAConfig
+    )  # masked-prediction references
     # A run is rejected if pooled features stay collapsed this many epochs.
     collapse_std_threshold: float = 0.02
     collapse_rank_threshold: float = 0.04
@@ -70,33 +74,41 @@ class PretrainConfig:
 class FinetuneConfig:
     """Downstream training of one task on top of a (pretrained) backbone."""
 
-    task: str = "classification"           # classification | regression | super_resolution
+    task: str = "classification"  # classification | regression | super_resolution
     data_root: str = "../datasets"
     train_dataset: str = "Model_II"
     test_dataset: str | None = "Model_II_test"
-    shots: int | None = None               # labels per class (classification/SR) or axion images (regression); null = all
-    train_fraction: float = 0.8            # full-data train/validation split
-    val_fraction: float = 0.25             # few-shot: validation images per class = shots * val_fraction
-    cache: bool = False                    # keep raw arrays in RAM
+    shots: int | None = (
+        None  # labels per class (classification/SR) or axion images (regression); null = all
+    )
+    train_fraction: float = 0.8  # full-data train/validation split
+    val_fraction: float = (
+        0.25  # few-shot: validation images per class = shots * val_fraction
+    )
+    cache: bool = False  # keep raw arrays in RAM
     image_size: int = 160
     patch_size: int = 16
     # Backbone: a ViT (optionally from a pretraining checkpoint) or a baseline.
-    backbone: str = "vit_small"            # encoder: vit_small | vit_tiny | vit_base | vit_base_3blocks | lens_jepa
-                                           # or a baseline: resnet18 | vit | vitsd | lensiformer | lenspinn | rcan | bicubic
-    pretrained: str | None = None          # path to last_pretrain.pt
-    adaptation: str = "rslora"             # an adapter name, "full" or "linear_probe" (encoder backbones only)
+    backbone: str = "vit_small"  # encoder: vit_small | vit_tiny | vit_base | vit_base_3blocks | lens_jepa
+    # or a baseline: resnet18 | vit | vitsd | lensiformer | lenspinn | rcan | bicubic
+    pretrained: str | None = None  # path to last_pretrain.pt
+    adaptation: str = (
+        "rslora"  # an adapter name, "full" or "linear_probe" (encoder backbones only)
+    )
     rank: int = 32
     alpha: float = 64.0
     dropout: float = 0.0
-    rank_schedule: list[int] | None = None # layerwise adapter only
+    rank_schedule: list[int] | None = None  # layerwise adapter only
     loraplus_ratio: float = 2.0
     epochs: int = 50
     batch_size: int = 128
-    grad_accum: int = 1                    # effective batch = batch_size * grad_accum
+    grad_accum: int = 1  # effective batch = batch_size * grad_accum
     lr: float = 3e-4
     weight_decay: float = 0.01
-    label_smoothing: float = 0.1           # classification only
-    train_jitter: int = 0                  # classification only: random +-N native-pixel shifts of training images
+    label_smoothing: float = 0.1  # classification only
+    train_jitter: int = (
+        0  # classification only: random +-N native-pixel shifts of training images
+    )
     val_interval: int = 10
     bf16: bool = True
     seed: int = 42
@@ -123,7 +135,9 @@ def _set_nested(data: dict, keys: list[str], value: Any) -> None:
     data[keys[-1]] = value
 
 
-def load_config(cls: type[C], path: str | Path | None = None, overrides: list[str] | None = None) -> C:
+def load_config(
+    cls: type[C], path: str | Path | None = None, overrides: list[str] | None = None
+) -> C:
     """Build ``cls`` from an optional YAML file plus ``key=value`` overrides."""
     data: dict[str, Any] = {}
     if path is not None:

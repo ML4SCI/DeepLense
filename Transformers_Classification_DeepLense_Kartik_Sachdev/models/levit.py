@@ -1,11 +1,9 @@
 from math import ceil
 
 import torch
-from torch import nn, einsum
-import torch.nn.functional as F
-
-from einops import rearrange, repeat
+from einops import rearrange
 from einops.layers.torch import Rearrange
+from torch import einsum, nn
 
 # file adapted from: https://github.com/lucidrains/vit-pytorch/blob/main/vit_pytorch/levit.py
 # helpers
@@ -64,7 +62,7 @@ class Attention(nn.Module):
         dim_out = default(dim_out, dim)
 
         self.heads = heads
-        self.scale = dim_key ** -0.5
+        self.scale = dim_key**-0.5
 
         self.to_q = nn.Sequential(
             nn.Conv2d(
@@ -102,7 +100,7 @@ class Attention(nn.Module):
         q_pos = torch.stack(torch.meshgrid(q_range, q_range), dim=-1)
         k_pos = torch.stack(torch.meshgrid(k_range, k_range), dim=-1)
 
-        q_pos, k_pos = map(lambda t: rearrange(t, "i j c -> (i j) c"), (q_pos, k_pos))
+        q_pos, k_pos = (rearrange(t, "i j c -> (i j) c") for t in (q_pos, k_pos))
         rel_pos = (q_pos[:, None, ...] - k_pos[None, :, ...]).abs()
 
         x_rel, y_rel = rel_pos.unbind(dim=-1)
@@ -116,13 +114,13 @@ class Attention(nn.Module):
         return fmap + (bias / self.scale)
 
     def forward(self, x):
-        b, n, *_, h = *x.shape, self.heads
+        _b, _n, *_, h = *x.shape, self.heads
 
         q = self.to_q(x)
         y = q.shape[2]
 
         qkv = (q, self.to_k(x), self.to_v(x))
-        q, k, v = map(lambda t: rearrange(t, "b (h d) ... -> b h (...) d", h=h), qkv)
+        q, k, v = (rearrange(t, "b (h d) ... -> b h (...) d", h=h) for t in qkv)
 
         dots = einsum("b h i d, b h j d -> b h i j", q, k) * self.scale
 
@@ -196,7 +194,7 @@ class LeViT(nn.Module):
         dim_value=64,
         dropout=0.0,
         num_distill_classes=None,
-        channels=3
+        channels=3,
     ):
         super().__init__()
 
@@ -204,9 +202,9 @@ class LeViT(nn.Module):
         depths = cast_tuple(depth, stages)
         layer_heads = cast_tuple(heads, stages)
 
-        assert all(
-            map(lambda t: len(t) == stages, (dims, depths, layer_heads))
-        ), "dimensions, depths, and heads must be a tuple that is less than the designated number of stages"
+        assert all(len(t) == stages for t in (dims, depths, layer_heads)), (
+            "dimensions, depths, and heads must be a tuple that is less than the designated number of stages"
+        )
 
         self.conv_embedding = nn.Sequential(
             nn.Conv2d(channels, 32, 3, stride=2, padding=1),
@@ -215,10 +213,10 @@ class LeViT(nn.Module):
             nn.Conv2d(128, dims[0], 3, stride=2, padding=1),
         )
 
-        fmap_size = image_size // (2 ** 4)
+        fmap_size = image_size // (2**4)
         layers = []
 
-        for ind, dim, depth, heads in zip(range(stages), dims, depths, layer_heads):
+        for ind, dim, depth, heads in zip(range(stages), dims, depths, layer_heads, strict=False):
             is_last = ind == (stages - 1)
             layers.append(
                 Transformer(

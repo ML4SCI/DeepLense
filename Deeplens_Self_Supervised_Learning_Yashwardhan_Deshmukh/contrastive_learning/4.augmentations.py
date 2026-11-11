@@ -32,55 +32,64 @@ class RandomResizedCrop(layers.Layer):
             images, bounding_boxes, tf.range(batch_size), (height, width)
         )
         return images
-    
+
+
 class RandomGaussianNoise(layers.Layer):
     def __init__(self, std_dev):
         super().__init__()
         self.std_dev = std_dev
 
     def add_gaussian_noise(self, images):
-        noise = tf.random.normal(shape=tf.shape(images), mean=0., stddev=self.std_dev)
+        noise = tf.random.normal(shape=tf.shape(images), mean=0.0, stddev=self.std_dev)
         return tf.clip_by_value(images + noise, 0, 1)
 
     def call(self, images):
         images = self.add_gaussian_noise(images)
         return images
 
-    
-    
+
 def get_augmenter_only_gaussian(std_dev, name):
     return keras.Sequential(
         [
             layers.Input(shape=input_shape),
             # layers.Rescaling(1 / 255), # Only for Single Channel Images
-#             layers.RandomRotation(1), # Not needed for now
+            #             layers.RandomRotation(1), # Not needed for now
             RandomGaussianNoise(std_dev=std_dev),
-#             RandomResizedCrop(scale=scale, ratio=(3 / 4, 4 / 3)),
-#             RandomBrightness(brightness=brightness),
+            #             RandomResizedCrop(scale=scale, ratio=(3 / 4, 4 / 3)),
+            #             RandomBrightness(brightness=brightness),
         ],
-        name=name,)
+        name=name,
+    )
+
 
 def get_augmenter_only_rotation(factor, name):
     return keras.Sequential(
         [
             layers.Input(shape=input_shape),
-            layers.RandomRotation(factor), 
+            layers.RandomRotation(factor),
         ],
-        name=name,)
+        name=name,
+    )
+
 
 class RandomBrightness(layers.Layer):
     def __init__(self, brightness):
         super().__init__()
         self.brightness = brightness
+
     def blend(self, images_1, images_2, ratios):
         return tf.clip_by_value(ratios * images_1 + (1.0 - ratios) * images_2, 0, 1)
+
     def random_brightness(self, images):
         # random interpolation/extrapolation between the image and darkness
         return self.blend(
             images,
             0,
             tf.random.uniform(
-                (tf.shape(images)[0], 1, 1, 1), 1 - self.brightness, 1 + self.brightness),)
+                (tf.shape(images)[0], 1, 1, 1), 1 - self.brightness, 1 + self.brightness
+            ),
+        )
+
     def call(self, images):
         images = self.random_brightness(images)
-        return images 
+        return images

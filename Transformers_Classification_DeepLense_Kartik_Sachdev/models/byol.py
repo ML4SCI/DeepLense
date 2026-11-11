@@ -1,12 +1,10 @@
-import warnings
+import copy
 
 import torch
-import torch.nn as nn
-
 from models._momentum import _MomentumEncoderMixin
 from models.modules.head import BYOLProjectionHead
+from torch import nn
 from utils.util import deactivate_requires_grad
-import copy
 
 
 def _get_byol_mlp(num_ftrs: int, hidden_dim: int, out_dim: int):
@@ -49,7 +47,7 @@ class BYOL(nn.Module, _MomentumEncoderMixin):
         out_dim: int = 256,
         m: float = 0.9,
     ):
-        super(BYOL, self).__init__()
+        super().__init__()
 
         self.backbone = backbone
         # the architecture of the projection and prediction head is the same
@@ -144,7 +142,7 @@ class BYOL(nn.Module, _MomentumEncoderMixin):
         if x1 is None:
             raise ValueError("x1 must not be None!")
 
-        if not all([s0 == s1 for s0, s1 in zip(x0.shape, x1.shape)]):
+        if not all(s0 == s1 for s0, s1 in zip(x0.shape, x1.shape, strict=False)):
             raise ValueError(
                 f"x0 and x1 must have same shape but got shapes {x0.shape} and {x1.shape}!"
             )
@@ -179,7 +177,7 @@ class BYOLSingleChannel(nn.Module, _MomentumEncoderMixin):
         out_dim: int = 256,
         m: float = 0.9,
     ):
-        super(BYOLSingleChannel, self).__init__()
+        super().__init__()
 
         self.backbone = backbone
         self.backbone[0] = nn.Conv2d(
@@ -277,7 +275,7 @@ class BYOLSingleChannel(nn.Module, _MomentumEncoderMixin):
         if x1 is None:
             raise ValueError("x1 must not be None!")
 
-        if not all([s0 == s1 for s0, s1 in zip(x0.shape, x1.shape)]):
+        if not all(s0 == s1 for s0, s1 in zip(x0.shape, x1.shape, strict=False)):
             raise ValueError(
                 f"x0 and x1 must have same shape but got shapes {x0.shape} and {x1.shape}!"
             )
@@ -317,7 +315,6 @@ class BYOLTransformer(BYOL):
 
         self.backbone = backbone
         # self.backbone = nn.Sequential(*list(backbone.children())[:-1])
-
 
         # the architecture of the projection and prediction head is the same
         self.projection_head = BYOLProjectionHead(num_ftrs, hidden_dim, out_dim)

@@ -1,6 +1,6 @@
 from lightly.models.modules import SimSiamPredictionHead, SimSiamProjectionHead
-import torch.nn as nn
-import torch
+from torch import nn
+
 
 class SimSiamTransformer(nn.Module):
     def __init__(self, backbone, input_dim):
@@ -15,4 +15,3 @@ class SimSiamTransformer(nn.Module):
         p = self.prediction_head(z)
         z = z.detach()
         return z, p
-

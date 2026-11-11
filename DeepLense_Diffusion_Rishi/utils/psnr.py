@@ -1,75 +1,81 @@
-import sys
-import os
 import torch
-import numpy as np
-
-from torch import nn
 import torch.nn.functional as F
-from torch.utils.data import DataLoader 
-from torchvision import models 
-
-from configmypy import ConfigPipeline, YamlConfig, ArgparseConfig
+from configmypy import ArgparseConfig, ConfigPipeline, YamlConfig
 from dataset.preprocessing_all_model2 import CustomDataset, CustomDataset_1
 from models.ddpm_all import Diffusion
-from models.autoencoder import Autoencoder
 from models.unet_all import UNet_all_conditional
-from train.train_ae_ddpm import Trainer
-
+from torch import nn
+from torch.utils.data import DataLoader
 from torchmetrics import StructuralSimilarityIndexMeasure
 
-import matplotlib.pyplot as plt
 # Set seed for PyTorch
 torch.manual_seed(42)
 
 
 class View(nn.Module):
     def __init__(self, size):
-        super(View, self).__init__()
+        super().__init__()
         self.size = size
 
     def forward(self, tensor):
         return tensor.view(self.size)
 
+
 def calculate_psnr(real_images, generated_images, max_pixel_value=1.0):
     mse = F.mse_loss(generated_images, real_images)
     if mse == 0:
-        return float('inf')
+        return float("inf")
 
-    psnr = 10*torch.log10(max_pixel_value **2/mse)
+    psnr = 10 * torch.log10(max_pixel_value**2 / mse)
     return psnr
+
 
 def calculate_ssim(real_images, generated_images, config):
     ssim_metric = StructuralSimilarityIndexMeasure().to(config.device)
     score = ssim_metric(real_images, generated_images)
     return score
+
+
 # Read the configuration
 config_name = "default"
 pipe = ConfigPipeline(
     [
         YamlConfig(
-            "./conditional_ddpm_config.yaml", config_name='default', config_folder='cfg/'
+            "./conditional_ddpm_config.yaml",
+            config_name="default",
+            config_folder="cfg/",
         ),
         ArgparseConfig(infer_types=True, config_name=None, config_file=None),
-        YamlConfig(config_folder='cfg/')
+        YamlConfig(config_folder="cfg/"),
     ]
 )
 config = pipe.read_conf()
 
 # Conditional DDPM
 model = UNet_all_conditional(config)
-model.load_state_dict(torch.load('saved_models/all_conditional_ckpt_model2.pt'))
+model.load_state_dict(torch.load("saved_models/all_conditional_ckpt_model2.pt"))
 model = model.to(device=config.device)
 
-# Load diffusion 
-diffusion = Diffusion(noise_steps=config.diff.noise_steps, beta_start=config.diff.beta_start, beta_end=config.diff.beta_end, img_size=config.data.image_size, device=config.device)
+# Load diffusion
+diffusion = Diffusion(
+    noise_steps=config.diff.noise_steps,
+    beta_start=config.diff.beta_start,
+    beta_end=config.diff.beta_end,
+    img_size=config.data.image_size,
+    device=config.device,
+)
 
 # Load Data
 # Load the Dataset
-dataset = CustomDataset(root_dir=config.data.folder, config=config)#, max_samples=config.data.max_samples, config=config)
+dataset = CustomDataset(
+    root_dir=config.data.folder, config=config
+)  # , max_samples=config.data.max_samples, config=config)
 data_loader = DataLoader(dataset=dataset, batch_size=100, shuffle=config.data.shuffle)
-#print(data_loader)
+# print(data_loader)
 dataset_1 = CustomDataset_1(root_dir=config.data.folder, config=config)
-data_loader_1 = DataLoader(dataset=dataset_1, batch_size=100, shuffle=config.data.shuffle)
+data_loader_1 = DataLoader(
+    dataset=dataset_1, batch_size=100, shuffle=config.data.shuffle
+)
 
 for batch_1 in data_loader_1:
     data_real, v1, v2, v3, v4 = batch_1
@@ -85,13 +91,15 @@ for batch in data_loader:
     v3 = v3.to(config.device).float()
     v4 = v4.to(config.device).float()
     data = data.to(config.device).float()
-    #print(v4)
-    #print(mass)
+    # print(v4)
+    # print(mass)
     # observed_values = model_latent.encode(mass)
     # print(observed_values)
-    sample_images = diffusion.sample_conditional(model, 100, v1, v2, v3, v4, cfg_scale=0)
-    #observed_values = model_res(sample_images)
-    #mae_loss_fn = nn.L1Loss()
+    sample_images = diffusion.sample_conditional(
+        model, 100, v1, v2, v3, v4, cfg_scale=0
+    )
+    # observed_values = model_res(sample_images)
+    # mae_loss_fn = nn.L1Loss()
     psnr = calculate_ssim(data_real, sample_images, config)
     print("psnr value", psnr)
     ## Plot for true and predicted
@@ -105,18 +113,18 @@ for batch in data_loader:
     # # plt.imshow(ndarr)
     # plt.savefig(os.path.join("plots", f"all_variables.jpg"))
     # plt.figure(figsize=(6,6), dpi=100)
-    # Renormalise 
-    #mass = mass.to('cpu').numpy()
-    #observed_values = observed_values.to('cpu').detach().numpy()
-    #mass = mass*(config.data.max_value-config.data.min_value) + config.data.min_value
-    #observed_values = observed_values*(config.data.max_value-config.data.min_value) + config.data.min_value
+    # Renormalise
+    # mass = mass.to('cpu').numpy()
+    # observed_values = observed_values.to('cpu').detach().numpy()
+    # mass = mass*(config.data.max_value-config.data.min_value) + config.data.min_value
+    # observed_values = observed_values*(config.data.max_value-config.data.min_value) + config.data.min_value
     # plt.scatter(v4_1.to('cpu').numpy(), observed_values.to('cpu').detach().numpy(), color='black')
     # #plt.scatter(, observed_values, color='black')
     # plt.xlabel('Observed variable 4')
     # plt.ylabel('Predicted variable 4')
     # plt.savefig(os.path.join("plots", f"all_new_variables_4.jpg"))
     break
-# Load mass and axion 
+# Load mass and axion
 # dir = '../Data/Model_II/axion/axion_sim_356113875435765399182650162198846.npy'
 # #dir = '../Data/Model_II/axion/axion_sim_76051909974444833968539282987196377.npy'
 # data = np.load(dir, allow_pickle=True)
@@ -125,11 +133,11 @@ for batch in data_loader:
 # print(labels.unsqueeze(0).unsqueeze(0))
 # sample_images = diffusion.sample_conditional(model, 1, labels)
 # print(sample_images)
-#print(model_latent(labels))
+# print(model_latent(labels))
 
 
 # Load resnet
-# Model 
+# Model
 # model_res = models.resnet18(pretrained=False)
 # model_res.conv1 = torch.nn.Conv2d(1, 64, kernel_size=(7, 7), stride=(2, 2), padding=(3, 3), bias=False)
 # num_ftrs = model_res.fc.in_features

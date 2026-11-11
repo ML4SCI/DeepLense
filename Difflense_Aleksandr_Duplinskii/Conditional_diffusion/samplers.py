@@ -1,27 +1,13 @@
-import torch
-import torch.nn as nn
-import torch.nn.functional as F
-from torchvision import datasets, transforms
-from torch.utils.data import DataLoader
 import numpy as np
-import matplotlib.pyplot as plt
-import copy
-from torch.utils.data import random_split
-from einops import rearrange
-import os
-import random
-from scipy.ndimage import gaussian_filter
-from typing import Optional, Tuple, Union
-
+import torch
 from models import get_time_embedding_continuous
-from torch.amp import GradScaler, autocast
 
 # --- Hyperparameters ---
 T = 1000
 BATCH_SIZE = 256
 IMG_SIZE = 64
 EMBED_DIM = 128
-DEVICE = 'cuda' if torch.cuda.is_available() else 'cpu'
+DEVICE = "cuda" if torch.cuda.is_available() else "cpu"
 
 
 def cosine_beta_schedule(timesteps, s=0.008):
@@ -30,7 +16,7 @@ def cosine_beta_schedule(timesteps, s=0.008):
     alphas_cumprod = torch.cos(((x / timesteps) + s) / (1 + s) * np.pi * 0.5) ** 2
     alphas_cumprod = alphas_cumprod / alphas_cumprod[0]
     alphas_cumprod = torch.clip(alphas_cumprod, 1e-8, 1.0)
-    
+
     betas = 1 - (alphas_cumprod[1:] / alphas_cumprod[:-1])
     betas = torch.clip(betas, 1e-5, 0.999)
     return betas
@@ -50,32 +36,37 @@ def cosine_beta_schedule_custom(timesteps, beta_start=1e-4, beta_end=0.02):
     """
     x = torch.linspace(0, 1, timesteps)
     cosine = (1 + torch.cos(np.pi * x + np.pi)) / 2
-    cosine = (cosine - cosine.min()) / (cosine.max() - cosine.min())  # Normalize to [0, 1]
+    cosine = (cosine - cosine.min()) / (
+        cosine.max() - cosine.min()
+    )  # Normalize to [0, 1]
     betas = beta_start + cosine * (beta_end - beta_start)  # Scale to desired range
     return betas
-
 
 
 # --- Noise Schedule ---
 # betas = torch.linspace(1e-4, 0.02, T).to(DEVICE)
 betas = cosine_beta_schedule_custom(T).to(DEVICE)
 # betas = cosine_beta_schedule(T).to(DEVICE)
-alphas = 1. - betas
+alphas = 1.0 - betas
 alphas_cumprod = torch.cumprod(alphas, dim=0)
 
 
 # --- EMA Update ---
 def update_ema(ema_model, model, decay):
     with torch.no_grad():
-        for ema_param, param in zip(ema_model.parameters(), model.parameters()):
+        for ema_param, param in zip(ema_model.parameters(), model.parameters(), strict=False):
             ema_param.data.mul_(decay).add_(param.data, alpha=1 - decay)
-            
+
+
 # --- Timestep Embedding ---
 def get_timestep_embedding(timesteps, dim):
     half_dim = dim // 2
-    freqs = torch.exp(-np.log(10000) * torch.arange(0, half_dim).float() / half_dim).to(DEVICE)
+    freqs = torch.exp(-np.log(10000) * torch.arange(0, half_dim).float() / half_dim).to(
+        DEVICE
+    )
     angles = timesteps[:, None].float() * freqs[None, :]
     return torch.cat([torch.sin(angles), torch.cos(angles)], dim=-1)
+
 
 # --- Forward Diffusion ---
 def q_sample(x0, t, noise):
@@ -83,13 +74,17 @@ def q_sample(x0, t, noise):
     sqrt_one_minus = torch.sqrt(1 - alphas_cumprod[t]).view(-1, 1, 1, 1).to(DEVICE)
     return sqrt_alphas_cumprod * x0 + sqrt_one_minus * noise
 
+
 # --- Ensure shapes match before adding ---
+
 
 def center_crop(tensor, target_height, target_width):
     _, _, h, w = tensor.shape
     start_h = (h - target_height) // 2
     start_w = (w - target_width) // 2
-    return tensor[:, :, start_h:start_h + target_height, start_w:start_w + target_width]
+    return tensor[
+        :, :, start_h : start_h + target_height, start_w : start_w + target_width
+    ]
 
 
 def predict_x0_from_noise(x_t, t, pred_noise, alphas_cumprod):
@@ -114,7 +109,7 @@ def sample_epsilon(model, n_samples=1):
             alpha_t = alphas[t_batch].view(-1, 1, 1, 1).to(DEVICE)
             alpha_bar_t = alphas_cumprod[t_batch].view(-1, 1, 1, 1).to(DEVICE)
             beta_t = betas[t_batch].view(-1, 1, 1, 1).to(DEVICE)
-            
+
             assert eps_theta.shape == x.shape, "Prediction shape mismatch"
             assert alpha_t.shape == x.shape[:1] + (1, 1, 1), "alpha_t shape mismatch"
             assert not torch.isnan(eps_theta).any(), "NaNs in prediction"
@@ -127,6 +122,7 @@ def sample_epsilon(model, n_samples=1):
             noise = torch.randn_like(x) if t > 0 else torch.zeros_like(x)
             x = mu + torch.sqrt(beta_t) * noise
     return (x + 1) / 2
+
 
 def sample_epsilon_conditional(model, x_cond, T=T):
     """
@@ -165,7 +161,6 @@ def sample_epsilon_conditional(model, x_cond, T=T):
     return (x + 1) / 2  # Return in [0, 1] range
 
 
-
 def sample_v(model, n_samples=1):
     model.eval()
     with torch.no_grad():
@@ -173,7 +168,7 @@ def sample_v(model, n_samples=1):
 
         for t in reversed(range(T)):
             t_batch = torch.full((n_samples,), t, device=DEVICE, dtype=torch.long)
-            t_emb   = get_timestep_embedding(t_batch, EMBED_DIM)
+            t_emb = get_timestep_embedding(t_batch, EMBED_DIM)
 
             # Predict v
             v_pred = model(x, t_emb)
@@ -181,14 +176,14 @@ def sample_v(model, n_samples=1):
 
             # Get per-sample scalars
             alpha_bar_t = alphas_cumprod[t_batch].view(-1, 1, 1, 1)  # [B,1,1,1]
-            sqrt_ab     = torch.sqrt(alpha_bar_t)
-            sigma_t     = torch.sqrt(1. - alpha_bar_t)
+            sqrt_ab = torch.sqrt(alpha_bar_t)
+            sigma_t = torch.sqrt(1.0 - alpha_bar_t)
 
             # Recover predicted noise ε̂
             eps_theta = sqrt_ab * v_pred + sigma_t * x
 
             alpha_t = alphas[t_batch].view(-1, 1, 1, 1)
-            beta_t  = betas[t_batch].view(-1, 1, 1, 1)
+            beta_t = betas[t_batch].view(-1, 1, 1, 1)
 
             mu = (1 / torch.sqrt(alpha_t)) * (x - (1 - alpha_t) / sigma_t * eps_theta)
 
@@ -200,12 +195,13 @@ def sample_v(model, n_samples=1):
             x = mu + torch.sqrt(beta_t) * noise
 
         # Final output should be in [-1, 1]
-        x = torch.clamp(x, -1., 1.)
+        x = torch.clamp(x, -1.0, 1.0)
 
         # Optional: convert to [0, 1] if needed for display
         # return F.interpolate((x + 1) / 2, size=(150, 150), mode='bilinear', align_corners=False)
         return (x + 1) / 2
-    
+
+
 @torch.no_grad()
 def sample_v_conditional(model, x_cond, T=T):
     """
@@ -226,20 +222,20 @@ def sample_v_conditional(model, x_cond, T=T):
 
     for t in reversed(range(T)):
         t_batch = torch.full((B,), t, device=x_cond.device, dtype=torch.long)
-        t_emb   = get_timestep_embedding(t_batch, EMBED_DIM)
+        t_emb = get_timestep_embedding(t_batch, EMBED_DIM)
 
         # --- predict v (conditional) ---
         v_pred = model(x, t_emb, x_cond)  # same API as your epsilon-conditional model
 
         # --- convert v -> epsilon_hat ---
-        alpha_bar_t = alphas_cumprod[t_batch].view(B, 1, 1, 1)          # \bar{alpha}_t
-        sqrt_ab     = torch.sqrt(alpha_bar_t)                            # sqrt(\bar{alpha}_t)
-        sigma_t     = torch.sqrt(1.0 - alpha_bar_t)                      # sqrt(1-\bar{alpha}_t)
-        eps_hat     = sqrt_ab * v_pred + sigma_t * x                     # <- from your unconditional code
+        alpha_bar_t = alphas_cumprod[t_batch].view(B, 1, 1, 1)  # \bar{alpha}_t
+        sqrt_ab = torch.sqrt(alpha_bar_t)  # sqrt(\bar{alpha}_t)
+        sigma_t = torch.sqrt(1.0 - alpha_bar_t)  # sqrt(1-\bar{alpha}_t)
+        eps_hat = sqrt_ab * v_pred + sigma_t * x  # <- from your unconditional code
 
         # --- DDPM step (same as epsilon-param) ---
         alpha_t = alphas[t_batch].view(B, 1, 1, 1)
-        beta_t  = betas[t_batch].view(B, 1, 1, 1)
+        beta_t = betas[t_batch].view(B, 1, 1, 1)
 
         # mu_t = (1/sqrt(alpha_t)) * (x_t - ((1 - alpha_t)/sqrt(1 - \bar{alpha}_t)) * eps_hat)
         mu = (1.0 / torch.sqrt(alpha_t)) * (x - ((1.0 - alpha_t) / sigma_t) * eps_hat)
@@ -249,6 +245,7 @@ def sample_v_conditional(model, x_cond, T=T):
 
     x = torch.clamp(x, -1.0, 1.0)
     return (x + 1.0) / 2.0
+
 
 @torch.no_grad()
 def sample_v_conditional_cfg(model, x_cond, T=T, guidance_scale=2.0, timesteps=None):
@@ -264,7 +261,7 @@ def sample_v_conditional_cfg(model, x_cond, T=T, guidance_scale=2.0, timesteps=N
     x = torch.randn_like(x_cond)
 
     if timesteps is None:
-        t_schedule = torch.arange(T-1, -1, -1, device=device)
+        t_schedule = torch.arange(T - 1, -1, -1, device=device)
     else:
         t_schedule = torch.as_tensor(timesteps, device=device).long()
 
@@ -272,27 +269,30 @@ def sample_v_conditional_cfg(model, x_cond, T=T, guidance_scale=2.0, timesteps=N
 
     for t in t_schedule:
         t_batch = torch.full((B,), int(t), device=device, dtype=torch.long)
-        t_emb   = get_timestep_embedding(t_batch, EMBED_DIM)
+        t_emb = get_timestep_embedding(t_batch, EMBED_DIM)
 
         # predict v for uncond and cond
         v_uncond = model(x, t_emb, zeros_cond)
-        v_cond   = model(x, t_emb, x_cond)
+        v_cond = model(x, t_emb, x_cond)
         v_guided = v_uncond + guidance_scale * (v_cond - v_uncond)
 
         # convert v -> eps_hat
-        alpha_bar_t = alphas_cumprod[t_batch].view(B,1,1,1)
+        alpha_bar_t = alphas_cumprod[t_batch].view(B, 1, 1, 1)
         alpha_t = torch.sqrt(alpha_bar_t)
         sigma_t = torch.sqrt(1.0 - alpha_bar_t)
         eps_hat = alpha_t * v_guided + sigma_t * x
 
         # DDPM update
-        alpha_t_scalar = alphas[t_batch].view(B,1,1,1)
-        beta_t         = betas[t_batch].view(B,1,1,1)
-        mu = (1.0 / torch.sqrt(alpha_t_scalar)) * (x - ((1.0 - alpha_t_scalar) / sigma_t) * eps_hat)
+        alpha_t_scalar = alphas[t_batch].view(B, 1, 1, 1)
+        beta_t = betas[t_batch].view(B, 1, 1, 1)
+        mu = (1.0 / torch.sqrt(alpha_t_scalar)) * (
+            x - ((1.0 - alpha_t_scalar) / sigma_t) * eps_hat
+        )
         noise = torch.randn_like(x) if t > 0 else torch.zeros_like(x)
         x = mu + torch.sqrt(beta_t) * noise
 
-    return (x.clamp(-1,1) + 1) / 2  # [0,1]
+    return (x.clamp(-1, 1) + 1) / 2  # [0,1]
+
 
 @torch.no_grad()
 def sample_epsilon_conditional_cfg(
@@ -334,25 +334,30 @@ def sample_epsilon_conditional_cfg(
 
     for t in t_schedule:
         t_batch = torch.full((B,), int(t), device=device, dtype=torch.long)
-        t_emb   = get_timestep_embedding(t_batch, EMBED_DIM)
+        t_emb = get_timestep_embedding(t_batch, EMBED_DIM)
 
         # ------- CFG: cond & uncond in ONE forward -------
-        x_cat      = torch.cat([x, x], dim=0)
-        t_emb_cat  = torch.cat([t_emb, t_emb], dim=0)
-        xcond_cat  = torch.cat([x_cond, x_cond], dim=0)
-        flags_cat  = torch.cat([torch.ones(B,1,device=device),  # cond
-                                torch.zeros(B,1,device=device)], dim=0)  # uncond
+        x_cat = torch.cat([x, x], dim=0)
+        t_emb_cat = torch.cat([t_emb, t_emb], dim=0)
+        xcond_cat = torch.cat([x_cond, x_cond], dim=0)
+        flags_cat = torch.cat(
+            [
+                torch.ones(B, 1, device=device),  # cond
+                torch.zeros(B, 1, device=device),
+            ],
+            dim=0,
+        )  # uncond
 
         eps_cat = model(x_cat, t_emb_cat, xcond_cat, flags_cat)  # ε(x_t, t, cond_flag)
         eps_cond, eps_uncond = eps_cat[:B], eps_cat[B:]
         eps_hat = eps_uncond + guidance_scale * (eps_cond - eps_uncond)  # ε̂_guided
 
         # ------- DDPM update (use posterior variance \tilde{β}_t) -------
-        alpha_t       = gather(alphas, t_batch)               # α_t
-        beta_t        = gather(betas, t_batch)                # β_t
-        alpha_bar_t   = gather(alphas_cumprod, t_batch)       # ᾱ_t
-        prev_t        = torch.clamp(t_batch - 1, min=0)
-        alpha_bar_tm1 = gather(alphas_cumprod, prev_t)        # ᾱ_{t-1}
+        alpha_t = gather(alphas, t_batch)  # α_t
+        beta_t = gather(betas, t_batch)  # β_t
+        alpha_bar_t = gather(alphas_cumprod, t_batch)  # ᾱ_t
+        prev_t = torch.clamp(t_batch - 1, min=0)
+        alpha_bar_tm1 = gather(alphas_cumprod, prev_t)  # ᾱ_{t-1}
 
         # mean μ_θ(x_t, t)
         # μ = (1/√α_t) * ( x_t - (β_t / √(1-ᾱ_t)) * ε̂ )
@@ -370,10 +375,10 @@ def sample_epsilon_conditional_cfg(
         return (x.clamp(-1, 1) + 1) / 2.0
     return x
 
+
 def cosine_timesteps(steps, device, eps=1e-3):
     s = torch.linspace(0, 1, steps + 1, device=device)
     return torch.cos((s * (1 - eps)) * (torch.pi / 2))  # 1 -> ~0
-
 
 
 @torch.no_grad()
@@ -381,7 +386,7 @@ def sample_flow_conditional(
     model,
     x_cond,
     steps=100,
-    solver="heun",       # "euler" or "heun"
+    solver="heun",  # "euler" or "heun"
     return_range="0_1",  # "0_1" or "minus1_1"
 ):
     """
@@ -397,7 +402,6 @@ def sample_flow_conditional(
     Returns:
         x: generated sample [B, C, H, W]
     """
-    device = x_cond.device
     model_was_training = model.training
     model.eval()
 
@@ -409,7 +413,7 @@ def sample_flow_conditional(
     ts = cosine_timesteps(steps, x_cond.device)
 
     for k in range(steps, 0, -1):
-        t_curr = ts[k]          # scalar tensor
+        t_curr = ts[k]  # scalar tensor
         t_prev = ts[k - 1]
         dt = t_curr - t_prev  # negative step size (since we go 1 -> 0)
 
@@ -445,5 +449,3 @@ def sample_flow_conditional(
     if return_range == "0_1":
         return (x + 1) / 2
     return x
-
-

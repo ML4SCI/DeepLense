@@ -97,7 +97,7 @@ pipeline = PipelineOrchestrator(config_path)
 # Process a list of targets
 targets = [
     {"ra": 150.1, "dec": 2.3, "name": "lens_001"},
-    {"ra": 150.2, "dec": 2.4, "name": "lens_002"}
+    {"ra": 150.2, "dec": 2.4, "name": "lens_002"},
 ]
 
 results = pipeline.process_targets(targets)
@@ -142,12 +142,7 @@ Efficient data retrieval from LSST Butler repositories with advanced features:
 from ripple.data_access import LsstDataFetcher
 
 fetcher = LsstDataFetcher(butler_config)
-cutout = fetcher.fetch_cutout(
-    ra=150.1, 
-    dec=2.3, 
-    size=64,
-    filters=['g', 'r', 'i']
-)
+cutout = fetcher.fetch_cutout(ra=150.1, dec=2.3, size=64, filters=["g", "r", "i"])
 ```
 
 ### 2. Preprocessing Module (`ripple.preprocessing`)

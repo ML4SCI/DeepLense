@@ -1,42 +1,22 @@
-from __future__ import print_function
+import json
 import os
 import time
-import copy
-
-import torch.nn as nn
-import torch.optim as optim
-from torchinfo import summary
-import torchvision
-from typing import *
-from utils.util import *
-from utils.inference import InferenceSSL
 from argparse import ArgumentParser
-from config.data_config import DATASET
-from torch.utils.data import DataLoader, random_split
-from models.cnn_zoo import CustomResNet
-from models.byol import BYOL, BYOLSingleChannel, BYOLTransformer
+from typing import *
 
-import json
 import yaml
-from utils.dataset import DefaultDatasetSetupSSL
-from self_supervised.losses.contrastive_loss import (
-    ContrastiveLossEuclidean,
-    ContrastiveLossEmbedding,
-    SimCLR_Loss,
-    NegativeCosineSimilarity,
-)
-from utils.train import (
-    train_simplistic,
-    train_byol,
-    train_contrastive_pair,
-    train_contrastive_with_labels,
-    train_contrastive,
-)
-from self_supervised.losses.sym_neg_cos_sim_loss import SymNegCosineSimilarityLoss
-
-from self_supervised.config.crossformer_network import CROSSFORMER_CONFIG
+from config.data_config import DATASET
+from models.byol import BYOLTransformer
 from models.transformer_zoo import TransformerModels
-
+from self_supervised.config.crossformer_network import CROSSFORMER_CONFIG
+from self_supervised.losses.sym_neg_cos_sim_loss import SymNegCosineSimilarityLoss
+from torch.utils.data import DataLoader, random_split
+from torchinfo import summary
+from utils.dataset import DefaultDatasetSetupSSL
+from utils.train import (
+    train_byol,
+)
+from utils.util import *
 
 parser = ArgumentParser()
 parser.add_argument(
@@ -90,7 +70,7 @@ def main():
     num_classes = len(classes)
 
     # Open the YAML file and load its contents
-    with open(train_config_path, "r") as file:
+    with open(train_config_path) as file:
         train_config = yaml.safe_load(file)
 
     ########################## boilerplate ##########################
@@ -102,15 +82,15 @@ def main():
     # Set hyperparameters
     batch_size = train_config["batch_size"]
     epochs_pretrained = train_config["pretrained"]["num_epochs"]
-    epochs_finetuned = train_config["finetuned"]["num_epochs"]
+    train_config["finetuned"]["num_epochs"]
 
-    learning_rate = train_config["optimizer_config"]["lr"]
-    margin = train_config["ssl"]["margin"]
-    num_channels = train_config["channels"]
-    temperature = train_config["ssl"]["temperature"]
+    train_config["optimizer_config"]["lr"]
+    train_config["ssl"]["margin"]
+    train_config["channels"]
+    train_config["ssl"]["temperature"]
     network_type = train_config["network_type"]
     image_size = train_config["image_size"]
-    optimizer_config = train_config["optimizer_config"]
+    train_config["optimizer_config"]
 
     backbone = train_config["backbone"]
 
@@ -133,7 +113,7 @@ def main():
         f"{network_type}_pretrained_{dataset_name}_{current_time}.pt",
     )
 
-    model_path_finetune = os.path.join(
+    os.path.join(
         f"{log_dir}/checkpoint",
         f"{network_type}_finetune_{dataset_name}_{current_time}.pt",
     )
@@ -141,7 +121,9 @@ def main():
     ########################## dataloading ##########################
 
     # setup default dataset
-    default_dataset_setup = DefaultDatasetSetupSSL(dataset_name=dataset_name, image_size=image_size)
+    default_dataset_setup = DefaultDatasetSetupSSL(
+        dataset_name=dataset_name, image_size=image_size
+    )
 
     # trainset
     train_dataset = default_dataset_setup.get_dataset(mode="train")
@@ -227,7 +209,7 @@ def main():
 if __name__ == "__main__":
     main()
 
-    """python byol_transformer.py 
+    """python byol_transformer.py
 
     python examples/byol/byol_transformer.py --train_config_path config/crossformer_byol.yaml
 

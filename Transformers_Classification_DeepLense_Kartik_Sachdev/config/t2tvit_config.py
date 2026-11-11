@@ -1,5 +1,5 @@
-from ray import tune
 import numpy as np
+from ray import tune
 
 T2TViT_CONFIG = {
     "network_type": "T2TViT",
@@ -17,7 +17,10 @@ T2TViT_CONFIG = {
     },
     "lr_schedule_config": {
         "use_lr_schedule": True,
-        "step_lr": {"gamma": 0.5, "step_size": 20,},
+        "step_lr": {
+            "gamma": 0.5,
+            "step_size": 20,
+        },
         "reduce_on_plateau": {
             "factor": 0.1,
             "patience": 4,
@@ -31,7 +34,11 @@ T2TViT_CONFIG = {
         "depth": 6,
         "heads": 5,
         "mlp_dim": 256,
-        "t2t_layers": ((7, 4), (3, 2), (3, 2),),
+        "t2t_layers": (
+            (7, 4),
+            (3, 2),
+            (3, 2),
+        ),
     },
 }
 
@@ -52,7 +59,10 @@ T2TViT_RAY_CONFIG = {
     },
     "lr_schedule_config": {
         "use_lr_schedule": True,
-        "step_lr": {"gamma": 0.5, "step_size": 20,},
+        "step_lr": {
+            "gamma": 0.5,
+            "step_size": 20,
+        },
         "reduce_on_plateau": {
             "factor": 0.1,
             "patience": 4,
@@ -66,6 +76,10 @@ T2TViT_RAY_CONFIG = {
         "depth": tune.randint(3, 7),
         "heads": tune.randint(3, 7),
         "mlp_dim": tune.randint(128, 512),
-        "t2t_layers": ((7, 4), (3, 2), (3, 2),),
+        "t2t_layers": (
+            (7, 4),
+            (3, 2),
+            (3, 2),
+        ),
     },
 }

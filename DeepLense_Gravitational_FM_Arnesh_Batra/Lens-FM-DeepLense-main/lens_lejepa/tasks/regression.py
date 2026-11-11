@@ -8,7 +8,6 @@ so all reported errors are in dex.
 from __future__ import annotations
 
 import numpy as np
-import torch
 import torch.nn.functional as F
 from torch import nn
 from torch.utils.data import Subset
@@ -32,17 +31,29 @@ class RegressionTask(Task):
 
     def build_datasets(self):
         c = self.config
-        dataset = AxionMassDataset(f"{c.data_root}/{c.train_dataset}", c.image_size, cache=c.cache, distortion=self.needs_distortion)
+        dataset = AxionMassDataset(
+            f"{c.data_root}/{c.train_dataset}",
+            c.image_size,
+            cache=c.cache,
+            distortion=self.needs_distortion,
+        )
         train_idx, val_idx = quantile_split(dataset.targets, c.train_fraction, c.seed)
         if c.shots is not None:
-            train_idx = train_idx[quantile_subsample(dataset.targets[train_idx], c.shots, c.seed)]
+            train_idx = train_idx[
+                quantile_subsample(dataset.targets[train_idx], c.shots, c.seed)
+            ]
         train_targets = dataset.targets[train_idx]
         self.mean = float(train_targets.mean())
         self.std = max(float(train_targets.std()), 1e-6)
         return Subset(dataset, train_idx.tolist()), Subset(dataset, val_idx.tolist())
 
     def build_test_dataset(self, root: str):
-        return AxionMassDataset(root, self.config.image_size, cache=self.config.cache, distortion=self.needs_distortion)
+        return AxionMassDataset(
+            root,
+            self.config.image_size,
+            cache=self.config.cache,
+            distortion=self.needs_distortion,
+        )
 
     def build_head(self, encoder: nn.Module) -> nn.Module:
         return EncoderRegressor(encoder)

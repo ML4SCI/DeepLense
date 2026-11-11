@@ -1,7 +1,7 @@
 """Collect held-out metrics from every ``summary.json`` under a runs directory.
 
-    python scripts/collect_results.py runs            # prints Markdown tables
-    python scripts/collect_results.py runs --csv out.csv
+python scripts/collect_results.py runs            # prints Markdown tables
+python scripts/collect_results.py runs --csv out.csv
 """
 
 from __future__ import annotations
@@ -31,7 +31,9 @@ def collect(runs: Path) -> list[dict]:
                 "task": config["task"],
                 "run": summary_path.parent.name,
                 "backbone": config["backbone"],
-                "adaptation": config["adaptation"] if config["backbone"].startswith("vit") else "-",
+                "adaptation": config["adaptation"]
+                if config["backbone"].startswith("vit")
+                else "-",
                 "train": config["train_dataset"],
                 "shots": "full" if config["shots"] is None else config["shots"],
                 "test": Path(test["test_root"]).name,
@@ -42,7 +44,9 @@ def collect(runs: Path) -> list[dict]:
 
 
 def main() -> None:
-    parser = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
+    parser = argparse.ArgumentParser(
+        description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter
+    )
     parser.add_argument("runs", type=Path)
     parser.add_argument("--csv", type=Path)
     args = parser.parse_args()
@@ -52,9 +56,14 @@ def main() -> None:
         if not task_rows:
             continue
         header = ["run", "backbone", "adaptation", "train", "shots", "test", *metrics]
-        print(f"\n### {task}\n\n| " + " | ".join(header) + " |\n|" + "---|" * len(header))
+        print(
+            f"\n### {task}\n\n| " + " | ".join(header) + " |\n|" + "---|" * len(header)
+        )
         for row in task_rows:
-            cells = [f"{row[k]:.4f}" if isinstance(row[k], float) else str(row[k]) for k in header]
+            cells = [
+                f"{row[k]:.4f}" if isinstance(row[k], float) else str(row[k])
+                for k in header
+            ]
             print("| " + " | ".join(cells) + " |")
     if args.csv and rows:
         fieldnames = list(dict.fromkeys(key for row in rows for key in row))

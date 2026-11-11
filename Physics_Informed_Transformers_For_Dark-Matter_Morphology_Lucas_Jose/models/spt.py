@@ -1,14 +1,9 @@
 import torch
-import numpy as np
-from torch import nn
-from torch import Tensor
-from typing import Tuple, Union, List
-import torchvision.transforms as transforms
-
+from torch import Tensor, nn
+from torchvision import transforms
 
 
 class ShiftedPatchTokenization(nn.Module):
-
     """
 
     This module performs shifted patch tokenization on input images,
@@ -32,10 +27,14 @@ class ShiftedPatchTokenization(nn.Module):
 
     """
 
-    def __init__(self, image_size: Union[int,Tuple[int,int]],
-                 patch_size: Union[int,Tuple[int,int]], embed_dim: int,
-                 in_channels: int, device: torch.device):
-
+    def __init__(
+        self,
+        image_size: int | tuple[int, int],
+        patch_size: int | tuple[int, int],
+        embed_dim: int,
+        in_channels: int,
+        device: torch.device,
+    ):
         """
         Initializes the ShiftedPatchTokenization module.
 
@@ -50,7 +49,7 @@ class ShiftedPatchTokenization(nn.Module):
             ValueError: If the image dimensions are not divisible by the patch dimensions.
         """
 
-        super(ShiftedPatchTokenization, self).__init__()
+        super().__init__()
 
         # If image_size or patch_size is an integer, convert it to a tuple with equal width and height
         if type(image_size) == int:
@@ -64,11 +63,19 @@ class ShiftedPatchTokenization(nn.Module):
         self.device = device
 
         # Check if the image dimensions are divisible by the patch dimensions
-        if self.image_width % self.patch_width != 0 or self.image_height % self.patch_height != 0:
-            raise ValueError("The image's width must be divisible by the patche's width and the image's height, by the patch's height")
+        if (
+            self.image_width % self.patch_width != 0
+            or self.image_height % self.patch_height != 0
+        ):
+            raise ValueError(
+                "The image's width must be divisible by the patche's width and the image's height, by the patch's height"
+            )
 
         # Calculate the number of patches
-        self.num_patches = int((self.image_width // self.patch_width) * (self.image_height // self.patch_height))
+        self.num_patches = int(
+            (self.image_width // self.patch_width)
+            * (self.image_height // self.patch_height)
+        )
 
         # Set the translation amounts
         self.delta_x = self.patch_width // 2
@@ -79,10 +86,12 @@ class ShiftedPatchTokenization(nn.Module):
         self.total_channels = in_channels * (self.num_transformations + 1)
 
         # Define the projection layer
-        self.projection = nn.Conv2d(in_channels=self.total_channels,
-                                    out_channels=self.embed_dim,
-                                    kernel_size=(self.patch_width, self.patch_height),
-                                    stride=(self.patch_width, self.patch_height))
+        self.projection = nn.Conv2d(
+            in_channels=self.total_channels,
+            out_channels=self.embed_dim,
+            kernel_size=(self.patch_width, self.patch_height),
+            stride=(self.patch_width, self.patch_height),
+        )
 
         # Define the layer normalization layer
         self.layer_norm = nn.LayerNorm(self.embed_dim)
@@ -91,10 +100,13 @@ class ShiftedPatchTokenization(nn.Module):
         self.cls_token = nn.Parameter(torch.zeros((1, 1, self.embed_dim)))
 
         # Define the positional encoding
-        self.positional_encoding = nn.Parameter(torch.zeros((1, 1 + self.num_patches, self.embed_dim)))
+        self.positional_encoding = nn.Parameter(
+            torch.zeros((1, 1 + self.num_patches, self.embed_dim))
+        )
 
-    def translate_image(self, image: Tensor, delta_x: int, delta_y: int, device: torch.device):
-
+    def translate_image(
+        self, image: Tensor, delta_x: int, delta_y: int, device: torch.device
+    ):
         """
         Translates an image by specified amounts along the x and y axes.
 
@@ -108,12 +120,13 @@ class ShiftedPatchTokenization(nn.Module):
             Tensor: Translated image.
         """
 
-        translated_image = transforms.functional.affine(image, angle=0, translate=(delta_x, delta_y), fill=0, scale=1, shear=0)
+        translated_image = transforms.functional.affine(
+            image, angle=0, translate=(delta_x, delta_y), fill=0, scale=1, shear=0
+        )
         translated_image = translated_image.to(device)
         return translated_image
 
     def get_num_patches(self):
-
         """
         Gets the total number of patches that would be created from an image.
 
@@ -124,7 +137,6 @@ class ShiftedPatchTokenization(nn.Module):
         return self.num_patches
 
     def forward(self, image: Tensor) -> Tensor:
-
         """
         Performs the forward pass, tokenizing the image into patches and adding positional encodings.
 
@@ -137,15 +149,25 @@ class ShiftedPatchTokenization(nn.Module):
 
         batch_size = image.size(0)
 
-
         # generate shifted versions of the image
-        shift_left_up = self.translate_image(image, -self.delta_x, -self.delta_y,self.device)
-        shift_right_up = self.translate_image(image, self.delta_x, -self.delta_y,self.device)
-        shift_left_down = self.translate_image(image, -self.delta_x, self.delta_y,self.device)
-        shift_right_down = self.translate_image(image, self.delta_x, self.delta_y,self.device)
+        shift_left_up = self.translate_image(
+            image, -self.delta_x, -self.delta_y, self.device
+        )
+        shift_right_up = self.translate_image(
+            image, self.delta_x, -self.delta_y, self.device
+        )
+        shift_left_down = self.translate_image(
+            image, -self.delta_x, self.delta_y, self.device
+        )
+        shift_right_down = self.translate_image(
+            image, self.delta_x, self.delta_y, self.device
+        )
 
         # concatenate the original image with its shifted versions
-        concatenated_images = torch.cat((image, shift_left_up, shift_right_up, shift_left_down, shift_right_down), dim=1)
+        concatenated_images = torch.cat(
+            (image, shift_left_up, shift_right_up, shift_left_down, shift_right_down),
+            dim=1,
+        )
 
         # project the concatenated image onto a lower-dimensional embedding
         projected_patches = self.projection(concatenated_images)

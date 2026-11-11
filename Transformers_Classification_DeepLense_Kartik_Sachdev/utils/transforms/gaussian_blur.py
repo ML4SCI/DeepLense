@@ -1,7 +1,6 @@
 # Copyright (c) 2020. Lightly AG and its affiliates.
 # All Rights Reserved
 
-from typing import Tuple, Union
 from warnings import warn
 
 import numpy as np
@@ -33,16 +32,16 @@ class GaussianBlur:
 
     def __init__(
         self,
-        kernel_size: Union[float, None] = None,
+        kernel_size: float | None = None,
         prob: float = 0.5,
-        scale: Union[float, None] = None,
-        sigmas: Tuple[float, float] = (0.2, 2),
+        scale: float | None = None,
+        sigmas: tuple[float, float] = (0.2, 2),
     ):
-        if scale != None or kernel_size != None:
+        if scale is not None or kernel_size is not None:
             warn(
                 "The 'kernel_size' and 'scale' arguments of the GaussianBlur augmentation will be deprecated.  "
                 "Please use the 'sigmas' parameter instead.",
-                DeprecationWarning,
+                DeprecationWarning, stacklevel=2,
             )
         self.prob = prob
         self.sigmas = sigmas

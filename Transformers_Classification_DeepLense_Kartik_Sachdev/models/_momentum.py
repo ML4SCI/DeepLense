@@ -1,7 +1,7 @@
 import copy
 
 import torch
-import torch.nn as nn
+from torch import nn
 
 
 def _deactivate_requires_grad(params):
@@ -12,7 +12,7 @@ def _deactivate_requires_grad(params):
 
 def _do_momentum_update(prev_params, params, m):
     """Updates the weights of the previous parameters."""
-    for prev_param, param in zip(prev_params, params):
+    for prev_param, param in zip(prev_params, params, strict=False):
         prev_param.data = prev_param.data * m + param.data * (1.0 - m)
 
 

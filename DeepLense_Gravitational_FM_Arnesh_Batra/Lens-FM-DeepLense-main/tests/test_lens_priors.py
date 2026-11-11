@@ -5,8 +5,15 @@ import itertools
 
 import pytest
 import torch
-
-from lens_lejepa.ssl import D4_SIZE, arc_weights, d4_patch_permutation, d4_token_loss, d4_transform, ring_descriptor, ring_masks
+from lens_lejepa.ssl import (
+    D4_SIZE,
+    arc_weights,
+    d4_patch_permutation,
+    d4_token_loss,
+    d4_transform,
+    ring_descriptor,
+    ring_masks,
+)
 
 GRID, PATCH = 10, 16
 SIZE = GRID * PATCH
@@ -15,7 +22,11 @@ SIZE = GRID * PATCH
 def patchify(x: torch.Tensor) -> torch.Tensor:
     """[B, C, N, N] -> [B, G*G, C, P, P] in row-major patch order."""
     b, c, _, _ = x.shape
-    return x.reshape(b, c, GRID, PATCH, GRID, PATCH).permute(0, 2, 4, 1, 3, 5).reshape(b, GRID * GRID, c, PATCH, PATCH)
+    return (
+        x.reshape(b, c, GRID, PATCH, GRID, PATCH)
+        .permute(0, 2, 4, 1, 3, 5)
+        .reshape(b, GRID * GRID, c, PATCH, PATCH)
+    )
 
 
 @pytest.mark.parametrize("g", range(D4_SIZE))
@@ -39,7 +50,9 @@ def test_identity_and_group_homomorphism():
     x = torch.randn(1, 1, SIZE, SIZE)
     for a, b in itertools.product(range(D4_SIZE), repeat=2):
         composed = d4_transform(d4_transform(x, b), a)
-        ab = next(k for k in range(D4_SIZE) if torch.equal(d4_transform(x, k), composed))
+        ab = next(
+            k for k in range(D4_SIZE) if torch.equal(d4_transform(x, k), composed)
+        )
         pa, pb = d4_patch_permutation(GRID, a), d4_patch_permutation(GRID, b)
         # Patch p of (a(b x)) comes from patch pa[p] of (b x), i.e. patch pb[pa[p]] of x.
         assert torch.equal(pb[pa], d4_patch_permutation(GRID, ab))
@@ -62,13 +75,17 @@ def test_arc_weights_have_unit_mean():
     weights = arc_weights(torch.rand(4, 1, SIZE, SIZE), PATCH, strength=0.75)
     assert weights.shape == (4, GRID * GRID)
     assert torch.allclose(weights.mean(1), torch.ones(4), atol=1e-5)
-    assert torch.allclose(arc_weights(torch.rand(2, 1, SIZE, SIZE), PATCH, 0.0), torch.ones(2, GRID * GRID))
+    assert torch.allclose(
+        arc_weights(torch.rand(2, 1, SIZE, SIZE), PATCH, 0.0),
+        torch.ones(2, GRID * GRID),
+    )
 
 
 @pytest.mark.parametrize("g", range(D4_SIZE))
 def test_losses_vanish_for_an_equivariant_encoder(g):
     """A patch-wise encoder is exactly D4-equivariant up to the in-patch action,
     so with a D4-invariant patch feature both priors must be zero."""
+
     def encoder(x):  # per-patch sorted pixels: invariant to any in-patch permutation
         return patchify(x).flatten(2).sort(dim=-1).values
 
@@ -76,5 +93,8 @@ def test_losses_vanish_for_an_equivariant_encoder(g):
     xg = d4_transform(x, g)
     za, zb = encoder(x), encoder(xg)
     assert d4_token_loss(za, zb, d4_patch_permutation(GRID, g)).item() < 1e-10
-    ra, rb = ring_descriptor(za, x, PATCH, 3, 0.75), ring_descriptor(zb, xg, PATCH, 3, 0.75)
+    ra, rb = (
+        ring_descriptor(za, x, PATCH, 3, 0.75),
+        ring_descriptor(zb, xg, PATCH, 3, 0.75),
+    )
     assert torch.allclose(ra, rb, atol=1e-5)

@@ -1,11 +1,8 @@
-from logging import warn
-import torch
-from torch.nn import Softmax
-import numpy as np
-import matplotlib.pyplot as plt
-import random
 import os
+import random
 
+import numpy as np
+import torch
 from constants import *
 
 
@@ -33,7 +30,7 @@ def get_device(device):
         return "mps"
     if device == "cpu" or device == "best":
         return "cpu"
-    warn(f"Requested device {device} not found, running on CPU")
+    warning(f"Requested device {device} not found, running on CPU")
     return "cpu"
 
 

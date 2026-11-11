@@ -3,12 +3,9 @@ Code referenced from https://github.com/lucidrains/vit-pytorch/blob/main/vit_pyt
 """
 
 import torch
-from torch import nn
-from torch.nn import Conv2d
-
 from einops import rearrange, repeat
 from einops.layers.torch import Rearrange
-from torchvision import models
+from torch import nn
 
 
 def pair(t):
@@ -26,7 +23,7 @@ class PreNorm(nn.Module):
 
 
 class FeedForward(nn.Module):
-    def __init__(self, dim, hidden_dim, dropout=0.):
+    def __init__(self, dim, hidden_dim, dropout=0.0):
         """Feed forward neural network. MLP architecture.
 
         Args:
@@ -40,7 +37,7 @@ class FeedForward(nn.Module):
             nn.GELU(),
             nn.Dropout(dropout),
             nn.Linear(hidden_dim, dim),
-            nn.Dropout(dropout)
+            nn.Dropout(dropout),
         )
 
     def forward(self, x):
@@ -48,7 +45,7 @@ class FeedForward(nn.Module):
 
 
 class Attention(nn.Module):
-    def __init__(self, dim, heads=8, dim_head=64, dropout=0.):
+    def __init__(self, dim, heads=8, dim_head=64, dropout=0.0):
         """Attention module
 
         Args:
@@ -62,21 +59,22 @@ class Attention(nn.Module):
         project_out = not (heads == 1 and dim_head == dim)
 
         self.heads = heads
-        self.scale = dim_head ** -0.5
+        self.scale = dim_head**-0.5
 
         self.attend = nn.Softmax(dim=-1)
         self.dropout = nn.Dropout(dropout)
 
         self.to_qkv = nn.Linear(dim, inner_dim * 3, bias=False)
 
-        self.to_out = nn.Sequential(
-            nn.Linear(inner_dim, dim),
-            nn.Dropout(dropout)
-        ) if project_out else nn.Identity()
+        self.to_out = (
+            nn.Sequential(nn.Linear(inner_dim, dim), nn.Dropout(dropout))
+            if project_out
+            else nn.Identity()
+        )
 
     def forward(self, x):
         qkv = self.to_qkv(x).chunk(3, dim=-1)
-        q, k, v = map(lambda t: rearrange(t, 'b n (h d) -> b h n d', h=self.heads), qkv)
+        q, k, v = (rearrange(t, "b n (h d) -> b h n d", h=self.heads) for t in qkv)
 
         dots = torch.matmul(q, k.transpose(-1, -2)) * self.scale
 
@@ -84,19 +82,28 @@ class Attention(nn.Module):
         attn = self.dropout(attn)
 
         out = torch.matmul(attn, v)
-        out = rearrange(out, 'b h n d -> b n (h d)')
+        out = rearrange(out, "b h n d -> b n (h d)")
         return self.to_out(out)
 
 
 class Transformer(nn.Module):
-    def __init__(self, dim, depth, heads, dim_head, mlp_dim, dropout=0.):
+    def __init__(self, dim, depth, heads, dim_head, mlp_dim, dropout=0.0):
         super().__init__()
         self.layers = nn.ModuleList([])
         for _ in range(depth):
-            self.layers.append(nn.ModuleList([
-                PreNorm(dim, Attention(dim, heads=heads, dim_head=dim_head, dropout=dropout)),
-                PreNorm(dim, FeedForward(dim, mlp_dim, dropout=dropout))
-            ]))
+            self.layers.append(
+                nn.ModuleList(
+                    [
+                        PreNorm(
+                            dim,
+                            Attention(
+                                dim, heads=heads, dim_head=dim_head, dropout=dropout
+                            ),
+                        ),
+                        PreNorm(dim, FeedForward(dim, mlp_dim, dropout=dropout)),
+                    ]
+                )
+            )
 
     def forward(self, x):
         for attn, ff in self.layers:
@@ -107,7 +114,7 @@ class Transformer(nn.Module):
 
 class CNN(nn.Module):
     def __init__(self):
-        super(CNN, self).__init__()
+        super().__init__()
         # can tune
         self.cnn = nn.Sequential(
             nn.Conv2d(in_channels=1, out_channels=16, kernel_size=(3, 3), stride=2),
@@ -116,7 +123,7 @@ class CNN(nn.Module):
             nn.Conv2d(in_channels=16, out_channels=32, kernel_size=(3, 3), stride=2),
             nn.BatchNorm2d(32),
             nn.ReLU(),
-            Rearrange('b c h w -> b (h w) c')
+            Rearrange("b c h w -> b (h w) c"),
             # Rearrange('b c h w -> b c (h w)')
         )
 
@@ -168,7 +175,17 @@ class CNN(nn.Module):
 
 
 class CNNT(nn.Module):
-    def __init__(self, num_classes, depth, heads, mlp_dim, pool='mean', dim_head=64, dropout=0., emb_dropout=0.):
+    def __init__(
+        self,
+        num_classes,
+        depth,
+        heads,
+        mlp_dim,
+        pool="mean",
+        dim_head=64,
+        dropout=0.0,
+        emb_dropout=0.0,
+    ):
         super().__init__()
         self.to_patch_embedding = CNN()
 
@@ -185,10 +202,7 @@ class CNNT(nn.Module):
         self.pool = pool
         self.to_latent = nn.Identity()
 
-        self.mlp_head = nn.Sequential(
-            nn.LayerNorm(dim),
-            nn.Linear(dim, num_classes)
-        )
+        self.mlp_head = nn.Sequential(nn.LayerNorm(dim), nn.Linear(dim, num_classes))
 
     def forward(self, img):
         x = self.to_patch_embedding(img)
@@ -196,12 +210,12 @@ class CNNT(nn.Module):
         # b: batch size  n: patch number  _: dim of patch
         b, n, _ = x.shape
 
-        cls_tokens = repeat(self.cls_token, '1 1 d -> b 1 d', b=b)
+        cls_tokens = repeat(self.cls_token, "1 1 d -> b 1 d", b=b)
         x = torch.cat((cls_tokens, x), dim=1)
-        x += self.pos_embedding[:, :(n + 1)]
+        x += self.pos_embedding[:, : (n + 1)]
         x = self.dropout(x)
         x = self.transformer(x)
-        x = x.mean(dim=1) if self.pool == 'mean' else x[:, 0]
+        x = x.mean(dim=1) if self.pool == "mean" else x[:, 0]
 
         x = self.to_latent(x)
         return self.mlp_head(x)

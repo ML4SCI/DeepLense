@@ -1,7 +1,9 @@
-import torchvision.transforms as transforms
-import numpy as np
 from pathlib import Path
+
+import numpy as np
 from torch.utils.data import Dataset
+from torchvision import transforms
+
 
 class NpyDataset(Dataset):
     def __init__(self, root_dir, transform=None):
@@ -38,28 +40,39 @@ class NpyDataset(Dataset):
     def __getitem__(self, idx):
         file_path, class_idx = self.samples[idx]
         # Load data, add a channel dimension, making it (H, W, C)
-        sample = np.load(file_path).astype(np.float32) # Ensure float32
-        sample = np.expand_dims(sample, axis=-1) # Shape: (64, 64, 1)
+        sample = np.load(file_path).astype(np.float32)  # Ensure float32
+        sample = np.expand_dims(sample, axis=-1)  # Shape: (64, 64, 1)
 
         if self.transform:
             sample = self.transform(sample)
 
         return sample, class_idx
 
+
 # Pipeline A: For the NanoDiT Diffusion Model
 # Input: (64, 64, 1) NumPy array
 # Output: (1, 64, 64) Tensor, normalized to [-1, 1]
-diffusion_transforms = transforms.Compose([
-    transforms.ToTensor(), # Converts (H, W, C) NumPy to (C, H, W) Tensor and scales to [0, 1]
-    transforms.Normalize(mean=[0.5], std=[0.5]) # Normalizes a 1-channel image to [-1, 1]
-])
+diffusion_transforms = transforms.Compose(
+    [
+        transforms.ToTensor(),  # Converts (H, W, C) NumPy to (C, H, W) Tensor and scales to [0, 1]
+        transforms.Normalize(
+            mean=[0.5], std=[0.5]
+        ),  # Normalizes a 1-channel image to [-1, 1]
+    ]
+)
 
 # Pipeline B: For the ResNet34 Classifier
 # Input: (64, 64, 1) NumPy array
 # Output: (3, 224, 224) Tensor, normalized with ImageNet stats
-classifier_transforms = transforms.Compose([
-    transforms.ToTensor(), # Converts to (1, 64, 64) Tensor and scales to [0, 1]
-    transforms.Resize((224, 224), antialias=True), # Upsample to 224x224
-    transforms.Lambda(lambda x: x.repeat(3, 1, 1)), # Convert grayscale to 3-channel
-    transforms.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225]) # ImageNet normalization
-])
+classifier_transforms = transforms.Compose(
+    [
+        transforms.ToTensor(),  # Converts to (1, 64, 64) Tensor and scales to [0, 1]
+        transforms.Resize((224, 224), antialias=True),  # Upsample to 224x224
+        transforms.Lambda(
+            lambda x: x.repeat(3, 1, 1)
+        ),  # Convert grayscale to 3-channel
+        transforms.Normalize(
+            mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225]
+        ),  # ImageNet normalization
+    ]
+)

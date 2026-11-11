@@ -1,4 +1,3 @@
-import torch
 from torchvision.models import resnet18
 from utils.util import *
 

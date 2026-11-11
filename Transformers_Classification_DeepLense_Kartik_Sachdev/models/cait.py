@@ -1,10 +1,9 @@
 from random import randrange
-import torch
-from torch import nn, einsum
-import torch.nn.functional as F
 
+import torch
 from einops import rearrange, repeat
 from einops.layers.torch import Rearrange
+from torch import einsum, nn
 
 # file adapted from: https://github.com/lucidrains/vit-pytorch/blob/main/vit_pytorch/cait.py
 # helpers
@@ -26,7 +25,7 @@ def dropout_layers(layers, dropout):
         rand_index = randrange(num_layers)
         to_drop[rand_index] = False
 
-    layers = [layer for (layer, drop) in zip(layers, to_drop) if not drop]
+    layers = [layer for (layer, drop) in zip(layers, to_drop, strict=False) if not drop]
     return layers
 
 
@@ -81,7 +80,7 @@ class Attention(nn.Module):
         super().__init__()
         inner_dim = dim_head * heads
         self.heads = heads
-        self.scale = dim_head ** -0.5
+        self.scale = dim_head**-0.5
 
         self.to_q = nn.Linear(dim, inner_dim, bias=False)
         self.to_kv = nn.Linear(dim, inner_dim * 2, bias=False)
@@ -94,12 +93,12 @@ class Attention(nn.Module):
         self.to_out = nn.Sequential(nn.Linear(inner_dim, dim), nn.Dropout(dropout))
 
     def forward(self, x, context=None):
-        b, n, _, h = *x.shape, self.heads
+        _b, _n, _, h = *x.shape, self.heads
 
         context = x if not exists(context) else torch.cat((x, context), dim=1)
 
         qkv = (self.to_q(x), *self.to_kv(context).chunk(2, dim=-1))
-        q, k, v = map(lambda t: rearrange(t, "b n (h d) -> b h n d", h=h), qkv)
+        q, k, v = (rearrange(t, "b n (h d) -> b h n d", h=h) for t in qkv)
 
         dots = einsum("b h i d, b h j d -> b h i j", q, k) * self.scale
 
@@ -172,14 +171,14 @@ class CaiT(nn.Module):
         dropout=0.0,
         emb_dropout=0.0,
         layer_dropout=0.0,
-        channels=3
+        channels=3,
     ):
         super().__init__()
-        assert (
-            image_size % patch_size == 0
-        ), "Image dimensions must be divisible by the patch size."
+        assert image_size % patch_size == 0, (
+            "Image dimensions must be divisible by the patch size."
+        )
         num_patches = (image_size // patch_size) ** 2
-        patch_dim = channels * patch_size ** 2
+        patch_dim = channels * patch_size**2
 
         self.to_patch_embedding = nn.Sequential(
             Rearrange(

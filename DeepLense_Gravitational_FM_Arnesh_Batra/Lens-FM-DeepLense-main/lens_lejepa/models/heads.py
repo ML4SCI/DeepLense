@@ -43,7 +43,9 @@ class EncoderRegressor(nn.Module):
     def __init__(self, encoder: nn.Module) -> None:
         super().__init__()
         self.encoder = encoder
-        self.head = nn.Sequential(nn.LayerNorm(encoder.embed_dim), nn.Linear(encoder.embed_dim, 1))
+        self.head = nn.Sequential(
+            nn.LayerNorm(encoder.embed_dim), nn.Linear(encoder.embed_dim, 1)
+        )
 
     def forward(self, images: torch.Tensor) -> torch.Tensor:
         return self.head(self.encoder(images).mean(dim=1)).squeeze(-1)
@@ -57,17 +59,35 @@ class PatchSuperResolution(nn.Module):
     to ``[0, 1]`` with a sigmoid.
     """
 
-    def __init__(self, encoder: nn.Module, image_size: int, patch_size: int, output_size: int = 64) -> None:
+    def __init__(
+        self,
+        encoder: nn.Module,
+        image_size: int,
+        patch_size: int,
+        output_size: int = 64,
+    ) -> None:
         super().__init__()
         self.encoder = encoder
         self.patch_size = patch_size
         self.grid_size = image_size // patch_size
         self.output_size = output_size
-        self.patch_head = nn.Sequential(nn.LayerNorm(encoder.embed_dim), nn.Linear(encoder.embed_dim, patch_size * patch_size))
+        self.patch_head = nn.Sequential(
+            nn.LayerNorm(encoder.embed_dim),
+            nn.Linear(encoder.embed_dim, patch_size * patch_size),
+        )
 
     def forward(self, images: torch.Tensor) -> torch.Tensor:
         patches = self.patch_head(self.encoder(images))
         batch, grid, size = patches.shape[0], self.grid_size, self.patch_size
-        image = patches.reshape(batch, grid, grid, size, size).permute(0, 1, 3, 2, 4).reshape(batch, 1, grid * size, grid * size)
-        image = F.interpolate(image, size=(self.output_size, self.output_size), mode="bicubic", align_corners=False)
+        image = (
+            patches.reshape(batch, grid, grid, size, size)
+            .permute(0, 1, 3, 2, 4)
+            .reshape(batch, 1, grid * size, grid * size)
+        )
+        image = F.interpolate(
+            image,
+            size=(self.output_size, self.output_size),
+            mode="bicubic",
+            align_corners=False,
+        )
         return torch.sigmoid(image)
