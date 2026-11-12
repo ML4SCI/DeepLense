@@ -91,7 +91,7 @@ def train(
     device : str
         Device to use for training
     log_interval : int, optional
-        Number of epochs after which to log imtermediate results, by default 100
+        Number of batches after which to log intermediate results, by default 100
 
     Returns
     -------
@@ -99,6 +99,9 @@ def train(
         Metrics on validation data from best model (based on val AUROC).
         It is a dict containing metrics like "loss", "accuracy", "micro_auroc", "macro_auroc".
     """
+    if log_interval <= 0:
+        raise ValueError("log_interval must be a positive integer.")
+
     _ = model(
         next(iter(train_loader))[0].to(device, dtype=torch.float)
     )  # Used to initialize parameters in lazy layers
@@ -109,7 +112,9 @@ def train(
     best_val_auroc, best_val_metrics = 0.0, dict()
     batch_num = 0
     for epoch in range(1, epochs + 1):
-        for batch_data in tqdm(train_loader, desc=f"Epoch {epoch}"):
+        for batch_idx, batch_data in enumerate(
+            tqdm(train_loader, desc=f"Epoch {epoch}")
+        ):
             batch_num += 1
             model.train()  # Set train mode
             images, labels = batch_data  # Get data
@@ -118,8 +123,11 @@ def train(
                 model, images, labels, optimizer, scheduler, criterion, device=device
             )
 
-            # Compute metrics for validation data after every few epochs
-            if batch_num % log_interval == 0:
+            # Validate at each logging interval and at the end of every epoch.
+            # The OR condition ensures the final batch is evaluated only once.
+            is_log_interval = batch_num % log_interval == 0
+            is_last_batch = batch_idx == len(train_loader) - 1
+            if is_log_interval or is_last_batch:
                 # Get validation data metrics
                 val_metrics = evaluate(model, val_loader, criterion, device=device)
 
