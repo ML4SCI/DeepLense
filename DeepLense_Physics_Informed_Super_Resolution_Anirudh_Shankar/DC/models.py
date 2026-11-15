@@ -45,7 +45,7 @@ class SersicProfiler(torch.nn.Module):
         arcsec_bound = resolution*x/2
         pos_x = torch.linspace(-arcsec_bound, arcsec_bound, x).to(self.device)
         pos_y = torch.linspace(-arcsec_bound, arcsec_bound, y).to(self.device)
-        theta_y, theta_x = torch.meshgrid(pos_x, pos_y)
+        theta_y, theta_x = torch.meshgrid(pos_x, pos_y, indexing='ij')
 
         # reverse lensing to get the source
 
@@ -77,7 +77,7 @@ class SersicProfiler(torch.nn.Module):
         arcsec_bound = resolution*x/2
         pos_x_source = torch.linspace(-arcsec_bound, arcsec_bound, x).to(self.device)
         pos_y_source = torch.linspace(-arcsec_bound, arcsec_bound, y).to(self.device)
-        theta_y_source, theta_x_source = torch.meshgrid(pos_x_source, pos_y_source)
+        theta_y_source, theta_x_source = torch.meshgrid(pos_x_source, pos_y_source, indexing='ij')
 
         y_center_LR, x_center_LR = mean_indices//y, mean_indices%x
         y_center_LR = x - y_center_LR
@@ -92,7 +92,7 @@ class SersicProfiler(torch.nn.Module):
         arcsec_bound = resolution*x/2 #
         pos_x = torch.linspace(-arcsec_bound, arcsec_bound, x).to(self.device)
         pos_y = torch.linspace(-arcsec_bound, arcsec_bound, y).to(self.device)
-        theta_y, theta_x = torch.meshgrid(pos_x, pos_y)
+        theta_y, theta_x = torch.meshgrid(pos_x, pos_y, indexing='ij')
 
         # reverse lensing to get the source
 
@@ -126,7 +126,7 @@ class SersicProfiler(torch.nn.Module):
         arcsec_bound = resolution_*in_shape/2
         pos_x_source = torch.linspace(-arcsec_bound, arcsec_bound, in_shape).to(self.device)
         pos_y_source = torch.linspace(-arcsec_bound, arcsec_bound, in_shape).to(self.device)
-        theta_y_source, theta_x_source = torch.meshgrid(pos_x_source, pos_y_source)
+        theta_y_source, theta_x_source = torch.meshgrid(pos_x_source, pos_y_source, indexing='ij')
         theta_r_source = torch.sqrt(theta_x_source**2 + theta_y_source**2)
         theta_t_source = torch.arctan2(input=theta_y_source,other=theta_x_source)
         theta_y_source = torch.flip(theta_y_source, dims=[0]) #gradient flow
@@ -139,8 +139,8 @@ class SersicProfiler(torch.nn.Module):
         y_center_LR = x - y_center_LR
         x_center_LR, y_center_LR = self.origin_shift(x_center_LR, x/2)*resolution, self.origin_shift(y_center_LR, y/2)*resolution
 
-        I_lens_LR = self.sersic_law(beta_x_LR.view(B,-1), beta_y_LR.view(B,-1), x_center_LR.view(B,1), y_center_LR.view(B,1), R_sersic) #gradient flow
-        I_lens = self.sersic_law(beta_x_source.view(B,-1), beta_y_source.view(B,-1), x_center_LR.view(B,1), y_center_LR.view(B,1), R_sersic) #gradient flow
+        I_lens_LR = self.sersic_law(beta_x_LR.reshape(B,-1), beta_y_LR.reshape(B,-1), x_center_LR.view(B,1), y_center_LR.view(B,1), R_sersic) #gradient flow
+        I_lens = self.sersic_law(beta_x_source.reshape(B,-1), beta_y_source.reshape(B,-1), x_center_LR.view(B,1), y_center_LR.view(B,1), R_sersic) #gradient flow
         S_lens = self.sersic_law(theta_x_source.reshape(1,-1).repeat(B,1), theta_y_source.reshape(1,-1).repeat(B,1), x_center_LR.view(B,-1), y_center_LR.view(B,-1), R_sersic) #no gradient
 
         I_lens_LR = (I_lens_LR - torch.min(I_lens_LR, dim=-1)[0].view(B,1))/(torch.max(I_lens_LR, dim=-1)[0].view(B,1)-torch.min(I_lens_LR, dim=-1)[0].view(B,1) + 1e-8)
@@ -210,13 +210,14 @@ class SersicProfiler(torch.nn.Module):
         :param x_center, y_center: Defines the displacement of the Sérsic center
         :return: Intensity values for the given coordinates
         """
-        if R_sersic == None:
+        if R_sersic is None:
             amp, n_sersic, R_sersic = self.sersic_args
         else:
             amp, n_sersic = self.sersic_args[:2]
         b_n = 1.999*n_sersic-0.327
-        R = torch.sqrt(torch.pow(x-x_center,2)+torch.pow(y-y_center,2) + 1e-12)
-        I = amp*torch.pow(torch.e,-b_n*(torch.pow(R/R_sersic,1/n_sersic)-1))
+        eps = 1e-7 if x.dtype in (torch.float32, torch.float64) else 1e-3
+        R = torch.sqrt(torch.pow(x-x_center,2)+torch.pow(y-y_center,2) + eps)
+        I = amp*torch.exp(-b_n*(torch.pow(R/R_sersic,1/n_sersic)-1))
         return I
     
     def forward(self, alpha, LR, R_sersic = None):
