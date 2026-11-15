@@ -95,7 +95,7 @@ class SersicProfiler(torch.nn.Module):
         x_center_LR, y_center_LR = self.origin_shift(x_center_LR, x/2)*resolution, self.origin_shift(y_center_LR, y/2)*resolution
 
         S_lens = self.sersic_law(theta_x_source.reshape(1,-1).repeat(B,1), theta_y_source.reshape(1,-1).repeat(B,1), x_center_LR.view(B,-1), y_center_LR.view(B,-1), R_sersic) #no gradient
-        S_lens = (S_lens - torch.min(S_lens, dim=-1)[0].view(B,1))/(torch.max(S_lens, dim=-1)[0].view(B,1)-torch.min(S_lens, dim=-1)[0].view(B,1))
+        S_lens = (S_lens - torch.min(S_lens, dim=-1)[0].view(B,1))/(torch.max(S_lens, dim=-1)[0].view(B,1)-torch.min(S_lens, dim=-1)[0].view(B,1) + 1e-8)
         return S_lens
 
     def create_lensing(self, LR, alpha, alpha_interpolated, resolution, resolution_, magnification, R_sersic = None):
@@ -173,11 +173,11 @@ class SersicProfiler(torch.nn.Module):
         I_lens = self.sersic_law(beta_x_source.view(B,-1), beta_y_source.view(B,-1), x_center_LR.view(B,1), y_center_LR.view(B,1), R_sersic) #gradient flow
         S_lens = self.sersic_law(theta_x_source.reshape(1,-1).repeat(B,1), theta_y_source.reshape(1,-1).repeat(B,1), x_center_LR.view(B,-1), y_center_LR.view(B,-1), R_sersic) #no gradient
 
-        I_lens_LR = (I_lens_LR - torch.min(I_lens_LR, dim=-1)[0].view(B,1))/(torch.max(I_lens_LR, dim=-1)[0].view(B,1)-torch.min(I_lens_LR, dim=-1)[0].view(B,1))
-        S_lens = (S_lens - torch.min(S_lens, dim=-1)[0].view(B,1))/(torch.max(S_lens, dim=-1)[0].view(B,1)-torch.min(S_lens, dim=-1)[0].view(B,1))
-        I_lens = (I_lens - torch.min(I_lens, dim=-1)[0].view(B,1))/(torch.max(I_lens, dim=-1)[0].view(B,1)-torch.min(I_lens, dim=-1)[0].view(B,1))
+        I_lens_LR = (I_lens_LR - torch.min(I_lens_LR, dim=-1)[0].view(B,1))/(torch.max(I_lens_LR, dim=-1)[0].view(B,1)-torch.min(I_lens_LR, dim=-1)[0].view(B,1) + 1e-8)
+        S_lens = (S_lens - torch.min(S_lens, dim=-1)[0].view(B,1))/(torch.max(S_lens, dim=-1)[0].view(B,1)-torch.min(S_lens, dim=-1)[0].view(B,1) + 1e-8)
+        I_lens = (I_lens - torch.min(I_lens, dim=-1)[0].view(B,1))/(torch.max(I_lens, dim=-1)[0].view(B,1)-torch.min(I_lens, dim=-1)[0].view(B,1) + 1e-8)
         source_profile_regenerated = source_profile_regenerated.view(B,-1)
-        source_profile_regenerated = (source_profile_regenerated - torch.min(source_profile_regenerated, dim=-1)[0].view(B,1))/(torch.max(source_profile_regenerated, dim=-1)[0].view(B,1)-torch.min(source_profile_regenerated, dim=-1)[0].view(B,1))
+        source_profile_regenerated = (source_profile_regenerated - torch.min(source_profile_regenerated, dim=-1)[0].view(B,1))/(torch.max(source_profile_regenerated, dim=-1)[0].view(B,1)-torch.min(source_profile_regenerated, dim=-1)[0].view(B,1) + 1e-8)
 
 
         I_lens_LR = I_lens_LR.view(B,1,x,y)
@@ -252,7 +252,7 @@ class SersicProfiler(torch.nn.Module):
         else:
             amp, n_sersic = self.sersic_args[:2]
         b_n = 1.999*n_sersic-0.327
-        R = torch.sqrt(torch.pow(x-x_center,2)+torch.pow(y-y_center,2))
+        R = torch.sqrt(torch.pow(x-x_center,2)+torch.pow(y-y_center,2) + 1e-12)
         I = amp*torch.pow(torch.e,-b_n*(torch.pow(R/R_sersic,1/n_sersic)-1))
         return I
     
