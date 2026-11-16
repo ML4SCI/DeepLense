@@ -59,7 +59,8 @@ class ECNN(object):
         self.current_time = current_time
 
         if mode == 'Test':
-            self.model.load_state_dict(torch.load('{}/best-model-parameters.pt'.format(os.path.join(self.log_dir,self.current_time),map_location=self.device)))
+            checkpoint_path = os.path.join(self.log_dir, self.current_time, 'best-model-parameters.pt')
+            self.model.load_state_dict(torch.load(checkpoint_path, map_location=self.device))
 
 
 
@@ -229,7 +230,7 @@ class ECNN(object):
                 correct += (prediction == t).sum().item()
                 print(correct/total*100)
 
-                one_hot_t = self.__to_one_hot_vector(3,t.cpu().numpy())
+                one_hot_t = self.__to_one_hot_vector(self.n_classes, t.cpu().numpy())
                 label_true_arr.append(one_hot_t)
 
         y_test = []
