@@ -56,9 +56,10 @@ def evaluate(model, data_loader, loss_fn, device):
     # Concatenate all results
     logits, y = torch.cat(logits), torch.cat(y)
     loss.append(loss_fn(logits, y))
-    accuracy.append(accuracy_fn(logits, y, num_classes=NUM_CLASSES))
-    class_auroc.append(auroc_fn(logits, y, num_classes=NUM_CLASSES, average=None))
-    macro_auroc.append(auroc_fn(logits, y, num_classes=NUM_CLASSES, average="macro"))
+    accuracy.append(accuracy_fn(logits, y, task="multiclass", num_classes=NUM_CLASSES))
+    class_auroc.append(auroc_fn(logits, y, task="multiclass", num_classes=NUM_CLASSES, average=None))
+    micro_auroc.append(auroc_fn(logits, y, task="multiclass", num_classes=NUM_CLASSES, average="micro"))
+    macro_auroc.append(auroc_fn(logits, y, task="multiclass", num_classes=NUM_CLASSES, average="macro"))
 
     result = {
         "ground_truth": y,
@@ -93,7 +94,7 @@ if __name__ == "__main__":
 
     # Start wandb run
     with wandb.init(
-        entity="_archil", project=run_config.project, id=run_config.runid, resume="must"
+        project=run_config.project, id=run_config.runid, resume="must"
     ):
         # Get best device on machine
         device = get_device(run_config.device)
@@ -169,7 +170,7 @@ if __name__ == "__main__":
         roc_auc = dict()
         for idx, cls in enumerate(LABELS):
             class_truth = (metrics["ground_truth"].numpy() == idx).astype(int)
-            class_pred = torch.nn.functional.softmax(metrics["logits"]).numpy()[
+            class_pred = torch.nn.functional.softmax(metrics["logits"], dim=-1).numpy()[
                 ..., idx
             ]
             fpr[idx], tpr[idx], _ = roc_curve(class_truth, class_pred)
