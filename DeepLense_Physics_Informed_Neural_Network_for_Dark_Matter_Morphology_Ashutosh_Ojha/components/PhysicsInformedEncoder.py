@@ -8,6 +8,14 @@ import torchvision.transforms.functional as F
 from typing import Tuple, Union, List
 import time
 
+try:
+    from .TransformerLSABlock import TransformerLSABlock
+    from .Physics import Physics
+except (ImportError, ValueError):
+    from TransformerLSABlock import TransformerLSABlock
+    from Physics import Physics
+
+
 class PhysicsInformedEncoder(nn.Module):
     def __init__(self, image_size, patch_size, embedding_dim, num_patches, num_heads,
                  hidden_dim, transformer_block_activation_function, num_transformer_block,
@@ -85,8 +93,13 @@ class PhysicsInformedEncoder(nn.Module):
         elif gradient is not None:
             if gradient.shape != image.shape:
                 raise ValueError("The gradient and image should be of the same shape")
-            xdef = np.gradient(gradient, axis=0)
-            ydef = np.gradient(gradient, axis=1)
+            if isinstance(gradient, torch.Tensor):
+                xdef, ydef = torch.gradient(gradient, dim=(0, 1))
+            else:
+                gx = np.gradient(gradient, axis=0)
+                gy = np.gradient(gradient, axis=1)
+                xdef = torch.from_numpy(gx).to(device=self.device, dtype=x.dtype)
+                ydef = torch.from_numpy(gy).to(device=self.device, dtype=y.dtype)
         elif E_r is not None:
             k = torch.ones((length, width), device=self.device) * E_r
             xdef = (k * x) / r
