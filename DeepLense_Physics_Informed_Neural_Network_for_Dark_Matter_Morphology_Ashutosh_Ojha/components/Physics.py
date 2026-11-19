@@ -43,6 +43,8 @@ class Physics():
             if gradient.shape != image.shape:
                 raise ValueError("The gradient and image should be of the same shape")
             #gradient = gradient*r
+            if hasattr(gradient, "detach"):
+                gradient = gradient.detach().cpu().numpy()
             xdef = np.gradient(gradient, axis=0)
             ydef = np.gradient(gradient, axis=1)
         elif E_r is not None:

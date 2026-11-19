@@ -8,6 +8,14 @@ import torchvision.transforms.functional as F
 from typing import Tuple, Union, List
 import time
 
+try:
+    from .MultiLocallySelfAttention import MultiLocallySelfAttention
+    from .FeedForwardBlock import FeedForwardBlock
+except (ImportError, ValueError):
+    from MultiLocallySelfAttention import MultiLocallySelfAttention
+    from FeedForwardBlock import FeedForwardBlock
+
+
 class TransformerLSABlock(nn.Module):
     def __init__(self,
                  embedding_dim: int,
