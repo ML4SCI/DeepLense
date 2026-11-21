@@ -7,6 +7,7 @@ import torch.nn as nn
 import torchvision.transforms.functional as F
 from typing import Tuple, Union, List
 import time
+import copy
 
 class FeedForwardBlock(nn.Module):
     """
@@ -25,16 +26,23 @@ class FeedForwardBlock(nn.Module):
                  dropout: float = 0.1
                 ):
         super(FeedForwardBlock, self).__init__()  # corrected super() call
+
+        def _get_activation():
+            if isinstance(activation_function, type):
+                return activation_function()
+            elif isinstance(activation_function, nn.Module):
+                return copy.deepcopy(activation_function)
+            return activation_function
         
         self.feed_list = nn.ModuleList()
         self.feed_list.append(nn.Linear(in_features=in_dim, out_features=hidden_dim))  # add initial linear layer
-        self.feed_list.append(activation_function())  # add activation function
+        self.feed_list.append(_get_activation())  # add activation function
         self.feed_list.append(nn.Dropout(dropout))  # add dropout layer
         
         # add hidden layers
         for _ in range(num_hidden_layers):
             self.feed_list.append(nn.Linear(in_features=hidden_dim, out_features=hidden_dim))
-            self.feed_list.append(activation_function())
+            self.feed_list.append(_get_activation())
             self.feed_list.append(nn.Dropout(dropout))
         
         # determine final activation layer based on task type

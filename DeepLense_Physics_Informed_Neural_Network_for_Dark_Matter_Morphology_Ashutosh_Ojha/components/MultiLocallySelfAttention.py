@@ -30,16 +30,15 @@ class MultiLocallySelfAttention(nn.Module):
         self.device = device
         self.dropout = dropout
         
-        # Initialize the attention mask
-        #self.attention_mask = torch.ones(1 + self.num_patches, 1 + self.num_patches, dtype=torch.bool)
-        #self.attention_mask = self.attention_mask.triu(1) + self.attention_mask.tril(-1)
-        #self.attention_mask = self.attention_mask.to(self.device)
-        self.attention_mask = torch.eye(1 + self.num_patches, 1 + self.num_patches, dtype=torch.bool, requires_grad=False)
-        self.attention_mask = self.attention_mask.to(device)
+        # Initialize the attention mask as a registered buffer
+        self.register_buffer(
+            "attention_mask",
+            torch.eye(1 + self.num_patches, 1 + self.num_patches, dtype=torch.bool),
+        )
 
         # Initializing the multi-head self-attention layer
         self.mha = nn.MultiheadAttention(self.embedding_dim, self.num_heads, dropout=self.dropout, batch_first=True)
         
     def forward(self, key, query, value):
-        x, _ = self.mha(query, key, value, attn_mask=self.attention_mask)
+        x, _ = self.mha(query, key, value, attn_mask=self.attention_mask.to(query.device))
         return x

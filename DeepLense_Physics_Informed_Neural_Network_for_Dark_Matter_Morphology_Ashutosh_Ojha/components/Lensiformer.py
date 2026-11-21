@@ -9,6 +9,24 @@ from typing import Tuple, Union, List
 import time
 import timm
 
+try:
+    from .ShiftPatchTokenizer import ShiftPatchTokenizer
+    from .PhysicsInformedEncoder import PhysicsInformedEncoder
+    from .Decoder import Decoder
+    from .FeedForwardBlock import FeedForwardBlock
+    from .Flatten import Flatten
+    from .TransformerLSABlock import TransformerLSABlock
+except (ImportError, ValueError):
+    try:
+        from ShiftPatchTokenizer import ShiftPatchTokenizer
+        from PhysicsInformedEncoder import PhysicsInformedEncoder
+        from Decoder import Decoder
+        from FeedForwardBlock import FeedForwardBlock
+        from Flatten import Flatten
+        from TransformerLSABlock import TransformerLSABlock
+    except ImportError:
+        pass
+
 class Lensiformer(nn.Module):
     def __init__(self,
                  image_size: int,
@@ -114,7 +132,7 @@ class Lensiformer(nn.Module):
         initial_patches = self.initial_tokenizer(images_T)
 
         # Encode images and patches
-        lens_corrected_images = self.encoder(images, initial_patches)
+        _, lens_corrected_images = self.encoder(images, initial_patches)
 
         return lens_corrected_images
 

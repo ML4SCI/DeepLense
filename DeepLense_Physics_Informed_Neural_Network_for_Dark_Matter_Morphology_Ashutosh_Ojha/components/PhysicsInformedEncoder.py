@@ -8,6 +8,16 @@ import torchvision.transforms.functional as F
 from typing import Tuple, Union, List
 import time
 
+try:
+    from .TransformerLSABlock import TransformerLSABlock
+    from .Physics import Physics
+except (ImportError, ValueError):
+    try:
+        from TransformerLSABlock import TransformerLSABlock
+        from Physics import Physics
+    except ImportError:
+        pass
+
 class PhysicsInformedEncoder(nn.Module):
     def __init__(self, image_size, patch_size, embedding_dim, num_patches, num_heads,
                  hidden_dim, transformer_block_activation_function, num_transformer_block,
@@ -51,8 +61,8 @@ class PhysicsInformedEncoder(nn.Module):
         self.total_features = (self.num_patches + 1) * self.embedding_dim
         self.transformer.append(nn.Linear(self.total_features, self.image_size*self.image_size))
         self.physics = Physics(mag=1)
-        self.imones = torch.ones((self.image_size,self.image_size)).to(self.device)
-        self.imones_1d = torch.ones((self.image_size*self.image_size)).to(self.device)
+        self.register_buffer("imones", torch.ones((self.image_size, self.image_size)))
+        self.register_buffer("imones_1d", torch.ones((self.image_size * self.image_size)))
         # Create a grid for image coordinates
         self.profile_size = self.image_size
         self.half_profile_size = self.profile_size // 2
@@ -66,9 +76,10 @@ class PhysicsInformedEncoder(nn.Module):
         if False:
             centre_x = centre_x.item()
             centre_y = centre_y.item()
-        
-        range_indices_x = torch.arange(-(centre_x - 1), length - (centre_x - 1), device=self.device)
-        range_indices_y = torch.arange(-(centre_y - 1), width - (centre_y - 1), device=self.device)
+
+        target_device = image.device if isinstance(image, torch.Tensor) else self.device
+        range_indices_x = torch.arange(-(centre_x - 1), length - (centre_x - 1), device=target_device)
+        range_indices_y = torch.arange(-(centre_y - 1), width - (centre_y - 1), device=target_device)
 
         x, y = torch.meshgrid(range_indices_x, range_indices_y, indexing='ij')
         x, y = x * pixel_width, y * pixel_width
@@ -85,10 +96,15 @@ class PhysicsInformedEncoder(nn.Module):
         elif gradient is not None:
             if gradient.shape != image.shape:
                 raise ValueError("The gradient and image should be of the same shape")
-            xdef = np.gradient(gradient, axis=0)
-            ydef = np.gradient(gradient, axis=1)
+            if isinstance(gradient, torch.Tensor):
+                xdef, ydef = torch.gradient(gradient, dim=(0, 1))
+            else:
+                xdef_np = np.gradient(gradient, axis=0)
+                ydef_np = np.gradient(gradient, axis=1)
+                xdef = torch.as_tensor(xdef_np, dtype=torch.float32, device=target_device)
+                ydef = torch.as_tensor(ydef_np, dtype=torch.float32, device=target_device)
         elif E_r is not None:
-            k = torch.ones((length, width), device=self.device) * E_r
+            k = torch.ones((length, width), device=target_device) * E_r
             xdef = (k * x) / r
             ydef = (k * y) / r
         else:
@@ -103,7 +119,7 @@ class PhysicsInformedEncoder(nn.Module):
         by = torch.clamp(by + centre_y * self.source_mag, 0, width * self.source_mag - 1).long()
 
         # Initialize the output image tensor
-        sourceimage = torch.zeros((length * self.source_mag, width * self.source_mag), dtype=torch.float, device=self.device)
+        sourceimage = torch.zeros((length * self.source_mag, width * self.source_mag), dtype=torch.float, device=target_device)
         
         # Flatten the image and coordinates
         flat_image = image.view(-1)
@@ -115,20 +131,18 @@ class PhysicsInformedEncoder(nn.Module):
 
         # Scatter add the values to sourceimage
         sourceimage_flat = sourceimage.view(-1)
-        count  = torch.zeros_like(sourceimage_flat)
+        count = torch.zeros_like(sourceimage_flat)
         sourceimage_flat = sourceimage_flat.scatter_add(0, one_d_indices, flat_image)
-        count = count.scatter_add(0, one_d_indices, self.imones_1d)
-        mask = count!=0
-        sourceimage_flat[mask]/=count[mask]
+        count = count.scatter_add(0, one_d_indices, self.imones_1d.to(target_device))
+        mask = count != 0
+        sourceimage_flat[mask] /= count[mask]
         sourceimage = sourceimage_flat.view(sourceimage.shape)
 
         return sourceimage
 
-
-    def forward(self, input_images, patches,distortion):
+    def forward(self, input_images, patches, distortion=None):
         # Move tensors to the appropriate device
         input_images = input_images.to(self.device)
-        distortion = distortion.to(self.device)
         patches = patches.to(self.device)
 
         batch_size = input_images.shape[0]
@@ -139,9 +153,12 @@ class PhysicsInformedEncoder(nn.Module):
             k_sigmoid = layer(k_sigmoid)
 
         # Extract output components from k_sigmoid
-        k_sigmoid = k_sigmoid.view(batch_size,64,64)
-        distortion = distortion.view(batch_size,64,64)
-        einstein_angle = k_sigmoid*distortion
+        k_sigmoid = k_sigmoid.view(batch_size, self.image_size, self.image_size)
+        if distortion is not None:
+            distortion = distortion.to(self.device).view(batch_size, self.image_size, self.image_size)
+            einstein_angle = k_sigmoid * distortion
+        else:
+            einstein_angle = k_sigmoid
 
         # Reshape input images
         input_images = input_images.view(batch_size, self.image_size, self.image_size)
@@ -154,4 +171,4 @@ class PhysicsInformedEncoder(nn.Module):
             source_image_np = self.image_to_source(image=input_images[i], E_r=einstein_angle[i])
             source_image[i] = source_image_np
 
-        return k_sigmoid,source_image
+        return k_sigmoid, source_image
