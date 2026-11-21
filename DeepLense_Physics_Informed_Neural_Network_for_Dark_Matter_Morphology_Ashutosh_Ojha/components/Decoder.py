@@ -9,6 +9,20 @@ from typing import Tuple, Union, List
 import time
 import timm
 
+try:
+    from .ShiftPatchTokenizer import ShiftPatchTokenizer
+    from .ChangedPhysicsInformedEncoder import ChangedPhysicsInformedEncoder
+    from .TransformerLSABlock import TransformerLSABlock
+    from .Flatten import Flatten
+except (ImportError, ValueError):
+    try:
+        from ShiftPatchTokenizer import ShiftPatchTokenizer
+        from ChangedPhysicsInformedEncoder import ChangedPhysicsInformedEncoder
+        from TransformerLSABlock import TransformerLSABlock
+        from Flatten import Flatten
+    except ImportError:
+        pass
+
 class Decoder(nn.Module):
     def __init__(self,
                  image_size: int,
