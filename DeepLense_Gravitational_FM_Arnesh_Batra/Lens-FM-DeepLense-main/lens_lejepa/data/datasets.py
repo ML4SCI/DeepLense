@@ -142,7 +142,7 @@ class SyntheticSuperResolutionDataset(Dataset):
     def __getitem__(self, index: int) -> dict[str, torch.Tensor]:
         image = self._cache[index] if self._cache is not None else load_lens_image(self.paths[index])
         high_res = torch.from_numpy(minmax_normalise(image))
-        if high_res.shape[-1] != self.hr_size:
+        if high_res.shape[-2:] != self.hr_size:
             high_res = bicubic(high_res, self.hr_size, antialias=True)
         low_res = bicubic(high_res, self.hr_size // 2, antialias=True)
         return {
