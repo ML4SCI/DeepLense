@@ -1,0 +1,58 @@
+# lsst_deeplense pipeline configuration
+# ----------------------------------------
+# Copy and edit this file for your run.
+# All paths can be absolute or relative to the working directory.
+
+# ── Data access ──────────────────────────────────────────────────────────────
+data:
+  # Rubin Science Platform TAP endpoint
+  tap_url: "https://data.lsst.cloud/api/tap"
+  # Rubin Science Platform SIAv2 endpoint
+  sia_url: "https://data.lsst.cloud/api/image/siav2"
+  # RSP personal access token (prefer RSP_TOKEN env var instead of hardcoding)
+  token: null
+
+  # Catalog table to query for candidates
+  catalog_table: "dp02_dc2_catalogs.Object"
+
+  # Cone-search parameters
+  search_ra: 150.1    # degrees
+  search_dec: 2.2     # degrees
+  search_radius_deg: 1.0
+
+  # Photometric pre-selection
+  band: "i"
+  mag_limit: 24.0
+  snr_min: 10.0
+  max_candidates: 10000
+
+# ── Preprocessing ─────────────────────────────────────────────────────────────
+preprocessing:
+  # Cutout half-width in arcseconds (LSST native: ~0.2 arcsec/px)
+  size_arcsec: 10.0
+  # Output image size fed to DeepLense models
+  output_size: 64
+  # Bands to retrieve per candidate
+  bands: ["g", "r", "i"]
+  # Normalisation strategy: 'asinh' | 'minmax' | 'zscore'
+  normalisation: "asinh"
+  asinh_a: 0.1
+  # Optional sigma-clipping before normalisation (null = disabled)
+  clip_sigma: null
+
+# ── Pipeline execution ────────────────────────────────────────────────────────
+pipeline:
+  batch_size: 64
+  num_workers: 4
+  # Directory to cache downloaded .npy cutouts
+  cache_dir: "./cache/rubin_cutouts"
+  # CSV to write candidate list
+  candidates_csv: "./candidates.csv"
+
+# ── Model (optional – for end-to-end inference) ───────────────────────────────
+model:
+  type: "classification"          # 'classification' | 'regression' | 'super_resolution'
+  architecture: "resnet18"
+  checkpoint: null                # path to a DeepLense .pth checkpoint
+  device: "cuda"                  # 'cuda' | 'cpu'
+  num_classes: 3                  # 3 for Model I/II/III (no-sub, subhalo, vortex)
