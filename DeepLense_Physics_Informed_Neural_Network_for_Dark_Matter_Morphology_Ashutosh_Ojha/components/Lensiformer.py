@@ -8,6 +8,11 @@ import torchvision.transforms.functional as F
 from typing import Tuple, Union, List
 import time
 import timm
+from components.ShiftPatchTokenizer import ShiftPatchTokenizer
+from components.PhysicsInformedEncoder import PhysicsInformedEncoder
+from components.TransformerLSABlock import TransformerLSABlock
+from components.Flatten import Flatten
+from components.FeedForwardBlock import FeedForwardBlock
 
 class Lensiformer(nn.Module):
     def __init__(self,
