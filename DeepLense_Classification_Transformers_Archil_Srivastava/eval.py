@@ -40,8 +40,7 @@ def evaluate(model, data_loader, loss_fn, device):
     """
     model.eval()  # Switch on evaluation model
 
-    # Initialize lists for different metrics
-    loss, accuracy, class_auroc, micro_auroc, macro_auroc = [], [], [], [], []
+    # Collect predictions and labels to compute metrics in one pass
     logits, y = [], []
 
     # Iterate over batches and accumulate metrics
@@ -55,24 +54,30 @@ def evaluate(model, data_loader, loss_fn, device):
 
     # Concatenate all results
     logits, y = torch.cat(logits), torch.cat(y)
-    loss.append(loss_fn(logits, y))
-    accuracy.append(accuracy_fn(logits, y, num_classes=NUM_CLASSES))
-    class_auroc.append(auroc_fn(logits, y, num_classes=NUM_CLASSES, average=None))
-    macro_auroc.append(auroc_fn(logits, y, num_classes=NUM_CLASSES, average="macro"))
+    loss = loss_fn(logits, y).item()
+    accuracy = accuracy_fn(logits, y, num_classes=NUM_CLASSES).item()
+    class_auroc = auroc_fn(
+        logits, y, num_classes=NUM_CLASSES, average=None
+    ).cpu()
+    micro_auroc = auroc_fn(
+        logits, y, num_classes=NUM_CLASSES, average="micro"
+    ).item()
+    macro_auroc = auroc_fn(
+        logits, y, num_classes=NUM_CLASSES, average="macro"
+    ).item()
 
     result = {
         "ground_truth": y,
         "logits": logits,
-        "loss": np.mean(loss),
-        "accuracy": np.mean(accuracy),
-        "micro_auroc": np.mean(micro_auroc),
-        "macro_auroc": np.mean(macro_auroc),
+        "loss": loss,
+        "accuracy": accuracy,
+        "micro_auroc": micro_auroc,
+        "macro_auroc": macro_auroc,
     }
 
     # Class-wise AUROC
-    class_auroc = class_auroc[0]
     for i, label in enumerate(LABELS):
-        result[f"{label}_auroc"] = class_auroc[i]
+        result[f"{label}_auroc"] = class_auroc[i].item()
 
     return result
 
@@ -84,6 +89,12 @@ if __name__ == "__main__":
     # Wandb-specific params
     parser.add_argument("--runid", type=str, help="ID of train run")
     parser.add_argument("--project", type=str, default="ml4sci_deeplense_final")
+    parser.add_argument(
+        "--entity",
+        type=str,
+        default=os.environ.get("WANDB_ENTITY"),
+        help="Weights & Biases entity; defaults to WANDB_ENTITY env var or your logged-in user.",
+    )
 
     # Device to run on
     parser.add_argument(
@@ -92,9 +103,15 @@ if __name__ == "__main__":
     run_config = parser.parse_args()
 
     # Start wandb run
-    with wandb.init(
-        entity="_archil", project=run_config.project, id=run_config.runid, resume="must"
-    ):
+    wandb_kwargs = {
+        "project": run_config.project,
+        "id": run_config.runid,
+        "resume": "must",
+    }
+    if run_config.entity:
+        wandb_kwargs["entity"] = run_config.entity
+
+    with wandb.init(**wandb_kwargs):
         # Get best device on machine
         device = get_device(run_config.device)
 
@@ -169,9 +186,9 @@ if __name__ == "__main__":
         roc_auc = dict()
         for idx, cls in enumerate(LABELS):
             class_truth = (metrics["ground_truth"].numpy() == idx).astype(int)
-            class_pred = torch.nn.functional.softmax(metrics["logits"]).numpy()[
-                ..., idx
-            ]
+            class_pred = torch.nn.functional.softmax(
+                metrics["logits"], dim=-1
+            ).numpy()[..., idx]
             fpr[idx], tpr[idx], _ = roc_curve(class_truth, class_pred)
             _ = axes[0].plot(
                 fpr[idx],
