@@ -159,7 +159,8 @@ def train_contrastive_with_labels(
 
     for epoch in range(epochs):
         epoch_loss = 0.0
-        for batch_idx, (img1, img2, label) in enumerate(train_loader):
+        pbar = tqdm(train_loader, desc=f"Epoch [{epoch}/{epochs}]")
+        for batch_idx, (img1, img2, label) in enumerate(pbar):
             img1, img2, label = img1.to(device), img2.to(device), label.to(device)
 
             optimizer.zero_grad()
@@ -170,10 +171,7 @@ def train_contrastive_with_labels(
             loss.backward()
             optimizer.step()
 
-            if batch_idx % 10 == 0:
-                print(
-                    f"Epoch [{epoch}/{epochs}], Batch [{batch_idx}/{len(train_loader)}], Loss: {loss.item()}"
-                )
+            pbar.set_postfix({"Loss": loss.item()})
 
         epoch_loss = epoch_loss / len(train_loader)
 
@@ -198,7 +196,8 @@ def train_contrastive_pair(
     # Training loop
     for epoch in range(epochs):
         epoch_loss = 0.0
-        for batch_idx, (img1, img2, label) in enumerate(train_loader):
+        pbar = tqdm(train_loader, desc=f"Epoch [{epoch}/{epochs}]")
+        for batch_idx, (img1, img2, label) in enumerate(pbar):
             if img1.shape[0] != batch_size:
                 continue
 
@@ -217,10 +216,7 @@ def train_contrastive_pair(
             loss.backward()
             optimizer.step()
 
-            if batch_idx % 10 == 0:
-                print(
-                    f"Epoch [{epoch}/{epochs}], Batch [{batch_idx}/{len(train_loader)}], Loss: {loss.item()}"
-                )
+            pbar.set_postfix({"Loss": loss.item()})
 
         epoch_loss = epoch_loss / len(train_loader)
 
@@ -244,7 +240,8 @@ def train_contrastive(
     # Training loop
     for epoch in range(epochs):
         epoch_loss = 0.0
-        for batch_idx, (img1, _, _) in enumerate(train_loader):
+        pbar = tqdm(train_loader, desc=f"Epoch [{epoch}/{epochs}]")
+        for batch_idx, (img1, _, _) in enumerate(pbar):
             img1 = img1.to(device)
 
             optimizer.zero_grad()
@@ -257,10 +254,7 @@ def train_contrastive(
             loss.backward()
             optimizer.step()
 
-            if batch_idx % 10 == 0:
-                print(
-                    f"Epoch [{epoch}/{epochs}], Batch [{batch_idx}/{len(train_loader)}], Loss: {loss.item()}"
-                )
+            pbar.set_postfix({"Loss": loss.item()})
 
         epoch_loss = epoch_loss / len(train_loader)
 
@@ -288,7 +282,8 @@ def train_simplistic(
     for epoch in range(epochs):
         epoch_loss = 0.0
 
-        for batch_idx, (img1, _, label) in enumerate(train_loader):
+        pbar = tqdm(train_loader, desc=f"Epoch [{epoch}/{epochs}]")
+        for batch_idx, (img1, _, label) in enumerate(pbar):
             img1 = img1.to(device)
             label = label.to(device)
             optimizer.zero_grad()
@@ -299,10 +294,7 @@ def train_simplistic(
             optimizer.step()
             epoch_loss += loss
 
-            if batch_idx % 10 == 0:
-                print(
-                    f"Epoch [{epoch}/{epochs}], Batch [{batch_idx}/{len(train_loader)}], Loss: {loss.item()}"
-                )
+            pbar.set_postfix({"Loss": loss.item()})
 
         epoch_loss = epoch_loss / len(train_loader)
 
@@ -354,7 +346,8 @@ def train_byol(
     for epoch in range(epochs):
         total_loss = 0
         momentum_val = cosine_schedule(epoch, epochs, 0.996, 1)
-        for batch_idx, (img1, img2, label) in enumerate(train_loader):
+        pbar = tqdm(train_loader, desc=f"Epoch [{epoch}/{epochs}]")
+        for batch_idx, (img1, img2, label) in enumerate(pbar):
             x0, x1 = img1, img2
             x0 = x0.to(device)
             x1 = x1.to(device)
@@ -367,10 +360,7 @@ def train_byol(
             optimizer.step()
             optimizer.zero_grad()
 
-            if batch_idx % 10 == 0:
-                print(
-                    f"Epoch [{epoch}/{epochs}], Batch [{batch_idx}/{len(train_loader)}], Loss: {loss.item()}"
-                )
+            pbar.set_postfix({"Loss": loss.item()})
 
         if total_loss < best_loss:
             best_loss = total_loss
