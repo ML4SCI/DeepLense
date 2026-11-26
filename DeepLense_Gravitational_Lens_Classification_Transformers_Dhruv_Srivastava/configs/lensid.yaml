@@ -1,0 +1,41 @@
+# Dataset configuration
+
+data:
+  archive_path: data/Model_III.tgz
+  extract_dir: data/Model_III_data
+  dataset_root: data/Model_III_data/Model_III
+
+  # Dataset split ratios ( sum == 1.0)
+  split:
+    train: 0.75
+    val: 0.15
+    test: 0.10
+
+  # Vision Transformer input size
+  image_size: [64, 64]
+
+# Dataloader configuration
+dataloader:
+  batch_size: 32
+  num_workers: 4
+  pin_memory: true
+  shuffle_train: true
+
+# Training configuration
+training:
+  num_epochs: 100
+  learning_rate: 0.001
+
+# Model configuration
+model:
+  name: vision_transformer_basic
+  in_channels: 1
+  num_classes: 3
+
+# Output paths
+outputs:
+  root_dir: outputs
+  models_dir: outputs/models
+  figures_dir: outputs/figures
+  checkpoints_dir: outputs/checkpoints
+  model_name: vision_transformer_basic.pth
