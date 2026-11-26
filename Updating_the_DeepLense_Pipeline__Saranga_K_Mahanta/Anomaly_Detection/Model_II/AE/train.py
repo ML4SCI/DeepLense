@@ -148,10 +148,7 @@ if __name__ == "__main__":
     model = Autoencoder().to(device)
     
     if LOAD_PRETRAINED_MODEL:
-        if device != 'cpu':
-            model.load_state_dict(torch.load(MODEL_PATH))
-        else:
-            model.load_state_dict(torch.load(MODEL_PATH, map_location = torch.device('cpu')))
+        model.load_state_dict(torch.load(MODEL_PATH, map_location=device, weights_only=True))
 
     model, loss_dict = fit_model(model, checkpoint_path = MODEL_PATH)
 

@@ -75,7 +75,7 @@ def fit_model(model, criterion, optimizer):
     loss_dict = {'train_loss':[],'val_loss':[]}
     acc_dict = {'train_accuracy':[],'val_accuracy':[]}
     
-    scheduler = CosineAnnealingWarmRestarts(optimizer,T_0 = 15, T_mult = 1,eta_min = 1e-6, verbose=True)
+    scheduler = CosineAnnealingWarmRestarts(optimizer, T_0=15, T_mult=1, eta_min=1e-6)
     
 #     scheduler = ReduceLROnPlateau(optimizer, 'min',patience=2,factor=0.3,verbose=True)
 
@@ -105,10 +105,7 @@ if __name__ == '__main__':
     model = EffNetB1_backbone_model().to(device)
 
     if LOAD_PRETRAINED_MODEL:
-        if device != 'cpu':
-            model.load_state_dict(torch.load(MODEL_PATH))
-        else:
-            model.load_state_dict(torch.load(MODEL_PATH, map_location = torch.device('cpu')))
+        model.load_state_dict(torch.load(MODEL_PATH, map_location=device, weights_only=True))
 
     criterion = nn.CrossEntropyLoss()
     optimizer = optim.Adam(model.parameters(),lr = LEARNING_RATE)
