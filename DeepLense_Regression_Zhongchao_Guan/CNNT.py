@@ -173,10 +173,9 @@ class CNNT(nn.Module):
         self.to_patch_embedding = CNN()
 
         # hyper-params
-        num_patches = 16 * 16
         dim = 32
 
-        self.pos_embedding = nn.Parameter(torch.randn(1, num_patches + 1, dim))
+        self.pos_embedding = None
         self.cls_token = nn.Parameter(torch.randn(1, 1, dim))
         self.dropout = nn.Dropout(emb_dropout)
 
@@ -196,6 +195,14 @@ class CNNT(nn.Module):
         # b: batch size  n: patch number  _: dim of patch
         b, n, _ = x.shape
 
+        # create pos embedding dynamically
+        if self.pos_embedding is None or self.pos_embedding.shape[1] != n + 1:
+           pos_emb = nn.Parameter(
+               torch.randn(1, n + 1, x.shape[-1], device=x.device)
+           )
+           self.register_parameter("pos_embedding", pos_emb)
+           self.pos_embedding = pos_emb
+           
         cls_tokens = repeat(self.cls_token, '1 1 d -> b 1 d', b=b)
         x = torch.cat((cls_tokens, x), dim=1)
         x += self.pos_embedding[:, :(n + 1)]
