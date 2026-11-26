@@ -35,6 +35,16 @@ All results were calculated on a **separate test set**.
 |Contrastive Learning Gaussian Noise Pretext| 0.96,0.95,1.0   | **0.99, 0.99, 1.0**     |   **1.0, 0.99, 1.0**    | 
 | Bootstrap Your Own Latent | 0.95, 0.93, 1.0 |    **1.0, 0.98, 1.0**  |   0.98, 0.92, 0.98   | 
 
+## Environment Setup
+
+Clone the repository and install the required dependencies:
+
+```bash
+pip install -r requirements.txt
+```
+
+*(Note: In Google Colab or Kaggle notebooks, you can install the required packages using `%pip install -r requirements.txt` or `!pip install imageio gdown`)*
+
 ## Conclusion and Future Goals
 So far, we can see that the results for self-supervised learning seem superior to their ResNet50 Baseline. 
 Future goals consist of testing models for regression, implementing vision transformers (twin networks) and testing some more self-supervised learning methods.
