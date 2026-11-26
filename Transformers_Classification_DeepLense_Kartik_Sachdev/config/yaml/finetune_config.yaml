@@ -1,0 +1,13 @@
+device: "cuda"
+learning_method: "contrastive_embedding"
+batch_size: 128
+epochs: 10
+learning_rate: 0.001
+margin: 1.0
+num_channels: 1
+temperature: 0.5
+num_classes: 2
+num_workers: 4
+
+# REQUIRED - set this to your actual path
+saved_model_path: ""
