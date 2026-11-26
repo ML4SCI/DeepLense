@@ -1,4 +1,7 @@
 import torch
+import argparse
+import yaml
+import os
 import torch.nn as nn
 import torch.optim as optim
 from torch.utils.data import DataLoader
@@ -9,10 +12,11 @@ from utils.train import train_simplistic
 from utils.util import load_model_add_head
 from torchsummary import summary
 
+
 # Set device
-device = "cuda"  # torch.device("cuda" if torch.cuda.is_available() else "cpu")
-learning_method = "contrastive_embedding"
-saved_model_path = "/home/kartik/git/deepLense_transformer_ssl/output/pretrained_contrastive_embedding.pth"
+def main(log_dir,finetune_model_path):
+    device = "cuda"  # torch.device("cuda" if torch.cuda.is_available() else "cpu"
+    learning_method = "contrastive_embedding"
 
 # Set hyperparameters
 batch_size = 128
@@ -40,7 +44,7 @@ finetune_head = nn.Sequential(
 
 model = load_model_add_head(
     pretrain_model=pretrain_model,
-    saved_model_path=saved_model_path,
+    saved_model_path=finetune_model_path,
     head=finetune_head,
     freeze_pretrain_layers=True,
 )
@@ -55,5 +59,36 @@ criterion = nn.CrossEntropyLoss()
 
 # Training loop
 train_simplistic(
-    epochs, model, device, train_loader, criterion, optimizer, saved_model_path
+    epochs, model, device, train_loader, criterion, optimizer, log_dir
 )
+
+
+def load_config(config_path):
+    with open(config_path, "r") as f:
+        return yaml.safe_load(f)
+
+if __name__ == "__main__":
+    parser = argparse.ArgumentParser()
+
+    parser.add_argument("--log_dir", type=str, help="Log directory")
+    parser.add_argument("--finetune_model_path", type=str, help="Path to model")
+    parser.add_argument("--config", type=str, help="Path to YAML config file")
+
+    
+    args = parser.parse_args()
+
+    config = {}
+    if args.config:
+        config = load_config(args.config)
+
+    log_dir = args.log_dir or config.get("log_dir",None)
+    finetune_model_path = args.finetune_model_path or config.get("finetune_model_path")
+
+    if not log_dir or not finetune_model_path:
+        raise ValueError("Please provide log_dir and finetune_model_path via CLI or config file")
+
+    if not os.path.exists(finetune_model_path):
+        raise FileNotFoundError(f"Model path not found: {finetune_model_path}")
+
+    
+    main(log_dir, finetune_model_path)
