@@ -36,20 +36,18 @@ def evaluate(model, data_loader, loss_fn, device):
     -------
     dict
         Metrics on the provided data by the given model.
-        It is a dict containing metrics like "loss", "accuracy", "micro_auroc", "macro_auroc".
+        It is a dict containing metrics like "loss", "accuracy", "weighted_auroc", "macro_auroc".
     """
     model.eval()  # Switch on evaluation model
 
     # Initialize lists for different metrics
-    loss, accuracy, class_auroc, micro_auroc, macro_auroc = [], [], [], [], []
+    loss, accuracy, class_auroc, macro_auroc = [], [], [], []
     logits, y = [], []
 
     # Iterate over batches and accumulate metrics
     for batch_X, batch_y in data_loader:
         # Send data to device
-        batch_X, batch_y = batch_X.to(device, dtype=torch.float), batch_y.type(
-            torch.LongTensor
-        )
+        batch_X, batch_y = batch_X.to(device, dtype=torch.float), batch_y.to(device, dtype=torch.long)
         logits.append(model(batch_X).cpu())  # Append the logits
         y.append(batch_y)  # Append the predictions
 
@@ -57,6 +55,7 @@ def evaluate(model, data_loader, loss_fn, device):
     logits, y = torch.cat(logits), torch.cat(y)
     loss.append(loss_fn(logits, y))
     accuracy.append(accuracy_fn(logits, y, num_classes=NUM_CLASSES))
+    weighted_auroc = auroc_fn(logits, y, num_classes=NUM_CLASSES, average="weighted")
     class_auroc.append(auroc_fn(logits, y, num_classes=NUM_CLASSES, average=None))
     macro_auroc.append(auroc_fn(logits, y, num_classes=NUM_CLASSES, average="macro"))
 
@@ -65,7 +64,7 @@ def evaluate(model, data_loader, loss_fn, device):
         "logits": logits,
         "loss": np.mean(loss),
         "accuracy": np.mean(accuracy),
-        "micro_auroc": np.mean(micro_auroc),
+        "weighted_auroc": weighted_auroc.item() if hasattr(weighted_auroc, 'item') else float(weighted_auroc),
         "macro_auroc": np.mean(macro_auroc),
     }
 
@@ -145,7 +144,7 @@ if __name__ == "__main__":
         # Log the summary into W&B
         wandb.run.summary["test_loss"] = metrics["loss"]
         wandb.run.summary["test_accuracy"] = metrics["accuracy"]
-        wandb.run.summary["test_micro_auroc"] = metrics["micro_auroc"]
+        wandb.run.summary["test_weighted_auroc"] = metrics["weighted_auroc"]
         wandb.run.summary["test_macro_auroc"] = metrics["macro_auroc"]
         for label in LABELS:
             wandb.run.summary[f"test_{label}_auroc"] = metrics[f"{label}_auroc"]
