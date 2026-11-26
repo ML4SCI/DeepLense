@@ -55,8 +55,8 @@ def parse_args():
                         help='weight of the vdl loss')
 
     # Performance / architecture options
-    parser.add_argument('--resolution', type=float,
-                        help='arcsecond per pixel resolution the images are captured in')
+    parser.add_argument('--resolution', type=float, default=0.1,
+                    help='arcsecond per pixel resolution the images are captured in')
     parser.add_argument('--magnification', type=int, default=2,
                         help='magnification value achieved by the SR network')
     parser.add_argument('--n-mag', type=int, default=1,
@@ -137,18 +137,22 @@ if __name__ == '__main__':
             'hyperparameters',
             '|param|value|\n|-|-|\n%s'%('\n'.join([f'|{key}|{value}' for key, value in vars(args).items()])),
         )
+    # Get the script directory
+    script_dir = os.path.dirname(os.path.abspath(__file__))
 
-    # --- load precomputed sparse mappings and maps --------------------------
-    # These files must exist in working dir. They are moved to args.device below.
-    cross_grid_to_log = torch.load('scatter_to_log_128.pt').to(args.device)
-    cross_grid_forward_from_log = torch.load('forward_from_log_128.pt').to(args.device)
-    cross_grid_from_log = torch.load('scatter_from_log_128.pt').to(args.device)
-    cross_grid_backward = torch.load('sparse_grid_fracs_euclid_backward.pt').to(args.device)
+    # Define the folder where the grids are kept
+    grid_dir = os.path.join(script_dir, 'grid_matrices')
 
-    # convergence maps
-    source_convergence_map = torch.load('source_convergence_map.pt').to(args.device)
-    image_convergence_map = torch.load('image_convergence_map.pt').to(args.device)
+    # Load the files from that specific folder
+    cross_grid_to_log = torch.load(os.path.join(grid_dir, 'scatter_to_log_128.pt')).to(args.device)
+    cross_grid_forward_from_log = torch.load(os.path.join(grid_dir, 'forward_from_log_128.pt')).to(args.device)
+    cross_grid_from_log = torch.load(os.path.join(grid_dir, 'scatter_from_log_128.pt')).to(args.device)
+    cross_grid_backward = torch.load(os.path.join(grid_dir, 'sparse_grid_fracs_euclid_backward.pt')).to(args.device)
 
+    # Check if these maps are also in grid_matrices or the root
+    source_convergence_map = torch.load(os.path.join(grid_dir, 'source_convergence_map.pt')).to(args.device)
+    image_convergence_map = torch.load(os.path.join(grid_dir, 'image_convergence_map.pt')).to(args.device)
+  
     # --- PSF kernel setup ---------------------------------------------------
     # gaussian_kernel returns (Z, X, Y) as numpy arrays in the previous file.
     # Converting to torch.tensor is fine but be mindful of dtype/device.
