@@ -27,6 +27,48 @@ The dataset consists of 2,834 pairs of Low Resolution (LR) and High Resolution (
 
 ![Dataset](figures/dataset.webp)
 
+⚠️ Dataset Availability
+-----------------------
+
+The dataset is **not included in this repository** due to size constraints.
+
+It must be generated using the official simulation framework:
+
+### 🔗 **DeepLenseSim**
+
+<https://github.com/mwt5345/DeepLenseSim/tree/main/>
+
+DeepLenseSim is used to create physically realistic gravitational lensing simulations.
+
+## 📁 Required Dataset Structure
+
+After generating the dataset, organize it as:
+
+pairs/
+ ├── 0_label_hsc.npy   # HR image  
+ ├── 0_label_hst.npy   # LR image  
+ ├── 1_label_hsc.npy  
+ ├── 1_label_hst.npy  
+ └── ...
+
+| Suffix | Meaning |
+|--------|---------|
+| `hsc` | High Resolution image |
+| `hst` | Low Resolution image |
+
+---
+
+## 🧪 How LR Images Are Created
+
+Low-resolution (LR) images are generated from High-resolution (HR) images by simulating real telescope effects:
+
+- **Gaussian blurring** — simulates telescope Point Spread Function (PSF)  
+- **Gaussian noise addition** — mimics sensor noise  
+- **Downsampling** — reduces resolution  
+
+This process reproduces real observational degradation.
+
+---
 ## Results
 
 | Model   | PSNR  | SSIM  | Paper |
