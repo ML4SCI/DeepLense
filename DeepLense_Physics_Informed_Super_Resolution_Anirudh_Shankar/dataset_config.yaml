@@ -1,0 +1,41 @@
+# Dataset configuration for Physics-Informed Super Resolution
+# Externalizes parameters that are otherwise hardcoded in training notebooks.
+# Reference: config.json holds physics/model params; this file holds dataset params.
+
+# Each model corresponds to a simulated telescope (see README Section 4).
+models:
+  model_1:
+    data_dir: "../Simulations/data_model_1/"
+    eval_dir: "../Simulations/data_model_1/"
+    resolution: 0.05
+    alpha_t_scaling: 0.0025
+  model_2:
+    data_dir: "../Simulations/data_model_2/"
+    eval_dir: "../Simulations/data_model_2/"
+    resolution: 0.101
+    alpha_t_scaling: 0.0025
+  model_3:
+    data_dir: "../Simulations/data_model_3/"
+    eval_dir: "../Simulations/data_model_3/"
+    resolution: 0.08
+    alpha_t_scaling: 0.0025
+
+# Dark matter substructure classes
+classes:
+  train: ["no_sub", "axion", "cdm"]
+  eval_lr: ["no_sub", "axion", "cdm"]
+  eval_hr: ["no_sub_HR", "axion_HR", "cdm_HR"]
+
+# Dataset sizing
+num_samples: 5000
+train_val_split: 0.8
+
+# Training defaults
+batch_size: 5
+epochs: 150
+learning_rate: 1.0e-5
+num_workers: 15
+
+# Image properties (should stay consistent with config.json)
+image_shape: 75
+magnification: 2
