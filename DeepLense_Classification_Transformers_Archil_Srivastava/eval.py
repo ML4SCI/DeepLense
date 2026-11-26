@@ -56,9 +56,27 @@ def evaluate(model, data_loader, loss_fn, device):
     # Concatenate all results
     logits, y = torch.cat(logits), torch.cat(y)
     loss.append(loss_fn(logits, y))
-    accuracy.append(accuracy_fn(logits, y, num_classes=NUM_CLASSES))
-    class_auroc.append(auroc_fn(logits, y, num_classes=NUM_CLASSES, average=None))
-    macro_auroc.append(auroc_fn(logits, y, num_classes=NUM_CLASSES, average="macro"))
+    accuracy.append(
+        accuracy_fn(logits, y, task="multiclass", num_classes=NUM_CLASSES)
+    )
+    class_auroc.append(
+        auroc_fn(
+            logits,
+            y,
+            task="multiclass",
+            num_classes=NUM_CLASSES,
+            average=None,
+        )
+    )
+    macro_auroc.append(
+        auroc_fn(
+            logits,
+            y,
+            task="multiclass",
+            num_classes=NUM_CLASSES,
+            average="macro",
+        )
+    )
 
     result = {
         "ground_truth": y,
