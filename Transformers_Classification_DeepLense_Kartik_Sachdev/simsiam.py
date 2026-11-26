@@ -75,7 +75,7 @@ def main(args):
     num_classes = len(classes)
 
     make_directories([dataset_dir])
-    seed_everything(seed=42)
+    seed_everything(seed=args.seed)
     device = get_device(use_cuda=use_cuda, cuda_idx=0)
 
     # logging
@@ -331,6 +331,9 @@ if __name__ == "__main__":
     parser.add_argument("--cuda", action="store_true", help="whether to use cuda")
     parser.add_argument(
         "--no-cuda", dest="cuda", action="store_false", help="not to use cuda"
+    )
+    parser.add_argument(
+        "--seed", type=int, default=42, help="random seed for reproducible experiments"
     )
     parser.set_defaults(cuda=True)
 

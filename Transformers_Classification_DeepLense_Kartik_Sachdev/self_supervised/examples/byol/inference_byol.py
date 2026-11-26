@@ -1,4 +1,5 @@
 from __future__ import print_function
+import os
 
 from turtle import down
 
@@ -107,8 +108,22 @@ def main():
     labels_map = {0: "axion", 1: "cdm", 2: "no_sub"}
     image_size = 224
     channels = 1
-    log_dir = "/home/kartik/git/DeepLense/Transformers_Classification_DeepLense_Kartik_Sachdev/logger/2023-07-25-06-27-13"
-    finetune_model_path = "/home/kartik/git/DeepLense/Transformers_Classification_DeepLense_Kartik_Sachdev/logger/2023-07-25-06-27-13/checkpoint/CrossFormer_finetuned_Model_II_2023-07-25-06-27-13.pt"
+    
+    # Define base directory relative to script location
+    BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+    
+    # Use relative paths instead of hardcoded absolute paths
+    log_dir = os.path.join(BASE_DIR, "..", "..", "..", "logger", "2023-07-25-06-27-13")
+    finetune_model_path = os.path.join(
+        BASE_DIR,
+        "..",
+        "..",
+        "..",
+        "logger",
+        "2023-07-25-06-27-13",
+        "checkpoint",
+        "CrossFormer_finetuned_Model_II_2023-07-25-06-27-13.pt"
+    )
     batch_size = 512
     num_workers = 8
 

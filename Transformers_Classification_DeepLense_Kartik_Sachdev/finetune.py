@@ -1,3 +1,4 @@
+import os
 import torch
 import torch.nn as nn
 import torch.optim as optim
@@ -6,13 +7,27 @@ from utils.dataset import DefaultDatasetSetup
 from models.cnn_zoo import CustomResNet
 from utils.losses.contrastive_loss import ContrastiveLossEuclidean
 from utils.train import train_simplistic
-from utils.util import load_model_add_head
+from utils.util import load_model_add_head, seed_everything
 from torchsummary import summary
+from argparse import ArgumentParser
+
+parser = ArgumentParser()
+parser.add_argument(
+    "--seed", type=int, default=42, help="random seed for reproducible experiments"
+)
+args = parser.parse_args()
+
+# Set reproducible seed
+seed_everything(seed=args.seed)
+
 
 # Set device
 device = "cuda"  # torch.device("cuda" if torch.cuda.is_available() else "cpu")
 learning_method = "contrastive_embedding"
-saved_model_path = "/home/kartik/git/deepLense_transformer_ssl/output/pretrained_contrastive_embedding.pth"
+
+# Define base directory relative to script location
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+saved_model_path = os.path.join(BASE_DIR, "output", "pretrained_contrastive_embedding.pth")
 
 # Set hyperparameters
 batch_size = 128
