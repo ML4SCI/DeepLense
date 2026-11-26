@@ -19,6 +19,13 @@ It contains all the Python Notebooks used in training, the trained model weights
 Use the following to install the required libraries in a virtual environment of choice.
 
 `pip install -r requirements.txt`
+## Platform notes
+
+- `apturl` is an Ubuntu-only system package and is not required to run the core
+  grid-based lensing and super-resolution pipeline.
+- Windows and macOS users can install all required dependencies directly using
+  `requirements.txt`.
+
 
 Do find the implementation in Section 4 if you want to skip to it.
 
