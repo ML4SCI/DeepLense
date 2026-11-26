@@ -72,6 +72,10 @@ parser.add_argument(
 )
 
 parser.add_argument(
+    "--seed", type=int, default=42, help="random seed for reproducibility"
+)
+
+parser.add_argument(
     "--train_config",
     type=str,
     default="CvT",
@@ -105,6 +109,7 @@ def main():
     use_cuda = args.cuda
     num_workers = args.num_workers
     train_config_name = args.train_config
+    seed = args.seed
 
     classes = DATASET[f"{dataset_name}"]["classes"]
 
@@ -155,7 +160,7 @@ def main():
     train_len = len(trainset) - valid_len
     trainset, testset = random_split(trainset, [train_len, valid_len])
 
-    seed_everything(seed=42)
+    seed_everything(seed=seed)
     device = get_device(use_cuda=use_cuda, cuda_idx=0)
 
     # logging
