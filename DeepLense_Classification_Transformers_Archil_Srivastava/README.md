@@ -32,6 +32,11 @@ ___Note__: Axion files have extra data corresponding to mass of axion used in si
 
 # __Training__
 
+Install dependencies from this module first:
+```bash
+python -m pip install -r requirements.txt
+```
+
 Use the train.py script to train a particular model (using timm model name). The script will ask for a WandB login key, hence a WandB account is needed. Example: 
 ```bash
 python3 train.py \
@@ -41,7 +46,8 @@ python3 train.py \
 --tune \
 --no-complex \
 --device best \
---project ml4sci_deeplense_final
+--project ml4sci_deeplense_final \
+--entity $WANDB_ENTITY
 ```
 | Arguments | Description |
 | :---  | :--- |
@@ -60,6 +66,7 @@ python3 train.py \
 | random_rotation | Random rotation for augmentation (in degreees) |
 | log_interval | Log interval for logging to weights and biases |
 | project | Project name in Weight and Biases
+| entity | W&B entity/org (defaults to `$WANDB_ENTITY` when set) |
 | device | Device: cuda or mps or cpu or best |
 | seed | Random seed |
 
@@ -70,7 +77,8 @@ Run evaluation of trained model on test sets using eval.py script. Pass the run_
 python3 eval.py \
 --run_id 1g9hi3n6 \
 --device cuda \
--- project ml4sci_deeplense_final
+--project ml4sci_deeplense_final \
+--entity $WANDB_ENTITY
 ```
 
 <br>

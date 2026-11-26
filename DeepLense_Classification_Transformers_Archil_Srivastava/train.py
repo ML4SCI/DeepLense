@@ -187,6 +187,12 @@ if __name__ == "__main__":
     )
     parser.add_argument("--log_interval", type=int, default=100)
     parser.add_argument("--project", type=str, default="ml4sci_deeplense_final")
+    parser.add_argument(
+        "--entity",
+        type=str,
+        default=os.environ.get("WANDB_ENTITY"),
+        help="W&B entity/org. Defaults to $WANDB_ENTITY when set.",
+    )
 
     # Timm-Specific parameters
     parser.add_argument("--model_name", type=str, default="vit_base_patch16_224")
@@ -233,13 +239,16 @@ if __name__ == "__main__":
         group = f"{group}-complex"
 
     # Start wandb run
-    with wandb.init(
-        entity="_archil",
+    wandb_init_kwargs = dict(
         project=run_config.project,
         config=run_config,
         group=group,
         job_type=f"{run_config.dataset}",
-    ):
+    )
+    if run_config.entity:
+        wandb_init_kwargs["entity"] = run_config.entity
+
+    with wandb.init(**wandb_init_kwargs):
         # Set random seed
         if run_config.seed:
             set_seed(run_config.seed)
@@ -319,7 +328,7 @@ if __name__ == "__main__":
         # Scheduler
         if run_config.decay_lr:
             scheduler = CosineAnnealingWarmRestarts(
-                optimizer, T_0=15, T_mult=1, eta_min=1e-6, verbose=True
+                optimizer, T_0=15, T_mult=1, eta_min=1e-6
             )
         else:
             scheduler = None

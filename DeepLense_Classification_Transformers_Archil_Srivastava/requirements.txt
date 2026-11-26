@@ -1,0 +1,15 @@
+# Usage:
+#   python -m pip install -r requirements.txt
+#
+# Note:
+# - Installing PyTorch differs per OS/CUDA; install it separately if needed:
+#   https://pytorch.org/get-started/locally/
+
+einops>=0.7
+matplotlib>=3.6
+numpy>=1.23
+scikit-learn>=1.2
+timm>=0.9
+torchmetrics>=1.2
+tqdm>=4.60
+wandb>=0.16
