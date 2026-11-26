@@ -234,7 +234,7 @@ if __name__ == "__main__":
 
     # Start wandb run
     with wandb.init(
-        entity="_archil",
+        entity=os.environ.get("WANDB_ENTITY", None),
         project=run_config.project,
         config=run_config,
         group=group,
